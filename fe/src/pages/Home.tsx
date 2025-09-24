@@ -1,0 +1,1048 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Layout } from '../components/layout/Layout';
+import { Modal } from '../components/ui/Modal';
+
+export function Home() {
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', description: '' });
+
+  const handleThemeClick = (theme: string) => {
+    navigate(`/data-list?theme=${theme}`);
+  };
+
+  const handleDataTypeClick = (type: string) => {
+    navigate(`/data-list?type=${type}`);
+  };
+
+  const handleViewAllThemes = () => {
+    navigate('/data-search?type=theme');
+  };
+
+  const handleViewAllDataTypes = () => {
+    navigate('/data-search?type=data_type');
+  };
+
+  const handleServiceClick = (service: string) => {
+    if (service === '장애인 구인구직') {
+      // 환경변수에서 URL 가져와서 새창 열기
+      const employmentUrl = import.meta.env.VITE_EMPLOYMENT_SITE_URL || '#';
+      window.open(employmentUrl, '_blank');
+    } else {
+      // 준비중 모달 표시
+      setModalContent({
+        title: '준비중인 페이지입니다',
+        description: '해당 서비스는 현재 준비 중입니다.\n빠른 시일 내에 서비스할 예정입니다.'
+      });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleSearch = () => {
+    navigate('/data-search');
+  };
+
+  return (
+    <Layout idPrefix="home">
+      {/* Body Area - Figma Design */}
+      <div id="home-body-area" style={{
+        width: '100%',
+        position: 'relative',
+        display: 'inline-block'
+      }}>
+        {/* About Section + Latest Data Section - 2열 구조 */}
+        <div id="home-main-sections" style={{
+          width: '100%',
+          position: 'relative',
+          display: 'inline-block'
+        }}>
+          {/* About Section */}
+          <div id="home-about-section" style={{
+            width: '511px',
+            height: '320px',
+            padding: '32px 40px',
+            position: 'relative',
+            background: '#d0ecff',
+            borderRadius: '16px',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            display: 'inline-flex',
+            verticalAlign: 'top'
+          }}>
+            <div id="home-about-title" style={{
+              alignSelf: 'stretch',
+              color: 'black',
+              fontSize: '32px',
+              fontFamily: 'Pretendard',
+              fontWeight: 700,
+              wordWrap: 'break-word'
+            }}>
+              장애인의 자립에 관하여
+            </div>
+
+            <div id="home-about-description" style={{
+              alignSelf: 'stretch',
+              color: 'black',
+              fontSize: '20px',
+              fontFamily: 'Pretendard',
+              fontWeight: 400,
+              lineHeight: '30px',
+              wordWrap: 'break-word',
+              padding: '16px 0'
+            }}>
+              장애인 자립 지원 허브와 장애인 자립<br />데이터에
+              대해 소개합니다.
+            </div>
+
+            <div style={{
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '2px',
+              display: 'inline-flex'
+            }}>
+              <div style={{
+                color: 'black',
+                fontSize: '20px',
+                fontFamily: 'Pretendard',
+                fontWeight: 700,
+                lineHeight: '26px',
+                wordWrap: 'break-word'
+              }}>
+                자세히 보기
+              </div>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  left: '0px',
+                  top: '0px',
+                  position: 'absolute'
+                }} />
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  backgroundImage: 'url(/right_arrow.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }} />
+              </div>
+            </div>
+
+            <div style={{
+              width: '404px',
+              height: '222px',
+              flexShrink: 0,
+              aspectRatio: '202/111',
+              position: 'absolute',
+              right: 0,
+              bottom: '16px',
+              background: 'url(/main_top.png) 50% / cover no-repeat'
+            }} />
+          </div>
+
+          {/* Latest Data Section */}
+          <div style={{
+            width: '536px',
+            height: '328px',
+            padding: '28px',
+            background: 'white',
+            boxShadow: '0px 0px 100px rgba(0, 0, 0, 0.08)',
+            borderRadius: '16px',
+            outline: '1px #efefef solid',
+            outlineOffset: '-1px',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            marginLeft: '12px',
+            display: 'inline-flex',
+            verticalAlign: 'top'
+          }}>
+            <div style={{
+              color: 'black',
+              fontSize: '24px',
+              fontFamily: 'Pretendard',
+              fontWeight: 600,
+              wordWrap: 'break-word'
+            }}>
+              최신 데이터
+            </div>
+            <div style={{
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: '16px',
+              display: 'flex',
+              marginTop: '24px'
+            }}>
+              {[
+                { category: '기초', title: '장애유형 및 산업별 장애인 근로자 고용현황' },
+                { category: '이동권', title: '서울시 지하철역 엘리베이터 위치정보' },
+                { category: '고용', title: '23패널 코드북 및 조사표' },
+                { category: '기초', title: '운동 시 가장 도움이 되는 지원 사항' },
+                { category: '기초', title: '장애인 생활체육 실행 유형' },
+                { category: '고용', title: '한국장애인고용공단 신규고용장려금 지역별 지급 현황' }
+              ].map((item, index) => (
+                <div key={index} style={{
+                  width: '532px',
+                  height: '31px',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: '10px',
+                  display: 'inline-flex'
+                }}>
+                  <div style={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: '8px',
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      width: '62px',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      paddingTop: '5px',
+                      paddingBottom: '5px',
+                      background: 'rgba(0, 143.88, 255, 0.1)',
+                      borderRadius: '8px',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '10px',
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: '#0086ed',
+                        fontSize: '15px',
+                        fontFamily: 'Pretendard',
+                        fontWeight: 700,
+                        wordWrap: 'break-word'
+                      }}>
+                        {item.category}
+                      </div>
+                    </div>
+                    <div style={{
+                      color: 'black',
+                      fontSize: '20px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 400,
+                      wordWrap: 'break-word'
+                    }}>
+                      {item.title}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Theme Section */}
+        <div id="home-theme-section" style={{
+          width: '1200px',
+          marginTop: '0px',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          gap: '20px',
+          display: 'inline-flex',
+          marginTop: '60px'
+        }}>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            display: 'inline-flex'
+          }}>
+            <div style={{
+              width: '633px',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '8px',
+              display: 'flex'
+            }}>
+              <div id="home-theme-title" style={{
+                color: 'black',
+                fontSize: '28px',
+                fontFamily: 'Pretendard',
+                fontWeight: 600,
+                wordWrap: 'break-word'
+              }}>
+                자립 테마별
+              </div>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  left: '0px',
+                  top: '0px',
+                  position: 'absolute'
+                }} />
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  position: 'absolute',
+                  backgroundImage: 'url(/question.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }} />
+              </div>
+            </div>
+            <div id="home-theme-view-all-btn" style={{
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '2px',
+              display: 'flex',
+              cursor: 'pointer'
+            }}
+            onClick={handleViewAllThemes}
+            >
+              <div id="home-theme-view-all-btn-text" style={{
+                color: 'black',
+                fontSize: '20px',
+                fontFamily: 'Pretendard',
+                fontWeight: 600,
+                lineHeight: '26px',
+                wordWrap: 'break-word'
+              }}>
+                전체보기
+              </div>
+              <div id="home-theme-view-all-btn-icon" style={{
+                width: '28px',
+                height: '28px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  left: '0px',
+                  top: '0px',
+                  position: 'absolute'
+                }} />
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  backgroundImage: 'url(/right_arrow.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }} />
+              </div>
+            </div>
+          </div>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '16px',
+            display: 'inline-flex'
+          }}>
+            {/* Physical Card */}
+            <div id="home-theme-card-phy" style={{
+              flex: '1 1 0',
+              height: '104px',
+              padding: '28px',
+              position: 'relative',
+              background: '#ffeef2',
+              overflow: 'hidden',
+              borderRadius: '16px',
+              outline: '1px #ffdde5 solid',
+              outlineOffset: '-1px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              display: 'inline-flex',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleThemeClick('phy')}
+            >
+              <div id="home-theme-card-phy-title" style={{
+                color: 'black',
+                fontSize: '24px',
+                fontFamily: 'Pretendard',
+                fontWeight: 500,
+                wordWrap: 'break-word'
+              }}>
+                신체적 자립
+              </div>
+              <div id="home-theme-card-phy-count" style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: '4px',
+                display: 'inline-flex'
+              }}>
+                <div id="home-theme-card-phy-count-number" style={{
+                  color: 'black',
+                  fontSize: '30px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 700,
+                  wordWrap: 'break-word'
+                }}>
+                  181
+                </div>
+                <div id="home-theme-card-phy-count-unit" style={{
+                  color: 'black',
+                  fontSize: '24px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 500,
+                  wordWrap: 'break-word'
+                }}>
+                  건
+                </div>
+              </div>
+              <div id="home-theme-card-phy-image" style={{
+                width: '146px',
+                height: '146px',
+                position: 'absolute',
+                right: 0,
+                bottom: '-20px',
+                backgroundImage: 'url(/medal2.png)',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
+              }} />
+            </div>
+
+            {/* Emotional Card */}
+            <div id="home-theme-card-emo" style={{
+              flex: '1 1 0',
+              height: '104px',
+              padding: '28px',
+              position: 'relative',
+              background: '#fffdee',
+              overflow: 'hidden',
+              borderRadius: '16px',
+              outline: '1px #fff6b4 solid',
+              outlineOffset: '-1px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              display: 'inline-flex',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleThemeClick('emo')}
+            >
+              <div id="home-theme-card-emo-title" style={{
+                color: 'black',
+                fontSize: '24px',
+                fontFamily: 'Pretendard',
+                fontWeight: 500,
+                wordWrap: 'break-word'
+              }}>
+                정서적 자립
+              </div>
+              <div id="home-theme-card-emo-count" style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: '4px',
+                display: 'inline-flex'
+              }}>
+                <div id="home-theme-card-emo-count-number" style={{
+                  color: 'black',
+                  fontSize: '30px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 700,
+                  wordWrap: 'break-word'
+                }}>
+                  2,311
+                </div>
+                <div id="home-theme-card-emo-count-unit" style={{
+                  color: 'black',
+                  fontSize: '24px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 500,
+                  wordWrap: 'break-word'
+                }}>
+                  건
+                </div>
+              </div>
+              <div id="home-theme-card-emo-image" style={{
+                width: '146px',
+                height: '146px',
+                transform: 'rotate(-8deg)',
+                transformOrigin: 'top left',
+                backgroundImage: 'url(/lightbulb.png)',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                position: 'absolute',
+                right: 0,
+                bottom: '-25px',
+                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
+              }} />
+              <div id="home-theme-card-emo-overlay" style={{
+                width: '65px',
+                height: '65px',
+                left: '166px',
+                top: '24px',
+                position: 'absolute',
+                background: 'radial-gradient(ellipse 50% 50% at 50% 50%, white 0%, rgba(255, 255, 255, 0) 42%)',
+                borderRadius: '9999px'
+              }} />
+            </div>
+
+            {/* Economic Card */}
+            <div id="home-theme-card-econ" style={{
+              flex: '1 1 0',
+              height: '104px',
+              padding: '28px',
+              position: 'relative',
+              background: '#eefff2',
+              overflow: 'hidden',
+              borderRadius: '16px',
+              outline: '1px #d9f5df solid',
+              outlineOffset: '-1px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              display: 'inline-flex',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleThemeClick('econ')}
+            >
+              <div id="home-theme-card-econ-title" style={{
+                color: 'black',
+                fontSize: '24px',
+                fontFamily: 'Pretendard',
+                fontWeight: 500,
+                wordWrap: 'break-word'
+              }}>
+                경제적 자립
+              </div>
+              <div id="home-theme-card-econ-count" style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: '4px',
+                display: 'inline-flex'
+              }}>
+                <div id="home-theme-card-econ-count-number" style={{
+                  color: 'black',
+                  fontSize: '30px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 700,
+                  wordWrap: 'break-word'
+                }}>
+                  31
+                </div>
+                <div id="home-theme-card-econ-count-unit" style={{
+                  color: 'black',
+                  fontSize: '24px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 500,
+                  wordWrap: 'break-word'
+                }}>
+                  건
+                </div>
+              </div>
+              <div id="home-theme-card-econ-image" style={{
+                width: '156px',
+                height: '156px',
+                backgroundImage: 'url(/money.png)',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                transform: 'rotate(-19deg)',
+                transformOrigin: 'top left',
+                position: 'absolute',
+                right: 0,
+                bottom: '-40px',
+                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
+              }} />
+            </div>
+
+            {/* Social Card */}
+            <div id="home-theme-card-soc" style={{
+              flex: '1 1 0',
+              height: '104px',
+              padding: '28px',
+              position: 'relative',
+              background: '#eef8ff',
+              overflow: 'hidden',
+              borderRadius: '16px',
+              outline: '1px #d0ecff solid',
+              outlineOffset: '-1px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              display: 'inline-flex',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleThemeClick('soc')}
+            >
+              <div id="home-theme-card-soc-title" style={{
+                color: 'black',
+                fontSize: '24px',
+                fontFamily: 'Pretendard',
+                fontWeight: 500,
+                wordWrap: 'break-word'
+              }}>
+                사회적 자립
+              </div>
+              <div id="home-theme-card-soc-count" style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: '4px',
+                display: 'inline-flex'
+              }}>
+                <div id="home-theme-card-soc-count-number" style={{
+                  color: 'black',
+                  fontSize: '30px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 700,
+                  wordWrap: 'break-word'
+                }}>
+                  75
+                </div>
+                <div id="home-theme-card-soc-count-unit" style={{
+                  color: 'black',
+                  fontSize: '24px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 500,
+                  wordWrap: 'break-word'
+                }}>
+                  건
+                </div>
+              </div>
+              <div id="home-theme-card-soc-image" style={{
+                width: '150px',
+                height: '150px',
+                backgroundImage: 'url(/chat.png)',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                position: 'absolute',
+                right: 0,
+                bottom: 0,
+                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Data Type Section */}
+        <div id="home-data-type-section" style={{
+          width: '1200px',
+          marginTop: '60px',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          gap: '20px',
+          display: 'inline-flex'
+        }}>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            display: 'inline-flex'
+          }}>
+            <div id="home-data-type-title" style={{
+              color: 'black',
+              fontSize: '28px',
+              fontFamily: 'Pretendard',
+              fontWeight: 600,
+              wordWrap: 'break-word'
+            }}>
+              데이터 유형별
+            </div>
+            <div id="home-data-type-view-all-btn" style={{
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '2px',
+              display: 'flex',
+              cursor: 'pointer'
+            }}
+            onClick={handleViewAllDataTypes}
+            >
+              <div id="home-data-type-view-all-btn-text" style={{
+                color: 'black',
+                fontSize: '20px',
+                fontFamily: 'Pretendard',
+                fontWeight: 600,
+                lineHeight: '26px',
+                wordWrap: 'break-word'
+              }}>
+                전체보기
+              </div>
+              <div id="home-data-type-view-all-btn-icon" style={{
+                width: '28px',
+                height: '28px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  left: '0px',
+                  top: '0px',
+                  position: 'absolute'
+                }} />
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  backgroundImage: 'url(/right_arrow.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }} />
+              </div>
+            </div>
+          </div>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '16px',
+            display: 'inline-flex'
+          }}>
+            {[
+              { title: '기초 데이터', count: 2790, type: 'basic' },
+              { title: '이동권 데이터', count: 312, type: 'poi' },
+              { title: '고용 데이터', count: 56, type: 'emp' }
+            ].map((type, index) => (
+              <div key={index} id={`home-data-type-card-${type.type}`} style={{
+                flex: '1 1 0',
+                height: '104px',
+                paddingTop: '28px',
+                paddingBottom: '28px',
+                paddingLeft: '40px',
+                paddingRight: '28px',
+                background: '#fafcfd',
+                overflow: 'hidden',
+                borderRadius: '16px',
+                outline: '1px #e3e3e3 solid',
+                outlineOffset: '-1px',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                display: 'flex',
+                cursor: 'pointer'
+              }}
+              onClick={() => handleDataTypeClick(type.type)}
+              >
+                <div id={`home-data-type-card-${type.type}-content`} style={{
+                  alignSelf: 'stretch',
+                  paddingTop: '12px',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  gap: '16px',
+                  display: 'inline-flex'
+                }}>
+                  <div id={`home-data-type-card-${type.type}-title`} style={{
+                    color: 'black',
+                    fontSize: '24px',
+                    fontFamily: 'Pretendard',
+                    fontWeight: 600,
+                    wordWrap: 'break-word'
+                  }}>
+                    {type.title}
+                  </div>
+                  <div id={`home-data-type-card-${type.type}-count`} style={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: '4px',
+                    display: 'inline-flex'
+                  }}>
+                    <div id={`home-data-type-card-${type.type}-count-number`} style={{
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      gap: '6px',
+                      display: 'flex'
+                    }}>
+                      <div id={`home-data-type-card-${type.type}-count-number-value`} style={{
+                        color: '#0090ff',
+                        fontSize: '32px',
+                        fontFamily: 'Pretendard',
+                        fontWeight: 700,
+                        wordWrap: 'break-word'
+                      }}>
+                        {type.count.toLocaleString()}
+                      </div>
+                    </div>
+                    <div id={`home-data-type-card-${type.type}-count-unit`} style={{
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      gap: '6px',
+                      display: 'flex'
+                    }}>
+                      <div id={`home-data-type-card-${type.type}-count-unit-text`} style={{
+                        color: 'black',
+                        fontSize: '24px',
+                        fontFamily: 'Pretendard',
+                        fontWeight: 500,
+                        wordWrap: 'break-word'
+                      }}>
+                        건
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id={`home-data-type-card-${type.type}-icon`} style={{
+                  width: '52px',
+                  height: '52px',
+                  background: 'white',
+                  overflow: 'hidden',
+                  borderRadius: '100px',
+                  outline: '1px #d9d9d9 solid',
+                  outlineOffset: '-1px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  display: 'flex'
+                }}>
+                  <div id={`home-data-type-card-${type.type}-icon-image`} style={{
+                    width: '32px',
+                    height: '32px',
+                    backgroundImage: 'url(/right_up.svg)',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center'
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Self Check Section */}
+        <div id="home-self-check-section" style={{
+          width: '100vw',
+          height: '289px',
+          marginLeft: '50%',
+          transform: 'translateX(-50%)',
+          background: '#f0f8ff',
+          marginTop: '60px'
+        }}>
+          <div id="home-self-check-container" style={{
+            margin: '0 auto',
+            width: '1200px',
+            position: 'relative'
+          }}>
+            <div id="home-self-check-title" style={{
+              paddingTop: '52px',
+              color: 'black',
+              fontSize: '28px',
+              fontFamily: 'Pretendard',
+              fontWeight: 600,
+              wordWrap: 'break-word'
+            }}>
+              자립 수준 자가 진단
+            </div>
+            <div id="home-self-check-description" style={{
+              color: 'black',
+              fontSize: '20px',
+              fontFamily: 'Pretendard',
+              fontWeight: 400,
+              lineHeight: '30px',
+              wordWrap: 'break-word',
+              marginTop: '12px'
+            }}>
+              간단한 자가 진단으로 자립 수준을 확인하고, 맞춤
+              정보를 바로 만나보세요.
+            </div>
+            <Link to="/self-check/start">
+              <div id="home-self-check-btn" style={{
+                padding: '18px 28px',
+                background: '#0090ff',
+                borderRadius: '16px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                display: 'inline-flex',
+                marginTop: '44px',
+                cursor: 'pointer'
+              }}>
+                <div id="home-self-check-btn-text" style={{
+                  textAlign: 'center',
+                  color: 'white',
+                  fontSize: '20px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 700,
+                  wordWrap: 'break-word'
+                }}>
+                  자가 진단 바로가기
+                </div>
+              </div>
+            </Link>
+            <div id="home-self-check-image" style={{
+              width: '191px',
+              height: '191px',
+              transform: 'rotate(15deg)',
+              transformOrigin: 'top left',
+              backgroundImage: 'url(/contract.png)',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
+            }} />
+          </div>
+        </div>
+
+        {/* Services Section */}
+        <div id="home-services-section" style={{
+          width: '1200px',
+          marginTop: '60px',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          gap: '24px',
+          display: 'inline-flex'
+        }}>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '20px',
+            display: 'inline-flex'
+          }}>
+            <div id="home-services-title" style={{
+              color: 'black',
+              fontSize: '28px',
+              fontFamily: 'Pretendard',
+              fontWeight: 600,
+              wordWrap: 'break-word'
+            }}>
+              자립 지원 서비스
+            </div>
+          </div>
+          <div style={{
+            alignSelf: 'stretch',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '24px',
+            display: 'inline-flex'
+          }}>
+            {[
+              {
+                title: '보행 약자 맵',
+                description: '경사도, 계단, 엘리베이터 등 보행 환경\n정보를 표시해 안전한 길찾기를 돕는 지도\n서비스'
+              },
+              {
+                title: '장애인 구인구직',
+                description: '장애인 맞춤형 일자리 정보를 제공하고\n기업과\n구직자를 연결하는 취업 지원\n플랫폼'
+              },
+              {
+                title: '무장애 관광 지도',
+                description: '휠체어 접근 가능 시설과 편의시설 정보를\n담아\n누구나 즐길 수 있는 여행지를\n안내하는 지도 서비스'
+              }
+            ].map((service, index) => (
+              <div key={index} id={`home-service-card-${index + 1}`} style={{
+                flex: '1 1 0',
+                background: 'white',
+                boxShadow: '0px 4px 100px 8px rgba(0, 0, 0, 0.08)',
+                overflow: 'hidden',
+                borderRadius: '16px',
+                outline: '1px #efefef solid',
+                outlineOffset: '-1px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                display: 'inline-flex',
+                cursor: 'pointer'
+              }}
+              onClick={() => handleServiceClick(service.title)}
+              >
+                <div id={`home-service-card-${index + 1}-content`} style={{
+                  position: 'relative',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  display: 'flex'
+                }}>
+                  <div id={`home-service-card-${index + 1}-image`} style={{
+                    width: '384px',
+                    height: '248px',
+                    background: '#d9d9d9'
+                  }} />
+                  <div id={`home-service-card-${index + 1}-icon`} style={{
+                    width: '24px',
+                    height: '24px',
+                    left: '180px',
+                    top: '112px',
+                    position: 'absolute',
+                    overflow: 'hidden'
+                  }}>
+                    <div id={`home-service-card-${index + 1}-icon-image`} style={{
+                      width: '20px',
+                      height: '18.02px',
+                      left: '2px',
+                      top: '3px',
+                      position: 'absolute',
+                      background: '#03053d'
+                    }} />
+                  </div>
+                </div>
+                <div id={`home-service-card-${index + 1}-text`} style={{
+                  alignSelf: 'stretch',
+                  padding: '28px',
+                  background: 'white',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  display: 'flex'
+                }}>
+                  <div id={`home-service-card-${index + 1}-title-container`} style={{
+                    alignSelf: 'stretch',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    display: 'inline-flex'
+                  }}>
+                    <div id={`home-service-card-${index + 1}-title`} style={{
+                      color: 'black',
+                      fontSize: '24px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 600,
+                      wordWrap: 'break-word'
+                    }}>
+                      {service.title}
+                    </div>
+                  </div>
+                  <div id={`home-service-card-${index + 1}-description`} style={{
+                    alignSelf: 'stretch',
+                    color: 'black',
+                    fontSize: '16px',
+                    fontFamily: 'Pretendard',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-line'
+                  }}>
+                    {service.description}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      <Modal
+        id="home-modal"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={modalContent.title}
+        description={modalContent.description}
+        primaryButtonText="확인"
+        secondaryButtonText=""
+        onPrimaryClick={() => setIsModalOpen(false)}
+      />
+    </Layout>
+  );
+}

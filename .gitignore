@@ -1,0 +1,201 @@
+# ========================================
+# IITP DABT Admin - Monorepo .gitignore
+# ========================================
+
+# ========================================
+# Dependencies
+# ========================================
+node_modules/
+.pnp
+.pnp.js
+
+# ========================================
+# Logs
+# ========================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ========================================
+# Production Builds
+# ========================================
+# Root level
+build/
+dist/
+
+# Frontend
+fe/dist/
+fe/build/
+
+# Backend
+be/dist/
+be/build-info.json
+
+# Common package
+packages/common/dist/
+
+# ========================================
+# Environment Variables
+# ========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Frontend specific
+fe/.env
+fe/.env.*
+
+# Backend specific
+be/.env
+be/.env.*
+
+# ========================================
+# Testing
+# ========================================
+coverage/
+*.lcov
+
+# Frontend specific
+fe/coverage/
+
+# Backend specific
+be/coverage/
+
+# ========================================
+# IDE & Editor
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Frontend specific
+fe/.vscode/
+fe/.idea/
+
+# Backend specific
+be/.vscode/
+be/.idea/
+
+# ========================================
+# OS Generated Files
+# ========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Frontend specific
+fe/.DS_Store
+
+# Backend specific
+be/.DS_Store
+
+# Common package specific
+packages/common/.DS_Store
+
+# ========================================
+# Temporary Files
+# ========================================
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Frontend specific
+fe/tmp/
+fe/temp/
+
+# Backend specific
+be/tmp/
+be/temp/
+
+# ========================================
+# Process Management
+# ========================================
+# PM2
+pids/
+*.pid
+
+# Frontend specific
+fe/pids/
+fe/*.pid
+
+# Backend specific
+be/pids/
+be/*.pid
+
+# ========================================
+# Local Development
+# ========================================
+# Local deployment config (임시 로컬 배포 설정 파일)
+script/deploy-config.json
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================================
+# Package Manager
+# ========================================
+# npm
+.npm
+.npmrc
+
+# yarn
+.yarn-integrity
+.yarnrc
+
+# pnpm
+.pnpm-store/
+
+# ========================================
+# TypeScript
+# ========================================
+*.tsbuildinfo
+
+# ========================================
+# Security
+# ========================================
+# Private keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ========================================
+# Backup Files
+# ========================================
+*.bak
+*.backup
+*~
+
+# ========================================
+# Archive Files
+# ========================================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ========================================
+# Documentation Build
+# ========================================
+docs/build/
+docs/_build/
+01.references/
+
+iitp_plaform_requirement.md

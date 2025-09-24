@@ -1,0 +1,526 @@
+:root {
+  /* Color System - Figma Design System */
+  --color-primary: #0090ff;
+  --color-primary-hover: #007acc;
+  --color-primary-light: #e6f3ff;
+  --color-primary-dark: #0056b3;
+  
+  /* Figma Neutral Colors */
+  --color-neutral-black: #000000;
+  --color-neutral-light-black: #000000;
+  
+  /* Figma Theme Colors */
+  --color-theme-physical: #e8f5e8;
+  --color-theme-physical-border: #4caf50;
+  --color-theme-emotional: #fff3e0;
+  --color-theme-emotional-border: #ff9800;
+  --color-theme-economic: #e3f2fd;
+  --color-theme-economic-border: #2196f3;
+  --color-theme-social: #f3e5f5;
+  --color-theme-social-border: #9c27b0;
+  
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-info: #17a2b8;
+  
+  /* Theme Colors from Figma */
+  --color-theme-physical: #ffeef2;
+  --color-theme-physical-border: #ffdde5;
+  --color-theme-emotional: #fffdee;
+  --color-theme-emotional-border: #fff6b4;
+  --color-theme-economic: #eefff2;
+  --color-theme-economic-border: #d9f5df;
+  --color-theme-social: #eef8ff;
+  --color-theme-social-border: #d0ecff;
+  
+  /* Text Colors */
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-muted: #adb5bd;
+  --color-text-inverse: #ffffff;
+  
+  /* Background Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #e9ecef;
+  --color-bg-info: #f0f8ff;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Border Colors */
+  --color-border-primary: #dee2e6;
+  --color-border-secondary: #e9ecef;
+  --color-border-focus: var(--color-primary);
+  
+  /* Typography System - Pretendard Font */
+  --font-family-primary: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Font Sizes - Consistent Scale */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 32px;
+  --font-size-5xl: 36px;
+  --font-size-6xl: 48px;
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+  
+  /* Spacing System - 8px Grid */
+  --spacing-0: 0;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Shadows - Layered System */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  /* Z-Index Scale */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  
+  /* Breakpoints - Mobile First */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* Container Max Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1400px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Focus Styles */
+  --focus-ring: 0 0 0 3px rgba(0, 144, 255, 0.1);
+  --focus-ring-offset: 2px;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { 
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+/* Container System - 1920px 최적화 */
+.container { 
+  width: 100%;
+  max-width: 1200px; /* 1920px에서 최적 가독성 */
+  margin: 0 auto;
+  padding: 0 var(--spacing-6);
+}
+
+/* 1920px 이상 - 여유 공간 활용 */
+@media (min-width: 1920px) {
+  .container { 
+    max-width: 1400px; /* 1920px에서 적절한 여백 */
+    padding: 0 var(--spacing-8);
+  }
+}
+
+/* 2560px 이상 - 대형 모니터 */
+@media (min-width: 2560px) {
+  .container { 
+    max-width: 1600px;
+    padding: 0 var(--spacing-10);
+  }
+}
+
+/* 1440px~1919px - 표준 PC */
+@media (max-width: 1919px) {
+  .container { 
+    max-width: 1200px;
+    padding: 0 var(--spacing-6);
+  }
+}
+
+/* 1024px~1439px - 태블릿 가로 */
+@media (max-width: 1439px) {
+  .container { 
+    max-width: 100%;
+    padding: 0 var(--spacing-4);
+  }
+}
+
+/* 768px 이하 - 모바일 */
+@media (max-width: 768px) {
+  .container { 
+    padding: 0 var(--spacing-3);
+  }
+}
+
+/* Grid System - 1920px 최적화 */
+.grid {
+  display: grid;
+  gap: var(--spacing-6);
+}
+
+/* 기본 그리드 (1920px 기준) */
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 1920px 이상 - 더 넓은 그리드 */
+@media (min-width: 1920px) {
+  .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .grid { gap: var(--spacing-8); }
+}
+
+/* 2560px 이상 - 대형 모니터 */
+@media (min-width: 2560px) {
+  .grid { gap: var(--spacing-10); }
+}
+
+/* 1440px~1919px - 표준 PC */
+@media (max-width: 1919px) {
+  .grid { gap: var(--spacing-6); }
+}
+
+/* 1024px~1439px - 태블릿 가로 */
+@media (max-width: 1439px) {
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid { gap: var(--spacing-4); }
+}
+
+/* 768px 이하 - 모바일 */
+@media (max-width: 768px) {
+  .grid-cols-4,
+  .grid-cols-3,
+  .grid-cols-2 { grid-template-columns: repeat(1, 1fr); }
+  .grid { gap: var(--spacing-3); }
+}
+
+/* 특별한 그리드 레이아웃 */
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .grid-auto-fit {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive Flexbox */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+@media (min-width: 768px) {
+  .md\:flex-row { flex-direction: row; }
+  .md\:items-start { align-items: flex-start; }
+  .md\:justify-start { justify-content: flex-start; }
+}
+
+/* Responsive Spacing */
+.p-0 { padding: 0; }
+.p-1 { padding: var(--spacing-1); }
+.p-2 { padding: var(--spacing-2); }
+.p-4 { padding: var(--spacing-4); }
+.p-6 { padding: var(--spacing-6); }
+.p-8 { padding: var(--spacing-8); }
+
+.px-4 { padding-left: var(--spacing-4); padding-right: var(--spacing-4); }
+.py-4 { padding-top: var(--spacing-4); padding-bottom: var(--spacing-4); }
+
+@media (min-width: 768px) {
+  .md\:px-6 { padding-left: var(--spacing-6); padding-right: var(--spacing-6); }
+  .md\:py-8 { padding-top: var(--spacing-8); padding-bottom: var(--spacing-8); }
+}
+
+/* Typography - 1920px 최적화 */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+.text-6xl { font-size: var(--font-size-6xl); }
+
+/* 1920px 이상 - 더 큰 폰트 */
+@media (min-width: 1920px) {
+  .text-6xl { font-size: 56px; }
+  .text-5xl { font-size: 48px; }
+  .text-4xl { font-size: 40px; }
+  .text-3xl { font-size: 32px; }
+}
+
+/* 1440px~1919px - 표준 PC */
+@media (max-width: 1919px) {
+  .text-6xl { font-size: var(--font-size-6xl); }
+  .text-5xl { font-size: var(--font-size-5xl); }
+  .text-4xl { font-size: var(--font-size-4xl); }
+}
+
+/* 1024px~1439px - 태블릿 가로 */
+@media (max-width: 1439px) {
+  .text-6xl { font-size: var(--font-size-5xl); }
+  .text-5xl { font-size: var(--font-size-4xl); }
+  .text-4xl { font-size: var(--font-size-3xl); }
+  .text-3xl { font-size: var(--font-size-2xl); }
+}
+
+/* 768px 이하 - 모바일 */
+@media (max-width: 768px) {
+  .text-6xl { font-size: var(--font-size-4xl); }
+  .text-5xl { font-size: var(--font-size-3xl); }
+  .text-4xl { font-size: var(--font-size-2xl); }
+  .text-3xl { font-size: var(--font-size-xl); }
+  .text-2xl { font-size: var(--font-size-lg); }
+}
+
+/* Responsive Visibility */
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+
+/* Navigation Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-3);
+  }
+  
+  /* Mobile Navigation */
+  #layout-navigation {
+    display: none;
+  }
+  
+  /* Mobile Menu Button */
+  .mobile-menu-btn {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+  }
+  
+  /* Mobile Menu Overlay */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-bg-overlay);
+    z-index: var(--z-index-modal);
+    display: none;
+  }
+  
+  .mobile-menu.active {
+    display: block;
+  }
+  
+  .mobile-menu-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--color-bg-primary);
+    box-shadow: var(--shadow-xl);
+    padding: var(--spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+  
+  .mobile-menu-close {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+  }
+  
+  .mobile-menu-link {
+    display: block;
+    padding: var(--spacing-3) 0;
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: 18px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+  
+  .mobile-menu-link:hover {
+    color: var(--color-primary);
+  }
+}
+
+/* Hero Section - Figma Design */
+.hero-section {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #007acc 100%);
+  color: white;
+  padding: 80px 0;
+  margin-bottom: 60px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 20px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 40px;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.hero-stat-label {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.hero-cta {
+  background: white;
+  color: var(--color-primary);
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 144, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 36px;
+  }
+  
+  .hero-description {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .sm\:block { display: block; }
+  .sm\:hidden { display: none; }
+}
+
+@media (min-width: 768px) {
+  .md\:block { display: block; }
+  .md\:hidden { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:block { display: block; }
+  .lg\:hidden { display: none; }
+}
+

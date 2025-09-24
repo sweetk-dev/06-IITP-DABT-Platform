@@ -1,0 +1,13 @@
+{
+  "endpoints": [
+    {
+      "url": "http://localhost:3333/sse",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+        "Cache-Control": "no-cache"
+      }
+    }
+  ]
+}
