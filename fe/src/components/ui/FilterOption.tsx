@@ -4,7 +4,7 @@ import { Tag } from './Tag';
 interface FilterOptionProps {
   id: string;
   name: string;
-  count: number;
+  count?: number;
   icon?: ReactNode;
   isActive?: boolean;
   onClick?: () => void;
@@ -47,14 +47,16 @@ export function FilterOption({ id, name, count, icon, isActive = false, onClick 
         {icon}
         <span id={`${id}-name`}>{name}</span>
       </div>
-      <span id={`${id}-count`} style={{
-        fontSize: '14px',
-        fontFamily: 'Pretendard',
-        fontWeight: 500,
-        color: isActive ? '#0090ff' : '#666'
-      }}>
-        {count}
-      </span>
+      {count !== undefined && (
+        <span id={`${id}-count`} style={{
+          fontSize: '14px',
+          fontFamily: 'Pretendard',
+          fontWeight: 500,
+          color: isActive ? '#0090ff' : '#666'
+        }}>
+          {count}
+        </span>
+      )}
     </button>
   );
 }

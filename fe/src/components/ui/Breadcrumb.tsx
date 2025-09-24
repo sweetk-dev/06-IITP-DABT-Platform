@@ -99,9 +99,16 @@ export function getBreadcrumbItems(pathname: string, params?: Record<string, str
       return [{ label: '홈', active: true }];
       
     case '/data':
+    case '/data-list':
       return [
         { label: '홈', href: '/' },
         { label: '데이터 목록', active: true }
+      ];
+      
+    case '/data-search':
+      return [
+        { label: '홈', href: '/' },
+        { label: '검색 결과', active: true }
       ];
       
     case '/data/' + (params?.id || ''):

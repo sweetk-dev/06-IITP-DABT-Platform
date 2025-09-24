@@ -96,12 +96,18 @@ export function Home() {
               대해 소개합니다.
             </div>
 
-            <div style={{
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '2px',
-              display: 'inline-flex'
-            }}>
+            <Link 
+              to="/info"
+              id="home-about-detail-btn"
+              style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: '2px',
+                display: 'inline-flex',
+                cursor: 'pointer',
+                textDecoration: 'none'
+              }}
+            >
               <div style={{
                 color: 'black',
                 fontSize: '20px',
@@ -134,7 +140,7 @@ export function Home() {
                   backgroundPosition: 'center'
                 }} />
               </div>
-            </div>
+            </Link>
 
             <div style={{
               width: '404px',

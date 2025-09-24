@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
 import { Breadcrumb, getBreadcrumbItems } from '../ui/Breadcrumb';
 import { MobileNavigation } from '../ui/MobileNavigation';
+import { HeaderSearch } from '../ui/HeaderSearch';
 
 interface LayoutProps {
   idPrefix?: string;
@@ -26,22 +27,6 @@ export function Layout({
   const shouldShowBreadcrumb = location.pathname !== '/';
   const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, params) : [];
 
-  const handleSearchClick = () => {
-    // 검색 박스 클릭 시 포커스만 주고 이동하지 않음
-    const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (searchInput) {
-      searchInput.focus();
-    }
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const searchInput = e.currentTarget.querySelector('input[type="text"]') as HTMLInputElement;
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm) {
-      navigate(`/data-search?q=${encodeURIComponent(searchTerm)}`);
-    }
-  };
 
   return (
     <div id={`${idPrefix}-root`} style={{
@@ -67,65 +52,25 @@ export function Layout({
               position: 'relative',
               height: '118px'
             }}>
-              <div id={`${idPrefix}-header-title`} style={{
-                color: 'black',
-                fontSize: '30px',
-                fontFamily: 'Pretendard',
-                fontWeight: 700,
-                wordWrap: 'break-word',
-                marginTop: '44px',
-                display: 'inline-block'
-              }}>
-                장애인 자립 지원 허브
-              </div>
-
-              <div id={`${idPrefix}-search-box`} style={{
-                width: '485px',
-                paddingLeft: '24px',
-                paddingRight: '24px',
-                paddingTop: '16px',
-                paddingBottom: '16px',
-                background: '#f3f5f8',
-                borderRadius: '16px',
-                outline: '1px #f1f3f7 solid',
-                outlineOffset: '-1px',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                display: 'inline-flex',
-                float: 'right',
-                marginTop: '34px',
-                cursor: 'pointer'
-              }}
-              onClick={handleSearchClick}
-              >
-                <div id={`${idPrefix}-search-placeholder`} style={{
-                  color: 'rgba(0, 0, 0, 0.5)',
-                  fontSize: '18px',
+              <Link 
+                to="/"
+                id={`${idPrefix}-header-title`} 
+                style={{
+                  color: 'black',
+                  fontSize: '30px',
                   fontFamily: 'Pretendard',
-                  fontWeight: 400,
-                  wordWrap: 'break-word'
-                }}>
-                  검색어를 입력하세요
-                </div>
-                <div id={`${idPrefix}-search-icon-container`} style={{
-                  width: '24px',
-                  height: '24px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  <div id={`${idPrefix}-search-icon`} style={{
-                    width: '20.31px',
-                    height: '20.31px',
-                    left: '2px',
-                    top: '2px',
-                    position: 'absolute',
-                    backgroundImage: 'url(/search_ico.svg)',
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                  }} />
-                </div>
-              </div>
+                  fontWeight: 700,
+                  wordWrap: 'break-word',
+                  marginTop: '44px',
+                  display: 'inline-block',
+                  textDecoration: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                장애인 자립 지원 허브
+              </Link>
+
+              <HeaderSearch idPrefix={idPrefix} />
             </div>
 
             {/* Divider Line */}
@@ -158,7 +103,7 @@ export function Layout({
         <div id={`${idPrefix}-main-content`} style={{
           width: '100%',
           position: 'relative',
-          marginTop: showBreadcrumb ? '0' : '28px'
+          marginTop: shouldShowBreadcrumb ? '0' : '28px'
         }}>
           {children}
         </div>
