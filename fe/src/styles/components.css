@@ -159,3 +159,34 @@
   color: var(--color-text-secondary);
 }
 
+/* Card Stats Styles for Home Page */
+.card-stats {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.stat-item {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  display: flex;
+}
+
+.stat-number {
+  color: #0090ff;
+  font-size: 32px;
+  font-family: Pretendard;
+  font-weight: 700;
+  word-wrap: break-word;
+}
+
+.stat-unit {
+  color: black;
+  font-size: 24px;
+  font-family: Pretendard;
+  font-weight: 500;
+  word-wrap: break-word;
+}
+

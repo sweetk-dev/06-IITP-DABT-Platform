@@ -30,9 +30,9 @@ export function Home() {
       const employmentUrl = import.meta.env.VITE_EMPLOYMENT_SITE_URL || '#';
       window.open(employmentUrl, '_blank');
     } else {
-      // 준비중 모달 표시
+      // 준비중 모달 표시 - 클릭한 서비스에 따라 다른 타이틀
       setModalContent({
-        title: '준비중인 페이지입니다',
+        title: `${service}으로 이동`,
         description: '해당 서비스는 현재 준비 중입니다.\n빠른 시일 내에 서비스할 예정입니다.'
       });
       setIsModalOpen(true);
@@ -54,13 +54,14 @@ export function Home() {
         {/* About Section + Latest Data Section - 2열 구조 */}
         <div id="home-main-sections" style={{
           width: '100%',
-          position: 'relative',
-          display: 'inline-block'
+          display: 'flex',
+          gap: '16px',
+          marginTop: '60px'
         }}>
           {/* About Section */}
           <div id="home-about-section" style={{
-            width: '511px',
-            height: '320px',
+            flex: '1',
+            height: '380px',
             padding: '32px 40px',
             position: 'relative',
             background: '#d0ecff',
@@ -68,8 +69,7 @@ export function Home() {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            display: 'inline-flex',
-            verticalAlign: 'top'
+            display: 'flex'
           }}>
             <div id="home-about-title" style={{
               alignSelf: 'stretch',
@@ -143,21 +143,22 @@ export function Home() {
             </Link>
 
             <div style={{
-              width: '404px',
-              height: '222px',
+              width: '300px',
+              height: '166px',
               flexShrink: 0,
               aspectRatio: '202/111',
               position: 'absolute',
-              right: 0,
-              bottom: '16px',
-              background: 'url(/main_top.png) 50% / cover no-repeat'
+              right: '20px',
+              bottom: '20px',
+              background: 'url(/main_top.png) 50% / cover no-repeat',
+              zIndex: 1
             }} />
           </div>
 
           {/* Latest Data Section */}
           <div style={{
-            width: '536px',
-            height: '328px',
+            flex: '1',
+            height: '380px',
             padding: '28px',
             background: 'white',
             boxShadow: '0px 0px 100px rgba(0, 0, 0, 0.08)',
@@ -167,9 +168,7 @@ export function Home() {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            marginLeft: '12px',
-            display: 'inline-flex',
-            verticalAlign: 'top'
+            display: 'flex'
           }}>
             <div style={{
               color: 'black',
@@ -197,12 +196,12 @@ export function Home() {
                 { category: '고용', title: '한국장애인고용공단 신규고용장려금 지역별 지급 현황' }
               ].map((item, index) => (
                 <div key={index} style={{
-                  width: '532px',
+                  width: '100%',
                   height: '31px',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
                   gap: '10px',
-                  display: 'inline-flex'
+                  display: 'flex'
                 }}>
                   <div style={{
                     justifyContent: 'flex-start',
@@ -223,22 +222,26 @@ export function Home() {
                       gap: '10px',
                       display: 'flex'
                     }}>
-                      <div style={{
-                        color: '#0086ed',
-                        fontSize: '15px',
-                        fontFamily: 'Pretendard',
-                        fontWeight: 700,
-                        wordWrap: 'break-word'
-                      }}>
-                        {item.category}
-                      </div>
+                    <div style={{
+                      color: '#0086ed',
+                      fontSize: '15px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 700,
+                      wordWrap: 'break-word'
+                    }}>
+                      {item.category}
+                    </div>
                     </div>
                     <div style={{
                       color: 'black',
                       fontSize: '20px',
                       fontFamily: 'Pretendard',
                       fontWeight: 400,
-                      wordWrap: 'break-word'
+                      wordWrap: 'break-word',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1
                     }}>
                       {item.title}
                     </div>
@@ -352,14 +355,15 @@ export function Home() {
           <div style={{
             alignSelf: 'stretch',
             justifyContent: 'flex-start',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             gap: '16px',
-            display: 'inline-flex'
+            display: 'inline-flex',
+            minHeight: '150px'
           }}>
             {/* Physical Card */}
             <div id="home-theme-card-phy" style={{
               flex: '1 1 0',
-              height: '104px',
+              height: '140px',
               padding: '28px',
               position: 'relative',
               background: '#ffeef2',
@@ -391,8 +395,8 @@ export function Home() {
                 display: 'inline-flex'
               }}>
                 <div id="home-theme-card-phy-count-number" style={{
-                  color: 'black',
-                  fontSize: '30px',
+                  color: '#0090ff',
+                  fontSize: '32px',
                   fontFamily: 'Pretendard',
                   fontWeight: 700,
                   wordWrap: 'break-word'
@@ -426,7 +430,7 @@ export function Home() {
             {/* Emotional Card */}
             <div id="home-theme-card-emo" style={{
               flex: '1 1 0',
-              height: '104px',
+              height: '140px',
               padding: '28px',
               position: 'relative',
               background: '#fffdee',
@@ -458,8 +462,8 @@ export function Home() {
                 display: 'inline-flex'
               }}>
                 <div id="home-theme-card-emo-count-number" style={{
-                  color: 'black',
-                  fontSize: '30px',
+                  color: '#0090ff',
+                  fontSize: '32px',
                   fontFamily: 'Pretendard',
                   fontWeight: 700,
                   wordWrap: 'break-word'
@@ -504,7 +508,7 @@ export function Home() {
             {/* Economic Card */}
             <div id="home-theme-card-econ" style={{
               flex: '1 1 0',
-              height: '104px',
+              height: '140px',
               padding: '28px',
               position: 'relative',
               background: '#eefff2',
@@ -536,8 +540,8 @@ export function Home() {
                 display: 'inline-flex'
               }}>
                 <div id="home-theme-card-econ-count-number" style={{
-                  color: 'black',
-                  fontSize: '30px',
+                  color: '#0090ff',
+                  fontSize: '32px',
                   fontFamily: 'Pretendard',
                   fontWeight: 700,
                   wordWrap: 'break-word'
@@ -573,7 +577,7 @@ export function Home() {
             {/* Social Card */}
             <div id="home-theme-card-soc" style={{
               flex: '1 1 0',
-              height: '104px',
+              height: '140px',
               padding: '28px',
               position: 'relative',
               background: '#eef8ff',
@@ -605,8 +609,8 @@ export function Home() {
                 display: 'inline-flex'
               }}>
                 <div id="home-theme-card-soc-count-number" style={{
-                  color: 'black',
-                  fontSize: '30px',
+                  color: '#0090ff',
+                  fontSize: '32px',
                   fontFamily: 'Pretendard',
                   fontWeight: 700,
                   wordWrap: 'break-word'
@@ -721,7 +725,7 @@ export function Home() {
             ].map((type, index) => (
               <div key={index} id={`home-data-type-card-${type.type}`} style={{
                 flex: '1 1 0',
-                height: '104px',
+                height: '120px',
                 paddingTop: '28px',
                 paddingBottom: '28px',
                 paddingLeft: '40px',
@@ -739,13 +743,12 @@ export function Home() {
               onClick={() => handleDataTypeClick(type.type)}
               >
                 <div id={`home-data-type-card-${type.type}-content`} style={{
-                  alignSelf: 'stretch',
-                  paddingTop: '12px',
+                  flex: '1',
                   flexDirection: 'column',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
                   gap: '16px',
-                  display: 'inline-flex'
+                  display: 'flex'
                 }}>
                   <div id={`home-data-type-card-${type.type}-title`} style={{
                     color: 'black',
@@ -756,41 +759,14 @@ export function Home() {
                   }}>
                     {type.title}
                   </div>
-                  <div id={`home-data-type-card-${type.type}-count`} style={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    gap: '4px',
-                    display: 'inline-flex'
-                  }}>
-                    <div id={`home-data-type-card-${type.type}-count-number`} style={{
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      gap: '6px',
-                      display: 'flex'
-                    }}>
-                      <div id={`home-data-type-card-${type.type}-count-number-value`} style={{
-                        color: '#0090ff',
-                        fontSize: '32px',
-                        fontFamily: 'Pretendard',
-                        fontWeight: 700,
-                        wordWrap: 'break-word'
-                      }}>
+                  <div id={`home-data-type-card-${type.type}-count`} className="card-stats">
+                    <div id={`home-data-type-card-${type.type}-count-stat-item-1`} className="stat-item">
+                      <div id={`home-data-type-card-${type.type}-count-number`} className="stat-number">
                         {type.count.toLocaleString()}
                       </div>
                     </div>
-                    <div id={`home-data-type-card-${type.type}-count-unit`} style={{
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      gap: '6px',
-                      display: 'flex'
-                    }}>
-                      <div id={`home-data-type-card-${type.type}-count-unit-text`} style={{
-                        color: 'black',
-                        fontSize: '24px',
-                        fontFamily: 'Pretendard',
-                        fontWeight: 500,
-                        wordWrap: 'break-word'
-                      }}>
+                    <div id={`home-data-type-card-${type.type}-count-stat-item-2`} className="stat-item">
+                      <div id={`home-data-type-card-${type.type}-count-unit`} className="stat-unit">
                         건
                       </div>
                     </div>
@@ -806,7 +782,8 @@ export function Home() {
                   outlineOffset: '-1px',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  display: 'flex'
+                  display: 'flex',
+                  flexShrink: 0
                 }}>
                   <div id={`home-data-type-card-${type.type}-icon-image`} style={{
                     width: '32px',
@@ -1040,13 +1017,11 @@ export function Home() {
 
       {/* Modal */}
       <Modal
-        id="home-modal"
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={modalContent.title}
         description={modalContent.description}
         primaryButtonText="확인"
-        secondaryButtonText=""
         onPrimaryClick={() => setIsModalOpen(false)}
       />
     </Layout>

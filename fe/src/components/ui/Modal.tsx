@@ -21,9 +21,9 @@ export function Modal({
   title,
   description,
   children,
-  showIcon = true,
+  showIcon = false,
   primaryButtonText = '확인',
-  secondaryButtonText = '취소',
+  secondaryButtonText = '',
   onPrimaryClick,
   onSecondaryClick
 }: ModalProps) {

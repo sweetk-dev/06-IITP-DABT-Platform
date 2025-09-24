@@ -1,8 +1,31 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
+import { Modal } from '../components/ui/Modal';
 
 export function DataDetail() {
   const { id } = useParams<{ id: string }>();
+  const [isOpenApiModalOpen, setIsOpenApiModalOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+
+  const handleOpenApiClick = () => {
+    setIsOpenApiModalOpen(true);
+  };
+
+  const handleOpenApiConfirm = () => {
+    const openApiUrl = import.meta.env.VITE_OPEN_API_CENTER_URL || '#';
+    window.open(openApiUrl, '_blank');
+    setIsOpenApiModalOpen(false);
+  };
+
+  const handleDownloadClick = () => {
+    setIsDownloadModalOpen(true);
+  };
+
+  const handleChartClick = () => {
+    const visualToolUrl = import.meta.env.VITE_VISUAL_TOOL || '#';
+    window.open(visualToolUrl, '_blank');
+  };
 
   return (
     <Layout idPrefix="data-detail">
@@ -95,36 +118,61 @@ export function DataDetail() {
         </p>
         
         <div style={{ display: 'flex', gap: '12px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            background: '#0090ff',
-            color: 'white',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}>
-            다운로드 ↗
+          <div 
+            onClick={handleOpenApiClick}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              background: '#0090ff',
+              color: 'white',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Open API 센터로 이동 ↗
           </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            background: 'white',
-            color: '#0090ff',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            border: '2px solid #0090ff',
-            transition: 'all 0.2s ease'
-          }}>
-            공유하기
+          <div 
+            onClick={handleChartClick}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              background: 'white',
+              color: '#0090ff',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: '2px solid #0090ff',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            차트보기
+          </div>
+          <div 
+            onClick={handleDownloadClick}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              background: 'white',
+              color: '#0090ff',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: '2px solid #0090ff',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            다운로드
           </div>
         </div>
       </div>
@@ -362,6 +410,28 @@ export function DataDetail() {
           </div>
         </div>
       </div>
+
+      {/* Open API 센터로 이동 Confirm-01 모달 */}
+      <Modal
+        isOpen={isOpenApiModalOpen}
+        onClose={() => setIsOpenApiModalOpen(false)}
+        title="Open API 센터로 이동"
+        description="Open API 센터로 이동하시겠습니까?"
+        primaryButtonText="이동"
+        secondaryButtonText="취소"
+        onPrimaryClick={handleOpenApiConfirm}
+        onSecondaryClick={() => setIsOpenApiModalOpen(false)}
+      />
+
+      {/* 다운로드 준비중 모달 */}
+      <Modal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        title="준비중인 페이지입니다"
+        description="해당 서비스는 현재 준비 중입니다.\n빠른 시일 내에 서비스할 예정입니다."
+        primaryButtonText="확인"
+        onPrimaryClick={() => setIsDownloadModalOpen(false)}
+      />
     </Layout>
   );
 }
