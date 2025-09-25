@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode } from '../../../packages/common/src/types';
 
 export function Home() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function Home() {
   const handleServiceClick = (service: string) => {
     if (service === '장애인 구인구직') {
       // 환경변수에서 URL 가져와서 새창 열기
-      const employmentUrl = import.meta.env.VITE_EMPLOYMENT_SITE_URL || '#';
+      const employmentUrl = (import.meta as any).env?.VITE_EMPLOYMENT_SITE_URL || '#';
       window.open(employmentUrl, '_blank');
     } else {
       // 준비중 모달 표시 - 클릭한 서비스에 따라 다른 타이틀
@@ -255,13 +256,12 @@ export function Home() {
         {/* Theme Section */}
         <div id="home-theme-section" style={{
           width: '1200px',
-          marginTop: '0px',
+          marginTop: '60px',
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
           gap: '20px',
-          display: 'inline-flex',
-          marginTop: '60px'
+          display: 'inline-flex'
         }}>
           <div style={{
             alignSelf: 'stretch',
@@ -360,286 +360,122 @@ export function Home() {
             display: 'inline-flex',
             height: '160px'
           }}>
-            {/* Physical Card */}
-            <div id="home-theme-card-phy" style={{
-              width: '288px',
-              height: '160px',
-              padding: '28px',
-              position: 'relative',
-              background: '#ffeef2',
-              overflow: 'hidden',
-              borderRadius: '16px',
-              outline: '1px #ffdde5 solid',
-              outlineOffset: '-1px',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              display: 'inline-flex',
-              cursor: 'pointer'
-            }}
-            onClick={() => handleThemeClick('phy')}
-            >
-              <div id="home-theme-card-phy-title" style={{
-                color: 'black',
-                fontSize: '24px',
-                fontFamily: 'Pretendard',
-                fontWeight: 500,
-                wordWrap: 'break-word'
-              }}>
-                신체적 자립
-              </div>
-              <div id="home-theme-card-phy-count" style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '4px',
-                display: 'inline-flex'
-              }}>
-                <div id="home-theme-card-phy-count-number" style={{
-                  color: '#0090ff',
-                  fontSize: '32px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 700,
-                  wordWrap: 'break-word'
-                }}>
-                  181
+            {THEME_CONSTANTS.ALL_CODES.map((themeCode: ThemeCode) => {
+              const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
+              
+              // 각 테마별 스타일 설정 (피그마 디자인 보존)
+              const themeStyles = {
+                phy: {
+                  background: '#ffeef2',
+                  outline: '#ffdde5',
+                  image: '/medal2.png',
+                  count: '181',
+                  imageStyle: { right: 0, bottom: '-20px', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
+                },
+                emo: {
+                  background: '#fffdee',
+                  outline: '#fff6b4',
+                  image: '/lightbulb.png',
+                  count: '2,311',
+                  imageStyle: { right: 0, bottom: '-25px', transform: 'rotate(-8deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
+                },
+                econ: {
+                  background: '#eefff2',
+                  outline: '#d9f5df',
+                  image: '/money.png',
+                  count: '31',
+                  imageStyle: { right: 0, bottom: '-40px', transform: 'rotate(-19deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
+                },
+                soc: {
+                  background: '#eef8ff',
+                  outline: '#d0ecff',
+                  image: '/chat.png',
+                  count: '75',
+                  imageStyle: { right: 0, bottom: 0, filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
+                }
+              };
+              
+              const style = themeStyles[themeCode];
+              
+              return (
+                <div key={themeCode} id={`home-theme-card-${themeCode}`} style={{
+                  width: '288px',
+                  height: '160px',
+                  padding: '28px',
+                  position: 'relative',
+                  background: style.background,
+                  overflow: 'hidden',
+                  borderRadius: '16px',
+                  outline: `1px ${style.outline} solid`,
+                  outlineOffset: '-1px',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  display: 'inline-flex',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleThemeClick(themeCode)}
+                >
+                  <div id={`home-theme-card-${themeCode}-title`} style={{
+                    color: 'black',
+                    fontSize: '24px',
+                    fontFamily: 'Pretendard',
+                    fontWeight: 500,
+                    wordWrap: 'break-word'
+                  }}>
+                    {themeInfo.name}
+                  </div>
+                  <div id={`home-theme-card-${themeCode}-count`} style={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: '4px',
+                    display: 'inline-flex'
+                  }}>
+                    <div id={`home-theme-card-${themeCode}-count-number`} style={{
+                      color: '#0090ff',
+                      fontSize: '32px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 700,
+                      wordWrap: 'break-word'
+                    }}>
+                      {style.count}
+                    </div>
+                    <div id={`home-theme-card-${themeCode}-count-unit`} style={{
+                      color: 'black',
+                      fontSize: '24px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 500,
+                      wordWrap: 'break-word'
+                    }}>
+                      건
+                    </div>
+                  </div>
+                  <div id={`home-theme-card-${themeCode}-image`} style={{
+                    width: '146px',
+                    height: '146px',
+                    position: 'absolute',
+                    backgroundImage: `url(${style.image})`,
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    ...style.imageStyle
+                  }} />
+                  {/* 정서적 자립 카드에만 있는 특별한 overlay */}
+                  {themeCode === 'emo' && (
+                    <div id={`home-theme-card-${themeCode}-overlay`} style={{
+                      width: '65px',
+                      height: '65px',
+                      left: '166px',
+                      top: '24px',
+                      position: 'absolute',
+                      background: 'radial-gradient(ellipse 50% 50% at 50% 50%, white 0%, rgba(255, 255, 255, 0) 42%)',
+                      borderRadius: '9999px'
+                    }} />
+                  )}
                 </div>
-                <div id="home-theme-card-phy-count-unit" style={{
-                  color: 'black',
-                  fontSize: '24px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 500,
-                  wordWrap: 'break-word'
-                }}>
-                  건
-                </div>
-              </div>
-              <div id="home-theme-card-phy-image" style={{
-                width: '146px',
-                height: '146px',
-                position: 'absolute',
-                right: 0,
-                bottom: '-20px',
-                backgroundImage: 'url(/medal2.png)',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
-              }} />
-            </div>
+              );
+            })}
 
-            {/* Emotional Card */}
-            <div id="home-theme-card-emo" style={{
-              width: '288px',
-              height: '160px',
-              padding: '28px',
-              position: 'relative',
-              background: '#fffdee',
-              overflow: 'hidden',
-              borderRadius: '16px',
-              outline: '1px #fff6b4 solid',
-              outlineOffset: '-1px',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              display: 'inline-flex',
-              cursor: 'pointer'
-            }}
-            onClick={() => handleThemeClick('emo')}
-            >
-              <div id="home-theme-card-emo-title" style={{
-                color: 'black',
-                fontSize: '24px',
-                fontFamily: 'Pretendard',
-                fontWeight: 500,
-                wordWrap: 'break-word'
-              }}>
-                정서적 자립
-              </div>
-              <div id="home-theme-card-emo-count" style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '4px',
-                display: 'inline-flex'
-              }}>
-                <div id="home-theme-card-emo-count-number" style={{
-                  color: '#0090ff',
-                  fontSize: '32px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 700,
-                  wordWrap: 'break-word'
-                }}>
-                  2,311
-                </div>
-                <div id="home-theme-card-emo-count-unit" style={{
-                  color: 'black',
-                  fontSize: '24px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 500,
-                  wordWrap: 'break-word'
-                }}>
-                  건
-                </div>
-              </div>
-              <div id="home-theme-card-emo-image" style={{
-                width: '146px',
-                height: '146px',
-                transform: 'rotate(-8deg)',
-                transformOrigin: 'top left',
-                backgroundImage: 'url(/lightbulb.png)',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                position: 'absolute',
-                right: 0,
-                bottom: '-25px',
-                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
-              }} />
-              <div id="home-theme-card-emo-overlay" style={{
-                width: '65px',
-                height: '65px',
-                left: '166px',
-                top: '24px',
-                position: 'absolute',
-                background: 'radial-gradient(ellipse 50% 50% at 50% 50%, white 0%, rgba(255, 255, 255, 0) 42%)',
-                borderRadius: '9999px'
-              }} />
-            </div>
-
-            {/* Economic Card */}
-            <div id="home-theme-card-econ" style={{
-              width: '288px',
-              height: '160px',
-              padding: '28px',
-              position: 'relative',
-              background: '#eefff2',
-              overflow: 'hidden',
-              borderRadius: '16px',
-              outline: '1px #d9f5df solid',
-              outlineOffset: '-1px',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              display: 'inline-flex',
-              cursor: 'pointer'
-            }}
-            onClick={() => handleThemeClick('econ')}
-            >
-              <div id="home-theme-card-econ-title" style={{
-                color: 'black',
-                fontSize: '24px',
-                fontFamily: 'Pretendard',
-                fontWeight: 500,
-                wordWrap: 'break-word'
-              }}>
-                경제적 자립
-              </div>
-              <div id="home-theme-card-econ-count" style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '4px',
-                display: 'inline-flex'
-              }}>
-                <div id="home-theme-card-econ-count-number" style={{
-                  color: '#0090ff',
-                  fontSize: '32px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 700,
-                  wordWrap: 'break-word'
-                }}>
-                  31
-                </div>
-                <div id="home-theme-card-econ-count-unit" style={{
-                  color: 'black',
-                  fontSize: '24px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 500,
-                  wordWrap: 'break-word'
-                }}>
-                  건
-                </div>
-              </div>
-              <div id="home-theme-card-econ-image" style={{
-                width: '156px',
-                height: '156px',
-                backgroundImage: 'url(/money.png)',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                transform: 'rotate(-19deg)',
-                transformOrigin: 'top left',
-                position: 'absolute',
-                right: 0,
-                bottom: '-40px',
-                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
-              }} />
-            </div>
-
-            {/* Social Card */}
-            <div id="home-theme-card-soc" style={{
-              width: '288px',
-              height: '160px',
-              padding: '28px',
-              position: 'relative',
-              background: '#eef8ff',
-              overflow: 'hidden',
-              borderRadius: '16px',
-              outline: '1px #d0ecff solid',
-              outlineOffset: '-1px',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              display: 'inline-flex',
-              cursor: 'pointer'
-            }}
-            onClick={() => handleThemeClick('soc')}
-            >
-              <div id="home-theme-card-soc-title" style={{
-                color: 'black',
-                fontSize: '24px',
-                fontFamily: 'Pretendard',
-                fontWeight: 500,
-                wordWrap: 'break-word'
-              }}>
-                사회적 자립
-              </div>
-              <div id="home-theme-card-soc-count" style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '4px',
-                display: 'inline-flex'
-              }}>
-                <div id="home-theme-card-soc-count-number" style={{
-                  color: '#0090ff',
-                  fontSize: '32px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 700,
-                  wordWrap: 'break-word'
-                }}>
-                  75
-                </div>
-                <div id="home-theme-card-soc-count-unit" style={{
-                  color: 'black',
-                  fontSize: '24px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 500,
-                  wordWrap: 'break-word'
-                }}>
-                  건
-                </div>
-              </div>
-              <div id="home-theme-card-soc-image" style={{
-                width: '150px',
-                height: '150px',
-                backgroundImage: 'url(/chat.png)',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                position: 'absolute',
-                right: 0,
-                bottom: 0,
-                filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
-              }} />
-            </div>
           </div>
         </div>
 
@@ -719,86 +555,87 @@ export function Home() {
             display: 'inline-flex',
             height: '160px'
           }}>
-            {[
-              { title: '기초 데이터', count: 2790, type: 'basic' },
-              { title: '이동권 데이터', count: 312, type: 'poi' },
-              { title: '고용 데이터', count: 56, type: 'emp' }
-            ].map((type, index) => (
-              <div key={index} id={`home-data-type-card-${type.type}`} style={{
-                width: '389.33px',
-                height: '160px',
-                paddingTop: '28px',
-                paddingBottom: '28px',
-                paddingLeft: '40px',
-                paddingRight: '28px',
-                background: '#fafcfd',
-                overflow: 'hidden',
-                borderRadius: '16px',
-                outline: '1px #e3e3e3 solid',
-                outlineOffset: '-1px',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                display: 'flex',
-                cursor: 'pointer'
-              }}
-              onClick={() => handleDataTypeClick(type.type)}
-              >
-                <div id={`home-data-type-card-${type.type}-content`} style={{
-                  flex: '1',
-                  flexDirection: 'column',
+            {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode: DataTypeCode, index: number) => {
+              const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
+              const counts: { [key in DataTypeCode]: number } = { basic: 2790, poi: 312, emp: 56 };
+              
+              return (
+                <div key={dataTypeCode} id={`home-data-type-card-${dataTypeCode}`} style={{
+                  width: '389.33px',
+                  height: '160px',
+                  paddingTop: '28px',
+                  paddingBottom: '28px',
+                  paddingLeft: '40px',
+                  paddingRight: '28px',
+                  background: '#fafcfd',
+                  overflow: 'hidden',
+                  borderRadius: '16px',
+                  outline: '1px #e3e3e3 solid',
+                  outlineOffset: '-1px',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  height: '100%',
-                  display: 'flex'
-                }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
-                    <div id={`home-data-type-card-${type.type}-title`} style={{
-                      color: 'black',
-                      fontSize: '24px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 600,
-                      wordWrap: 'break-word'
-                    }}>
-                      {type.title}
-                    </div>
-                    <div id={`home-data-type-card-${type.type}-count`} className="card-stats">
-                      <div id={`home-data-type-card-${type.type}-count-stat-item-1`} className="stat-item">
-                        <div id={`home-data-type-card-${type.type}-count-number`} className="stat-number">
-                          {type.count.toLocaleString()}
-                        </div>
+                  display: 'flex',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleDataTypeClick(dataTypeCode)}
+                >
+                  <div id={`home-data-type-card-${dataTypeCode}-content`} style={{
+                    flex: '1',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    height: '100%',
+                    display: 'flex'
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                      <div id={`home-data-type-card-${dataTypeCode}-title`} style={{
+                        color: 'black',
+                        fontSize: '24px',
+                        fontFamily: 'Pretendard',
+                        fontWeight: 600,
+                        wordWrap: 'break-word'
+                      }}>
+                        {dataTypeInfo.name}
                       </div>
-                      <div id={`home-data-type-card-${type.type}-count-stat-item-2`} className="stat-item">
-                        <div id={`home-data-type-card-${type.type}-count-unit`} className="stat-unit">
-                          건
+                      <div id={`home-data-type-card-${dataTypeCode}-count`} className="card-stats">
+                        <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-1`} className="stat-item">
+                          <div id={`home-data-type-card-${dataTypeCode}-count-number`} className="stat-number">
+                            {counts[dataTypeCode].toLocaleString()}
+                          </div>
+                        </div>
+                        <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-2`} className="stat-item">
+                          <div id={`home-data-type-card-${dataTypeCode}-count-unit`} className="stat-unit">
+                            건
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div id={`home-data-type-card-${dataTypeCode}-icon`} style={{
+                    width: '52px',
+                    height: '52px',
+                    background: 'white',
+                    overflow: 'hidden',
+                    borderRadius: '100px',
+                    outline: '1px #d9d9d9 solid',
+                    outlineOffset: '-1px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexShrink: 0
+                  }}>
+                    <div id={`home-data-type-card-${dataTypeCode}-icon-image`} style={{
+                      width: '32px',
+                      height: '32px',
+                      backgroundImage: 'url(/right_up.svg)',
+                      backgroundSize: 'cover',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center'
+                    }} />
+                  </div>
                 </div>
-                <div id={`home-data-type-card-${type.type}-icon`} style={{
-                  width: '52px',
-                  height: '52px',
-                  background: 'white',
-                  overflow: 'hidden',
-                  borderRadius: '100px',
-                  outline: '1px #d9d9d9 solid',
-                  outlineOffset: '-1px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  display: 'flex',
-                  flexShrink: 0
-                }}>
-                  <div id={`home-data-type-card-${type.type}-icon-image`} style={{
-                    width: '32px',
-                    height: '32px',
-                    backgroundImage: 'url(/right_up.svg)',
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                  }} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
