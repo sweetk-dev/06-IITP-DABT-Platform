@@ -358,12 +358,12 @@ export function Home() {
             alignItems: 'flex-start',
             gap: '16px',
             display: 'inline-flex',
-            minHeight: '150px'
+            height: '160px'
           }}>
             {/* Physical Card */}
             <div id="home-theme-card-phy" style={{
-              flex: '1 1 0',
-              height: '140px',
+              width: '288px',
+              height: '160px',
               padding: '28px',
               position: 'relative',
               background: '#ffeef2',
@@ -429,8 +429,8 @@ export function Home() {
 
             {/* Emotional Card */}
             <div id="home-theme-card-emo" style={{
-              flex: '1 1 0',
-              height: '140px',
+              width: '288px',
+              height: '160px',
               padding: '28px',
               position: 'relative',
               background: '#fffdee',
@@ -507,8 +507,8 @@ export function Home() {
 
             {/* Economic Card */}
             <div id="home-theme-card-econ" style={{
-              flex: '1 1 0',
-              height: '140px',
+              width: '288px',
+              height: '160px',
               padding: '28px',
               position: 'relative',
               background: '#eefff2',
@@ -576,8 +576,8 @@ export function Home() {
 
             {/* Social Card */}
             <div id="home-theme-card-soc" style={{
-              flex: '1 1 0',
-              height: '140px',
+              width: '288px',
+              height: '160px',
               padding: '28px',
               position: 'relative',
               background: '#eef8ff',
@@ -716,7 +716,8 @@ export function Home() {
             justifyContent: 'flex-start',
             alignItems: 'center',
             gap: '16px',
-            display: 'inline-flex'
+            display: 'inline-flex',
+            height: '160px'
           }}>
             {[
               { title: '기초 데이터', count: 2790, type: 'basic' },
@@ -724,8 +725,8 @@ export function Home() {
               { title: '고용 데이터', count: 56, type: 'emp' }
             ].map((type, index) => (
               <div key={index} id={`home-data-type-card-${type.type}`} style={{
-                flex: '1 1 0',
-                height: '120px',
+                width: '389.33px',
+                height: '160px',
                 paddingTop: '28px',
                 paddingBottom: '28px',
                 paddingLeft: '40px',
@@ -745,29 +746,31 @@ export function Home() {
                 <div id={`home-data-type-card-${type.type}-content`} style={{
                   flex: '1',
                   flexDirection: 'column',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  gap: '16px',
+                  height: '100%',
                   display: 'flex'
                 }}>
-                  <div id={`home-data-type-card-${type.type}-title`} style={{
-                    color: 'black',
-                    fontSize: '24px',
-                    fontFamily: 'Pretendard',
-                    fontWeight: 600,
-                    wordWrap: 'break-word'
-                  }}>
-                    {type.title}
-                  </div>
-                  <div id={`home-data-type-card-${type.type}-count`} className="card-stats">
-                    <div id={`home-data-type-card-${type.type}-count-stat-item-1`} className="stat-item">
-                      <div id={`home-data-type-card-${type.type}-count-number`} className="stat-number">
-                        {type.count.toLocaleString()}
-                      </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                    <div id={`home-data-type-card-${type.type}-title`} style={{
+                      color: 'black',
+                      fontSize: '24px',
+                      fontFamily: 'Pretendard',
+                      fontWeight: 600,
+                      wordWrap: 'break-word'
+                    }}>
+                      {type.title}
                     </div>
-                    <div id={`home-data-type-card-${type.type}-count-stat-item-2`} className="stat-item">
-                      <div id={`home-data-type-card-${type.type}-count-unit`} className="stat-unit">
-                        건
+                    <div id={`home-data-type-card-${type.type}-count`} className="card-stats">
+                      <div id={`home-data-type-card-${type.type}-count-stat-item-1`} className="stat-item">
+                        <div id={`home-data-type-card-${type.type}-count-number`} className="stat-number">
+                          {type.count.toLocaleString()}
+                        </div>
+                      </div>
+                      <div id={`home-data-type-card-${type.type}-count-stat-item-2`} className="stat-item">
+                        <div id={`home-data-type-card-${type.type}-count-unit`} className="stat-unit">
+                          건
+                        </div>
                       </div>
                     </div>
                   </div>
