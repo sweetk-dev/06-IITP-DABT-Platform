@@ -1,8 +1,7 @@
 // API URL 상수 정의
-import { ParsedQs } from 'qs';
 
 export const API_URLS = {
-  // 데이터 목록
+    // 데이터 목록
   DATA: {
     BASE: '/api/data',
   },
@@ -11,9 +10,7 @@ export const API_URLS = {
   SELF_CHK: {
     BASE: '/api/self-chk',
   },
-
-  
-  // 공통
+    // 공통
   COMMON: {
     BASE: '/api/common',
     HEALTH_CHECK: '/health',
@@ -33,42 +30,12 @@ export const getCommonUrl = (path: string): string => buildUrl(API_URLS.COMMON.B
 
 // 완전한 URL 상수들 (함수 조합으로 생성)
 export const FULL_API_URLS = {  
-  USER: {
-    PROFILE: {
-      DETAIL: getUserUrl(API_URLS.USER.PROFILE),
-      UPDATE: getUserUrl(API_URLS.USER.PROFILE)
-    },
-    PASSWORD: {
-      UPDATE: getUserUrl(API_URLS.USER.PASSWORD)
-    },
-    REGISTER: getUserUrl(API_URLS.USER.REGISTER),
-    CHECK_EMAIL: getUserUrl(API_URLS.USER.CHECK_EMAIL),
-    FAQ: {
-      LIST: getUserUrl(API_URLS.USER.FAQ.LIST),
-      DETAIL: getUserUrl(API_URLS.USER.FAQ.DETAIL),
-      HOME: getUserUrl(API_URLS.USER.FAQ.HOME),
-    },
-    QNA: {
-      LIST: getUserUrl(API_URLS.USER.QNA.LIST),
-      DETAIL: getUserUrl(API_URLS.USER.QNA.DETAIL),
-      CREATE: getUserUrl(API_URLS.USER.QNA.CREATE),
-      DELETE: getUserUrl(API_URLS.USER.QNA.DELETE),
-      HOME: getUserUrl(API_URLS.USER.QNA.HOME),
-    },
-    NOTICE: {
-      LIST: getUserUrl(API_URLS.USER.NOTICE.LIST),
-      DETAIL: getUserUrl(API_URLS.USER.NOTICE.DETAIL),
-      HOME: getUserUrl(API_URLS.USER.NOTICE.HOME),
-    },
-    OPEN_API: {
-      LIST: getUserUrl(API_URLS.USER.OPEN_API.LIST),
-      DETAIL: getUserUrl(API_URLS.USER.OPEN_API.DETAIL),
-      CREATE: getUserUrl(API_URLS.USER.OPEN_API.CREATE),
-      DELETE: getUserUrl(API_URLS.USER.OPEN_API.DELETE),
-      EXTEND: getUserUrl(API_URLS.USER.OPEN_API.EXTEND),
-    }
+  DATA: {
+    //??: getDatahUrl(API_URLS.DATA.??),
   },
-  
+  SELF_CHK: {
+    //??: getSelfChkUrl(API_URLS.SELF_CHK.??),
+  },
   COMMON: {
     HEALTH_CHECK: getCommonUrl(API_URLS.COMMON.HEALTH_CHECK),
     VERSION: getCommonUrl(API_URLS.COMMON.VERSION),
@@ -87,7 +54,7 @@ export interface ApiResponse<T = any> {
 export interface PaginationReq {
   page?: number;
   limit?: number;
-  [key: string]: string | number | boolean | ParsedQs | (string | ParsedQs)[] | undefined;
+  [key: string]: string | number | boolean | undefined;
 }
 
 export interface PaginationRes<T> {
@@ -107,4 +74,4 @@ export interface SearchReq extends PaginationReq {
 export interface SortReq {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-} 
+}
