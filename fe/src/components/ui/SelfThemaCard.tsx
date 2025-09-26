@@ -46,15 +46,19 @@ export function SelfThemaCard({
       border: '1px solid #e3e3e3',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      padding: '28px 28px 28px 40px'
+      padding: '20px'
     },
     recommendation: {
-      background: 'white',
-      border: '1px solid #e0e0e0',
+      background: '#f4f4f4',
+      border: 'none',
+      display: 'flex',
+      flexDirection: 'column',
       justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '24px',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+      alignItems: 'flex-start',
+      padding: '28px',
+      width: '384px',
+      minHeight: '200px',
+      boxShadow: 'none'
     },
     score: {
       background: 'white',
@@ -69,15 +73,16 @@ export function SelfThemaCard({
   };
 
   const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { width: '280px', height: '120px' },
-    md: { width: '320px', height: '160px' },
-    lg: { width: '400px', height: '200px' }
+    sm: { height: '120px' },
+    md: { height: '160px' },
+    lg: { height: '200px' }
   };
 
   const combinedStyle = {
     ...baseStyle,
     ...variantStyles[variant],
-    ...sizeStyles[size]
+    ...sizeStyles[size],
+    ...style
   };
 
   return (
@@ -140,12 +145,13 @@ export function CardTitle({ children, className = '', style = {} }: CardTitlePro
     <div 
       className={`card-title ${className}`}
       style={{
-        color: 'var(--color-text-primary)',
-        fontSize: 'var(--font-size-xl)',
-        fontFamily: 'var(--font-family-primary)',
-        fontWeight: 600,
+        color: 'black',
+        fontSize: '24px',
+        fontFamily: 'Pretendard',
+        fontWeight: 700,
         wordWrap: 'break-word',
         marginBottom: '8px',
+        lineHeight: '33.6px',
         ...style
       }}
     >
@@ -165,12 +171,13 @@ export function CardSubtitle({ children, className = '', style = {} }: CardSubti
     <div 
       className={`card-subtitle ${className}`}
       style={{
-        color: '#666',
-        fontSize: '14px',
-        fontFamily: 'var(--font-family-primary)',
-        fontWeight: 500,
+        color: '#0086ed',
+        fontSize: '18px',
+        fontFamily: 'Pretendard',
+        fontWeight: 600,
         wordWrap: 'break-word',
         marginBottom: '8px',
+        lineHeight: '27px',
         ...style
       }}
     >
@@ -192,7 +199,7 @@ export function CardIcon({ children, className = '', style = {} }: CardIconProps
       style={{
         width: '52px',
         height: '52px',
-        background: 'var(--figma-white)',
+        background: 'white',
         borderRadius: '100px',
         border: '1px solid #d9d9d9',
         display: 'flex',
