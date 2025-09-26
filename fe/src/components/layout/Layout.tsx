@@ -40,7 +40,7 @@ export function Layout({
     }}>
       <div id={`${idPrefix}-container`} style={{
         margin: '0 auto',
-        width: '1200px',
+        width: '1200px', // Header 고정 너비
         position: 'relative',
         flex: 1,
         paddingBottom: '94px'

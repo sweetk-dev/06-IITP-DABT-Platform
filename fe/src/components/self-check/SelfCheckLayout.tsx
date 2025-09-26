@@ -1,22 +1,43 @@
 import { ReactNode } from 'react';
 import { Layout } from '../layout/Layout';
+import { SelfCheckNavigation } from './SelfCheckNavigation';
 
 interface SelfCheckLayoutProps {
   idPrefix: string;
   children: ReactNode;
   onBackClick?: () => void;
   showBackButton?: boolean;
+  // Navigation props
+  onPrevious?: () => void;
+  onNext?: () => void;
+  previousText?: string;
+  nextText?: string;
+  showPrevious?: boolean;
+  showNext?: boolean;
+  isNextDisabled?: boolean;
+  nextIcon?: ReactNode;
+  previousIcon?: ReactNode;
 }
 
 export function SelfCheckLayout({ 
   idPrefix, 
   children, 
   onBackClick,
-  showBackButton = true 
+  showBackButton = true,
+  // Navigation props
+  onPrevious,
+  onNext,
+  previousText = '이전',
+  nextText = '다음',
+  showPrevious = true,
+  showNext = true,
+  isNextDisabled = false,
+  nextIcon,
+  previousIcon
 }: SelfCheckLayoutProps) {
   return (
     <Layout idPrefix={idPrefix} showBreadcrumb={!showBackButton}>
-      {/* Self Check Container - HTML Design */}
+      {/* Self Check Container - 브라우저 전체 기준 중앙 정렬 (Header 중앙선과 일치) */}
       <div
         id={`${idPrefix}-container`}
         style={{
@@ -30,9 +51,10 @@ export function SelfCheckLayout({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          position: 'relative',
+          position: 'absolute',
           left: '50%',
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
+          zIndex: 10
         }}
       >
         {/* 메인화면으로 이동 - 왼쪽 상단에 위치 */}
@@ -90,6 +112,21 @@ export function SelfCheckLayout({
         >
           {children}
         </div>
+
+        {/* Navigation - SelfCheckLayout 내부에 배치 */}
+        {(onPrevious || onNext) && (
+          <SelfCheckNavigation
+            onPrevious={onPrevious}
+            onNext={onNext}
+            previousText={previousText}
+            nextText={nextText}
+            showPrevious={showPrevious}
+            showNext={showNext}
+            isNextDisabled={isNextDisabled}
+            nextIcon={nextIcon}
+            previousIcon={previousIcon}
+          />
+        )}
       </div>
     </Layout>
   );

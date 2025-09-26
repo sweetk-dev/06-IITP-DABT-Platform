@@ -10,7 +10,8 @@ export function SelfCheckContainer({ title, subtitle, children }: SelfCheckConta
   return (
     <div style={{
       width: '100%',
-      maxWidth: '1600px',
+      maxWidth: '1840px', // SelfCheckLayout과 동일한 너비
+      margin: '120px auto 0 auto', // 상단 120px, 좌우 중앙 정렬
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -18,8 +19,7 @@ export function SelfCheckContainer({ title, subtitle, children }: SelfCheckConta
       textAlign: 'center',
       padding: '0 60px',
       height: '100%',
-      minHeight: '600px',
-      marginTop: '120px'
+      minHeight: '600px'
     }}>
       {/* Title - HTML Design Style */}
       <h1 style={{
