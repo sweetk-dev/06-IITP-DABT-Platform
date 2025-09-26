@@ -1,0 +1,30 @@
+{
+  "name": "iitp-dabt-platform-be",
+  "version": "1.0.0",
+  "description": "IITP 장애인 데이터 플랫폼 Backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "npm run clean && tsc",
+    "start": "node dist/index.js",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@iitp-dabt-platform/common": "file:../packages/common",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.14.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}
