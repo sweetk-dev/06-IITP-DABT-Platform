@@ -25,6 +25,7 @@ export function Home() {
     navigate('/data-search?type=data_type');
   };
 
+
   const handleServiceClick = (service: string) => {
     if (service === '장애인 구인구직') {
       // 환경변수에서 URL 가져와서 새창 열기
@@ -743,10 +744,10 @@ export function Home() {
               자립 지원 서비스
             </div>
           </div>
-          <div style={{
+          <div           style={{
             alignSelf: 'stretch',
             justifyContent: 'flex-start',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             gap: '24px',
             display: 'inline-flex'
           }}>
@@ -790,24 +791,21 @@ export function Home() {
                   <div id={`home-service-card-${index + 1}-image`} style={{
                     width: '384px',
                     height: '248px',
-                    background: '#d9d9d9'
-                  }} />
-                  <div id={`home-service-card-${index + 1}-icon`} style={{
-                    width: '24px',
-                    height: '24px',
-                    left: '180px',
-                    top: '112px',
-                    position: 'absolute',
-                    overflow: 'hidden'
+                    background: '#D9D9D9',
+                    borderRadius: '16px 16px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative'
                   }}>
-                    <div id={`home-service-card-${index + 1}-icon-image`} style={{
-                      width: '20px',
-                      height: '18.02px',
-                      left: '2px',
-                      top: '3px',
-                      position: 'absolute',
-                      background: '#03053d'
-                    }} />
+                    <img 
+                      src="/image-line.svg" 
+                      alt="이미지 플레이스홀더"
+                      style={{
+                        width: '24px',
+                        height: '24px'
+                      }}
+                    />
                   </div>
                 </div>
                 <div id={`home-service-card-${index + 1}-text`} style={{
