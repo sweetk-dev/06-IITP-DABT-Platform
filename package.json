@@ -2,5 +2,26 @@
   "name": "iitp-dabt-platform",
   "version": "1.0.0",
   "description": "IITP 장애인 데이터 플랫폼",
-  "main": "index.js"
+  "main": "index.js",
+  "scripts": {
+    "build:common": "node script/local/build-common.js",
+    "build:fe": "node script/local/build-fe.js",
+    "build:be": "node script/local/build-be.js",
+    "build:all": "node script/local/build-all.js",
+    "dev:fe": "node script/local/run-fe.js",
+    "dev:be": "node script/local/run-be.js",
+    "dev:all": "node script/local/run-all.js",
+    "install:all": "npm install",
+    "clean:all": "npm run clean --workspaces",
+    "build:common:watch": "cd packages/common && npm run dev"
+  },
+  "workspaces": [
+    "packages/common",
+    "fe",
+    "be"
+  ],
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "rimraf": "^5.0.0"
+  }
 }
