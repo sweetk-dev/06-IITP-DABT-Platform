@@ -1,5 +1,21 @@
-// Common types for the application
+// FE 전용 타입 정의
+import { 
+  ApiResponse,
+  PaginationReq
+} from '../../../packages/common/src/types';
 
+// Re-export common types for convenience
+export type {
+  ApiResponse,
+  PaginationReq
+};
+
+// UI Component types (FE 전용)
+export type ButtonVariant = 'primary' | 'secondary' | 'outline';
+export type ButtonSize = 's' | 'm' | 'l';
+export type SpinnerSize = 's' | 'm' | 'l';
+
+// FE 전용 타입들
 export interface BaseEntity {
   id: string;
   createdAt: string;
@@ -15,13 +31,6 @@ export interface PaginationMeta {
   hasPrev: boolean;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-  meta?: PaginationMeta;
-}
-
 export interface ApiError {
   success: false;
   error: {
@@ -35,11 +44,6 @@ export interface ApiError {
 export type ThemeType = 'physical' | 'emotional' | 'economic' | 'social';
 export type DataType = 'basic' | 'mobility' | 'employment';
 export type SelfCheckStep = 'start' | 'questions' | 'result' | 'more';
-
-// UI Component types
-export type ButtonVariant = 'primary' | 'secondary' | 'outline';
-export type ButtonSize = 's' | 'm' | 'l';
-export type SpinnerSize = 's' | 'm' | 'l';
 
 // Data types
 export interface DataItem extends BaseEntity {
@@ -92,6 +96,14 @@ export interface DataFilter {
   limit?: number;
   sortBy?: 'title' | 'createdAt' | 'downloadCount';
   sortOrder?: 'asc' | 'desc';
+}
+
+// Route types
+export interface RouteConfig {
+  path: string;
+  element: React.ComponentType;
+  title?: string;
+  breadcrumb?: BreadcrumbItem[];
 }
 
 // Navigation types

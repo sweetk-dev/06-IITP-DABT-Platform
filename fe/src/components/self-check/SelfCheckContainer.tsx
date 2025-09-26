@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 
 interface SelfCheckContainerProps {
-  title: string;
-  subtitle?: string;
+  title: ReactNode;
+  subtitle?: ReactNode;
   children: ReactNode;
 }
 
@@ -16,28 +16,30 @@ export function SelfCheckContainer({ title, subtitle, children }: SelfCheckConta
       justifyContent: 'center',
       textAlign: 'center'
     }}>
-      {/* Title - Figma Style */}
+      {/* Title - HTML Design Style */}
       <h1 style={{
-        fontSize: '36px',
+        color: 'black',
+        fontSize: '32px',
+        fontFamily: 'Pretendard',
         fontWeight: 700,
-        fontFamily: 'var(--font-family-primary)',
-        color: 'var(--color-text-primary)',
-        textAlign: 'center',
-        marginBottom: subtitle ? '16px' : '40px',
-        lineHeight: '1.2'
+        lineHeight: '48px',
+        wordWrap: 'break-word',
+        marginBottom: subtitle ? '20px' : '40px',
+        textAlign: 'center'
       }}>
         {title}
       </h1>
 
-      {/* Subtitle */}
+      {/* Subtitle - HTML Design Style */}
       {subtitle && (
         <p style={{
-          fontSize: '18px',
-          fontFamily: 'var(--font-family-primary)',
-          fontWeight: 500,
-          color: 'var(--figma-gray-500)',
+          color: 'black',
+          fontSize: '20px',
+          fontFamily: 'Pretendard',
+          fontWeight: 400,
+          lineHeight: '30px',
+          wordWrap: 'break-word',
           marginBottom: '40px',
-          lineHeight: '1.6',
           textAlign: 'center'
         }}>
           {subtitle}

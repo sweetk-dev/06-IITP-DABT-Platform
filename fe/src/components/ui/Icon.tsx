@@ -15,7 +15,12 @@ export type IconName =
   | 'wallet-3-line'
   | 'mental-health-line'
   | 'parent-line'
-  | 'arrow-right-up-line';
+  | 'arrow-right-up-line'
+  | 'star-line'
+  | 'star-fill'
+  | 'information-line'
+  | 'book-open-line'
+  | 'customer-service-line';
 
 interface IconProps {
   name: IconName;
@@ -23,6 +28,7 @@ interface IconProps {
   color?: string;
   className?: string;
   id?: string;
+  style?: React.CSSProperties;
 }
 
 const iconSizes = {
@@ -32,7 +38,7 @@ const iconSizes = {
   xl: '32px'
 };
 
-export function Icon({ name, size = 'm', color = 'currentColor', className, id }: IconProps) {
+export function Icon({ name, size = 'm', color = 'currentColor', className, id, style }: IconProps) {
   const iconSize = iconSizes[size];
   
   // Figma 아이콘들을 SVG로 구현
@@ -51,7 +57,12 @@ export function Icon({ name, size = 'm', color = 'currentColor', className, id }
     'wallet-3-line': 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-2M9 12h6',
     'mental-health-line': 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
     'parent-line': 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-    'arrow-right-up-line': 'M7 17L17 7m0 0H9m8 0v8'
+    'arrow-right-up-line': 'M7 17L17 7m0 0H9m8 0v8',
+    'star-line': 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+    'star-fill': 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+    'information-line': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',
+    'book-open-line': 'M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2V3zm0 16h5a2 2 0 012 2v-2H2v-2zm8-16h6a4 4 0 014 4v14a3 3 0 01-3 3h-5V3zm0 16h5a2 2 0 002-2V7h-7v12z',
+    'customer-service-line': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'
   };
 
   return (
@@ -66,7 +77,7 @@ export function Icon({ name, size = 'm', color = 'currentColor', className, id }
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
-      style={{ display: 'inline-block', verticalAlign: 'middle' }}
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
     >
       <path d={iconPaths[name]} />
     </svg>

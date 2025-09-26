@@ -118,19 +118,19 @@ export function SelfCheckQuestions() {
   const getAreaProgress = () => {
     const progress: { [key: string]: string } = {};
     areas.forEach((area, index) => {
-      const areaQuestions = SELF_CHECK_QUESTIONS[area];
-      const totalQuestions = areaQuestions.length;
+      const areaName = AREA_NAMES[area];
+      const totalQuestions = SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA[area];
       
       if (index < currentAreaIndex) {
         // 완료된 영역
-        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(${totalQuestions}/${totalQuestions})`;
+        progress[areaName] = `${areaName}(${totalQuestions}/${totalQuestions})`;
       } else if (index === currentAreaIndex) {
         // 현재 진행 중인 영역
         const currentProgress = currentQuestionIndex + (selectedValue !== null ? 1 : 0);
-        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(${currentProgress}/${totalQuestions})`;
+        progress[areaName] = `${areaName}(${currentProgress}/${totalQuestions})`;
       } else {
         // 아직 시작하지 않은 영역
-        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(0/${totalQuestions})`;
+        progress[areaName] = `${areaName}(0/${totalQuestions})`;
       }
     });
     return progress;
@@ -146,15 +146,14 @@ export function SelfCheckQuestions() {
       {/* Progress Steps */}
       <SelfCheckProgress 
         currentStep={currentAreaIndex + 2} // 본인 확인(1) + 현재 영역 인덱스 + 1
-        totalSteps={5}
-        stepNames={['본인 확인', '신체적 자립', '정서적 자립', '경제적 자립', '사회적 자립']}
+        totalSteps={Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).length + 1} // 본인 확인 + 영역 수
+        stepNames={undefined} // 기본값 사용 (상수에서 동적 생성)
         areaProgress={getAreaProgress()}
       />
 
       {/* Main Container */}
       <SelfCheckContainer 
-        title={`${AREA_NAMES[currentArea]} 영역`}
-        subtitle={`${currentQuestionIndex + 1}. ${currentQuestion.question}`}
+        title={currentQuestion.question}
       >
         {/* Scale Selection - Figma Design */}
         <div style={{
@@ -164,7 +163,7 @@ export function SelfCheckQuestions() {
           gap: '24px',
           marginBottom: '40px'
         }}>
-          {[1, 2, 3, 4, 5].map((value) => (
+          {Array.from({ length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 }, (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN).map((value) => (
             <button
               key={value}
               onClick={() => setSelectedValue(value)}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
-import { IDENTITY_QUESTIONS, type IdentityQuestionType, type IdentityResponse } from '../../../../packages/common/src/types';
+import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, AREA_NAMES, type IdentityQuestionType, type IdentityResponse } from '../../../../packages/common/src/types';
 
 export function SelfCheckIdentity() {
   const navigate = useNavigate();
@@ -64,20 +64,19 @@ export function SelfCheckIdentity() {
       {/* Progress Steps */}
       <SelfCheckProgress 
         currentStep={1}
-        totalSteps={5}
-        stepNames={['본인 확인', '신체적 자립', '정서적 자립', '경제적 자립', '사회적 자립']}
-        areaProgress={{
-          '신체적 자립': '신체적 자립(0/8)',
-          '정서적 자립': '정서적 자립(0/7)',
-          '경제적 자립': '경제적 자립(0/8)',
-          '사회적 자립': '사회적 자립(0/8)'
-        }}
+        totalSteps={Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).length + 1} // 본인 확인 + 영역 수
+        stepNames={undefined} // 기본값 사용 (상수에서 동적 생성)
+        areaProgress={Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).reduce((acc, key) => {
+          const areaName = AREA_NAMES[key as keyof typeof AREA_NAMES];
+          const questionCount = SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA[key as keyof typeof SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA];
+          acc[areaName] = `${areaName}(0/${questionCount})`;
+          return acc;
+        }, {} as { [key: string]: string })}
       />
 
       {/* Main Container */}
       <SelfCheckContainer 
         title={currentQuestion.question}
-        subtitle={`${currentQuestionIndex + 1}/${IDENTITY_QUESTIONS.length}번째 질문`}
       >
         {/* Answer Options - Figma Style */}
         <div style={{
@@ -130,19 +129,6 @@ export function SelfCheckIdentity() {
           ))}
         </div>
 
-        {/* Note (if exists) */}
-        {currentQuestion.note && (
-          <div style={{
-            fontSize: '16px',
-            color: 'var(--figma-gray-500)',
-            textAlign: 'center',
-            fontStyle: 'italic',
-            marginBottom: '20px',
-            fontFamily: 'var(--font-family-primary)'
-          }}>
-            {currentQuestion.note}
-          </div>
-        )}
       </SelfCheckContainer>
 
       {/* Navigation */}

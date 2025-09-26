@@ -1,4 +1,5 @@
 import React from 'react';
+import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '../../../../packages/common/src/types';
 
 interface SelfCheckProgressProps {
   currentStep: number;
@@ -7,10 +8,16 @@ interface SelfCheckProgressProps {
   areaProgress?: { [key: string]: string }; // 영역별 진행상태 (예: "신체적 자립(1/8)")
 }
 
+// 기본 stepNames를 상수에서 동적으로 생성
+const getDefaultStepNames = () => {
+  const areaKeys = Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA);
+  return ['본인 확인', ...areaKeys.map(key => AREA_NAMES[key as keyof typeof AREA_NAMES])];
+};
+
 export function SelfCheckProgress({ 
   currentStep, 
   totalSteps, 
-  stepNames = ['본인 확인', '신체적 자립', '정서적 자립', '경제적 자립', '사회적 자립'], 
+  stepNames = getDefaultStepNames(), 
   areaProgress = {}
 }: SelfCheckProgressProps) {
   return (

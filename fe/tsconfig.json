@@ -12,8 +12,12 @@
     "jsx": "react-jsx",
     "strict": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@iitp-dabt-platform/common": ["../packages/common/src"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "src/vite-env.d.ts"]
 }
 

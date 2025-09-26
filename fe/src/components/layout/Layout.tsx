@@ -26,7 +26,7 @@ export function Layout({
   
   // 홈 페이지는 브레드크럼 숨김, showBreadcrumb prop도 고려
   const shouldShowBreadcrumb = showBreadcrumb && location.pathname !== '/';
-  const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, params) : [];
+  const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, params as Record<string, string>) : [];
 
 
   return (

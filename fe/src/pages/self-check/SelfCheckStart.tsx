@@ -12,10 +12,22 @@ export function SelfCheckStart() {
     <SelfCheckLayout idPrefix="self-check-start" showBackButton={false}>
       {/* Main Content Area - SelfCheckContainer 사용 */}
       <SelfCheckContainer 
-        title="자립 수준 자가 진단을 시작합니다."
-        subtitle={`자가 진단 문항은 총 ${totalQuestions}개로, 약 ${totalTimeMinutes}분 정도 소요됩니다.`}
+        title={
+          <div style={{ textAlign: 'center' }}>
+            자립 수준 자가 진단을 시작합니다.<br />
+            자가 진단 문항은 총{' '}
+            <span style={{ color: '#0090ff' }}>{totalQuestions}개</span>로, 약{' '}
+            <span style={{ color: '#0090ff' }}>{totalTimeMinutes}분</span> 정도 소요됩니다.
+          </div>
+        }
+        subtitle={
+          <div style={{ textAlign: 'center' }}>
+            테스트는 {Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).length}개 영역으로 구성되어 있으며<br />
+            각 문항에 대해 {SELF_CHECK_CONSTANTS.SCORE.MIN}(전혀 아니다) ~ {SELF_CHECK_CONSTANTS.SCORE.MAX}(매우 그렇다) 중<br />
+            하나를 선택해 주세요.
+          </div>
+        }
       >
-
         {/* Start Button */}
         <Link to="/self-check/identity" style={{ textDecoration: 'none' }}>
           <button style={{
