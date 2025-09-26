@@ -1,361 +1,245 @@
-import { Link } from 'react-router-dom';
-import { Layout } from '../../components/layout/Layout';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
+import { Modal } from '../../components/ui/Modal';
+import { 
+  SELF_CHECK_QUESTIONS, 
+  SELF_CHECK_CONSTANTS, 
+  AREA_NAMES, 
+  type SelfCheckAreaType,
+  type SelfCheckResponse 
+} from '../../../../packages/common/src/types';
 
 export function SelfCheckQuestions() {
-  // 현재 진행 상태 (예시)
-  const currentArea = '신체적 자립';
-  const currentQuestion = 1;
-  const totalQuestionsInArea = 8;
-  const areaProgress = '1/8';
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [currentAreaIndex, setCurrentAreaIndex] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [responses, setResponses] = useState<SelfCheckResponse>({});
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
+  const [showExitModal, setShowExitModal] = useState(false);
+
+  // 현재 영역과 질문 정보
+  const areas: SelfCheckAreaType[] = ['phys', 'emo', 'econ', 'soc'];
+  const currentArea = areas[currentAreaIndex];
+  const currentAreaQuestions = SELF_CHECK_QUESTIONS[currentArea];
+  const currentQuestion = currentAreaQuestions[currentQuestionIndex];
+  const currentQuestionId = currentQuestion.id;
   
-  const question = "나의 건강유지에 관심이 있다.";
-  const selectedValue = null; // 선택된 값
+  const isFirstQuestion = currentAreaIndex === 0 && currentQuestionIndex === 0;
+  const isLastQuestion = currentAreaIndex === areas.length - 1 && currentQuestionIndex === currentAreaQuestions.length - 1;
+  const isLastQuestionInArea = currentQuestionIndex === currentAreaQuestions.length - 1;
+
+  // 모달 핸들러
+  const handleExit = () => {
+    localStorage.removeItem('selfCheckUserInfo');
+    localStorage.removeItem('selfCheckResponses');
+    navigate('/');
+  };
+
+  // 컴포넌트 마운트 시 사용자 정보 로드
+  useEffect(() => {
+    const savedUserInfo = localStorage.getItem('selfCheckUserInfo');
+    if (savedUserInfo) {
+      setUserInfo(JSON.parse(savedUserInfo));
+    } else {
+      navigate('/self-check/identity');
+    }
+  }, [navigate]);
+
+  // 현재 질문의 응답 로드
+  useEffect(() => {
+    const currentResponse = responses[currentQuestionId];
+    setSelectedValue(currentResponse || null);
+  }, [currentQuestionId, responses]);
+
+  // 사용자 정보가 없으면 로딩 표시
+  if (!userInfo) {
+    return (
+      <SelfCheckLayout 
+        idPrefix="self-check-questions" 
+        showBackButton={true}
+        onBackClick={() => setShowExitModal(true)}
+      >
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '50vh' 
+        }}>
+          로딩 중...
+        </div>
+      </SelfCheckLayout>
+    );
+  }
+
+  // 이전 버튼 처리
+  const handlePrevious = () => {
+    if (isFirstQuestion) {
+      navigate('/self-check/identity');
+    } else if (currentQuestionIndex === 0) {
+      // 이전 영역의 마지막 질문으로 이동
+      const prevAreaIndex = currentAreaIndex - 1;
+      const prevArea = areas[prevAreaIndex];
+      const prevAreaQuestions = SELF_CHECK_QUESTIONS[prevArea];
+      setCurrentAreaIndex(prevAreaIndex);
+      setCurrentQuestionIndex(prevAreaQuestions.length - 1);
+    } else {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  // 다음 버튼 처리
+  const handleNext = () => {
+    if (selectedValue !== null) {
+      // 현재 응답 저장
+      const newResponses = {
+        ...responses,
+        [currentQuestionId]: selectedValue
+      };
+      setResponses(newResponses);
+
+      if (isLastQuestion) {
+        // 모든 질문 완료 - 결과 페이지로 이동
+        localStorage.setItem('selfCheckResponses', JSON.stringify(newResponses));
+        navigate('/self-check/result');
+      } else if (isLastQuestionInArea) {
+        // 다음 영역의 첫 번째 질문으로 이동
+        setCurrentAreaIndex(prev => prev + 1);
+        setCurrentQuestionIndex(0);
+      } else {
+        // 같은 영역의 다음 질문으로 이동
+        setCurrentQuestionIndex(prev => prev + 1);
+      }
+    }
+  };
+
+  // 영역별 진행 상태 계산
+  const getAreaProgress = () => {
+    const progress: { [key: string]: string } = {};
+    areas.forEach((area, index) => {
+      const areaQuestions = SELF_CHECK_QUESTIONS[area];
+      const totalQuestions = areaQuestions.length;
+      
+      if (index < currentAreaIndex) {
+        // 완료된 영역
+        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(${totalQuestions}/${totalQuestions})`;
+      } else if (index === currentAreaIndex) {
+        // 현재 진행 중인 영역
+        const currentProgress = currentQuestionIndex + (selectedValue !== null ? 1 : 0);
+        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(${currentProgress}/${totalQuestions})`;
+      } else {
+        // 아직 시작하지 않은 영역
+        progress[AREA_NAMES[area]] = `${AREA_NAMES[area]}(0/${totalQuestions})`;
+      }
+    });
+    return progress;
+  };
 
   return (
-    <Layout idPrefix="self-check-questions">
+    <>
+      <SelfCheckLayout 
+      idPrefix="self-check-questions" 
+      showBackButton={true}
+      onBackClick={() => setShowExitModal(true)}
+    >
       {/* Progress Steps */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '40px',
-        gap: '8px'
-      }}>
-        {/* Step 1 - Completed */}
+      <SelfCheckProgress 
+        currentStep={currentAreaIndex + 2} // 본인 확인(1) + 현재 영역 인덱스 + 1
+        totalSteps={5}
+        stepNames={['본인 확인', '신체적 자립', '정서적 자립', '경제적 자립', '사회적 자립']}
+        areaProgress={getAreaProgress()}
+      />
+
+      {/* Main Container */}
+      <SelfCheckContainer 
+        title={`${AREA_NAMES[currentArea]} 영역`}
+        subtitle={`${currentQuestionIndex + 1}. ${currentQuestion.question}`}
+      >
+        {/* Scale Selection - Figma Design */}
         <div style={{
           display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
-          gap: '8px'
+          gap: '24px',
+          marginBottom: '40px'
         }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: '#0090ff',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            ✓
-          </div>
-          <div style={{
-            color: 'black',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: 500
-          }}>
-            본인 확인
-          </div>
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              key={value}
+              onClick={() => setSelectedValue(value)}
+              style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: selectedValue === value ? 'var(--color-primary)' : 'var(--figma-white)',
+                color: selectedValue === value ? 'var(--figma-white)' : 'var(--color-text-primary)',
+                border: 'none',
+                fontSize: '24px',
+                fontFamily: 'var(--font-family-primary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: selectedValue === value 
+                  ? '0 4px 12px rgba(0, 144, 255, 0.3)' 
+                  : '0 2px 8px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedValue !== value) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedValue !== value) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                }
+              }}
+            >
+              {value}
+            </button>
+          ))}
         </div>
 
-        {/* Separator */}
-        <div style={{
-          width: '40px',
-          height: '2px',
-          background: '#0090ff'
-        }} />
-
-        {/* Step 2 - Active */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: '#0090ff',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            1
-          </div>
-          <div style={{
-            color: 'black',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: 500
-          }}>
-            {currentArea}({areaProgress})
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div style={{
-          width: '40px',
-          height: '2px',
-          background: '#e0e0e0'
-        }} />
-
-        {/* Step 3 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: '#e0e0e0',
-            color: '#666',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            2
-          </div>
-          <div style={{
-            color: '#666',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: 400
-          }}>
-            정서적 자립(0/7)
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div style={{
-          width: '40px',
-          height: '2px',
-          background: '#e0e0e0'
-        }} />
-
-        {/* Step 4 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: '#e0e0e0',
-            color: '#666',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            3
-          </div>
-          <div style={{
-            color: '#666',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: 400
-          }}>
-            경제적 자립(0/8)
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div style={{
-          width: '40px',
-          height: '2px',
-          background: '#e0e0e0'
-        }} />
-
-        {/* Step 5 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: '#e0e0e0',
-            color: '#666',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            4
-          </div>
-          <div style={{
-            color: '#666',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: 400
-          }}>
-            사회적 자립(0/8)
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div style={{
-        width: '100%',
-        minHeight: '460px',
-        background: 'white',
-        borderRadius: '16px',
-        padding: '40px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: '1px solid #efefef'
-      }}>
-        {/* Category Title */}
-        <div style={{
-          fontSize: '24px',
-          fontFamily: 'Pretendard',
-          fontWeight: 700,
-          color: 'black',
-          marginBottom: '32px',
-          textAlign: 'center'
-        }}>
-          {currentArea} 영역
-        </div>
-
-        {/* Question Section */}
-        <div style={{
-          marginBottom: '40px',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            fontSize: '28px',
-            fontFamily: 'Pretendard',
-            fontWeight: 600,
-            color: 'black',
-            lineHeight: '1.4'
-          }}>
-            {currentQuestion}. {question}
-          </div>
-        </div>
-
-        {/* Scale Section */}
-        <div style={{
-          marginBottom: '60px'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
-            flexWrap: 'wrap'
-          }}>
-            <div style={{
-              fontSize: '16px',
-              fontFamily: 'Pretendard',
-              fontWeight: 500,
-              color: '#666'
-            }}>
-              전혀 아니다
-            </div>
-            
-            {[1, 2, 3, 4, 5].map((value) => (
-              <button
-                key={value}
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: selectedValue === value ? '#0090ff' : '#f8f9fa',
-                  border: selectedValue === value ? '2px solid #0090ff' : '2px solid #e0e0e0',
-                  color: selectedValue === value ? 'white' : '#666',
-                  fontSize: '18px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedValue !== value) {
-                    e.currentTarget.style.borderColor = '#0090ff';
-                    e.currentTarget.style.background = '#e3f2fd';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedValue !== value) {
-                    e.currentTarget.style.borderColor = '#e0e0e0';
-                    e.currentTarget.style.background = '#f8f9fa';
-                  }
-                }}
-              >
-                {value}
-              </button>
-            ))}
-            
-            <div style={{
-              fontSize: '16px',
-              fontFamily: 'Pretendard',
-              fontWeight: 500,
-              color: '#666'
-            }}>
-              매우 그렇다
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Buttons */}
+        {/* Scale Labels */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          fontSize: '14px',
+          color: '#666',
+          marginBottom: '20px'
         }}>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            background: '#f8f9fa',
-            color: '#666',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontFamily: 'Pretendard',
-            fontWeight: '500',
-            cursor: 'pointer',
-            border: '1px solid #e0e0e0',
-            transition: 'all 0.2s ease'
-          }}>
-            <img src="/left_arrow2.svg" alt="이전" style={{ width: '16px', height: '16px' }} />
-            <span>이전</span>
-          </button>
-          
-          {/* 다음 버튼 - 현재는 임시로 결과 페이지로 이동 */}
-          <Link to="/self-check/result" style={{ textDecoration: 'none' }}>
-            <button 
-              disabled={!selectedValue}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                background: selectedValue ? '#0090ff' : '#e0e0e0',
-                color: selectedValue ? 'white' : '#999',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontFamily: 'Pretendard',
-                fontWeight: '500',
-                cursor: selectedValue ? 'pointer' : 'not-allowed',
-                border: 'none',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span>{currentQuestion === totalQuestionsInArea ? '다음 영역' : '다음'}</span>
-              <img src="/right_arrow2.svg" alt="다음" style={{ width: '16px', height: '16px' }} />
-            </button>
-          </Link>
+          <span>전혀 아니다</span>
+          <span>매우 그렇다</span>
         </div>
-      </div>
-    </Layout>
+      </SelfCheckContainer>
+
+      {/* Navigation */}
+      <SelfCheckNavigation
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        previousText="이전"
+        nextText={isLastQuestion ? '결과보기' : isLastQuestionInArea ? '다음 영역' : '다음'}
+        isNextDisabled={selectedValue === null}
+      />
+    </SelfCheckLayout>
+
+    {/* Exit Modal */}
+    <Modal
+      isOpen={showExitModal}
+      onClose={() => setShowExitModal(false)}
+      title="메인화면으로 이동"
+      description="진행중인 자가 진단이 초기화 됩니다. 메인화면으로 이동하시겠습니까?"
+      primaryButtonText="이동하기"
+      secondaryButtonText="취소"
+      onPrimaryClick={handleExit}
+      onSecondaryClick={() => setShowExitModal(false)}
+    />
+    </>
   );
 }

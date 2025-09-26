@@ -1,50 +1,75 @@
 :root {
   /* Color System - Figma Design System */
   --color-primary: #0090ff;
-  --color-primary-hover: #007acc;
-  --color-primary-light: #e6f3ff;
-  --color-primary-dark: #0056b3;
+  --color-primary-hover: #0086ed;
+  --color-primary-light: #f0f8ff;
+  --color-primary-dark: #03053d;
   
   /* Figma Neutral Colors */
   --color-neutral-black: #000000;
-  --color-neutral-light-black: #000000;
+  --color-neutral-light-black: #252525;
   
-  /* Figma Theme Colors */
-  --color-theme-physical: #e8f5e8;
-  --color-theme-physical-border: #4caf50;
-  --color-theme-emotional: #fff3e0;
-  --color-theme-emotional-border: #ff9800;
-  --color-theme-economic: #e3f2fd;
-  --color-theme-economic-border: #2196f3;
-  --color-theme-social: #f3e5f5;
-  --color-theme-social-border: #9c27b0;
+  /* Figma Theme Colors - Exact from Figma */
+  --color-theme-physical: #ffeef2;
+  --color-theme-physical-border: #d0ecff;
+  --color-theme-emotional: #fffdee;
+  --color-theme-emotional-border: #d0ecff;
+  --color-theme-economic: #eefff2;
+  --color-theme-economic-border: #d0ecff;
+  --color-theme-social: #eef8ff;
+  --color-theme-social-border: #d0ecff;
   
-  --color-secondary: #6c757d;
+  --color-secondary: #6f6f6f;
   --color-success: #28a745;
   --color-warning: #ffc107;
   --color-danger: #dc3545;
   --color-info: #17a2b8;
   
-  /* Theme Colors from Figma */
-  --color-theme-physical: #ffeef2;
-  --color-theme-physical-border: #ffdde5;
-  --color-theme-emotional: #fffdee;
-  --color-theme-emotional-border: #fff6b4;
-  --color-theme-economic: #eefff2;
-  --color-theme-economic-border: #d9f5df;
-  --color-theme-social: #eef8ff;
-  --color-theme-social-border: #d0ecff;
   
-  /* Text Colors */
-  --color-text-primary: #212529;
-  --color-text-secondary: #6c757d;
-  --color-text-muted: #adb5bd;
+  /* Figma Extracted Colors - Platform UI v.1 */
+  --figma-white: #ffffff;
+  --figma-black: #000000;
+  --figma-gray-50: #f4f6f8;
+  --figma-gray-100: #f1f4f7;
+  --figma-gray-150: #F1F3F7;
+  --figma-gray-200: #e8e8e8;
+  --figma-gray-300: #d9d9d9;
+  --figma-gray-400: #a3a3a3;
+  --figma-gray-500: #6f6f6f;
+  --figma-gray-600: #252525;
+  --figma-gray-700: #252525;
+  --figma-gray-800: #252525;
+  
+  /* Figma Primary Blue Colors */
+  --figma-blue-50: #f0f8ff;
+  --figma-blue-100: #e5f2ff;
+  --figma-blue-200: #d0ecff;
+  --figma-blue-300: #b3d9ff;
+  --figma-blue-400: #90c7ff;
+  --figma-blue-500: #0085ff;
+  --figma-blue-600: #0066ed;
+  --figma-blue-700: #004db3;
+  
+  /* Figma Theme Specific Colors - Exact from Figma */
+  --figma-physical-50: #ffeef2;
+  --figma-physical-100: #d0ecff;
+  --figma-emotional-50: #fffdee;
+  --figma-emotional-100: #d0ecff;
+  --figma-economic-50: #eefff2;
+  --figma-economic-100: #d0ecff;
+  --figma-social-50: #eef8ff;
+  --figma-social-100: #d0ecff;
+  
+  /* Text Colors - Updated from Figma */
+  --color-text-primary: #252525;
+  --color-text-secondary: #6f6f6f;
+  --color-text-muted: #939393;
   --color-text-inverse: #ffffff;
   
-  /* Background Colors */
+  /* Background Colors - Updated from Figma */
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8f9fa;
-  --color-bg-tertiary: #e9ecef;
+  --color-bg-secondary: #f3f5f8;
+  --color-bg-tertiary: #f1f3f7;
   --color-bg-info: #f0f8ff;
   --color-bg-overlay: rgba(0, 0, 0, 0.5);
   
@@ -56,17 +81,18 @@
   /* Typography System - Pretendard Font */
   --font-family-primary: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Font Sizes - Consistent Scale */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 28px;
+  /* Font Sizes - Exact from Figma */
+  --font-size-xs: 15px;
+  --font-size-sm: 16px;
+  --font-size-base: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 30px;
   --font-size-4xl: 32px;
   --font-size-5xl: 36px;
-  --font-size-6xl: 48px;
+  --font-size-6xl: 40px;
+  --font-size-7xl: 60px;
   
   /* Font Weights */
   --font-weight-normal: 400;
@@ -75,10 +101,51 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
   
-  /* Line Heights */
-  --line-height-tight: 1.25;
+  /* Line Heights - Exact from Figma */
+  --line-height-tight: 1.2;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-relaxed: 1.8;
+  
+  /* Figma Typography Classes */
+  --figma-text-xs: 15px/18px Pretendard;
+  --figma-text-sm: 16px/24px Pretendard;
+  --figma-text-base: 18px/22px Pretendard;
+  --figma-text-lg: 20px/30px Pretendard;
+  --figma-text-xl: 24px/29px Pretendard;
+  --figma-text-2xl: 28px/34px Pretendard;
+  --figma-text-3xl: 30px/36px Pretendard;
+  --figma-text-4xl: 32px/38px Pretendard;
+  --figma-text-5xl: 36px/54px Pretendard;
+  --figma-text-6xl: 40px/48px Pretendard;
+  --figma-text-7xl: 60px/72px Pretendard;
+  
+  /* Figma Font Weight Classes */
+  --figma-text-15-400: 15px/18px Pretendard;
+  --figma-text-15-500: 15px/18px Pretendard;
+  --figma-text-15-600: 15px/20px Pretendard;
+  --figma-text-15-700: 15px/18px Pretendard;
+  --figma-text-16-400: 16px/24px Pretendard;
+  --figma-text-16-500: 16px/21px Pretendard;
+  --figma-text-16-600: 16px/19px Pretendard;
+  --figma-text-16-700: 16px/19px Pretendard;
+  --figma-text-18-400: 18px/22px Pretendard;
+  --figma-text-18-600: 18px/27px Pretendard;
+  --figma-text-18-700: 18px/27px Pretendard;
+  --figma-text-20-400: 20px/30px Pretendard;
+  --figma-text-20-600: 20px/26px Pretendard;
+  --figma-text-20-700: 20px/26px Pretendard;
+  --figma-text-24-500: 24px/29px Pretendard;
+  --figma-text-24-600: 24px/29px Pretendard;
+  --figma-text-24-700: 24px/34px Pretendard;
+  --figma-text-28-600: 28px/34px Pretendard;
+  --figma-text-28-700: 28px/34px Pretendard;
+  --figma-text-30-700: 30px/36px Pretendard;
+  --figma-text-32-700: 32px/38px Pretendard;
+  --figma-text-36-600: 36px/54px Pretendard;
+  --figma-text-36-700: 36px/54px Pretendard;
+  --figma-text-40-500: 40px/48px Pretendard;
+  --figma-text-60-600: 60px/72px Pretendard;
+  
   --line-height-loose: 2;
   
   /* Spacing System - 8px Grid */

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
-import { Breadcrumb, getBreadcrumbItems } from '../ui/Breadcrumb';
+import { Breadcrumb } from '../ui/Breadcrumb';
+import { getBreadcrumbItems } from '../../pages/App';
 import { MobileNavigation } from '../ui/MobileNavigation';
 import { HeaderSearch } from '../ui/HeaderSearch';
 
@@ -23,8 +24,8 @@ export function Layout({
   const params = useParams();
   const navigate = useNavigate();
   
-  // 홈 페이지는 브레드크럼 숨김
-  const shouldShowBreadcrumb = location.pathname !== '/';
+  // 홈 페이지는 브레드크럼 숨김, showBreadcrumb prop도 고려
+  const shouldShowBreadcrumb = showBreadcrumb && location.pathname !== '/';
   const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, params) : [];
 
 

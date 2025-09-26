@@ -7,6 +7,7 @@ import { Icon } from '../../components/ui/Icon';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Tag } from '../../components/ui/Tag';
+import { SELF_REL_TYPE_CONSTANTS, type SelfRelTypeCode } from '../../../../packages/common/src/types';
 
 export function SelfCheckMore() {
   return (
@@ -18,14 +19,17 @@ export function SelfCheckMore() {
           <h1 id="self-check-more-title" style={{
             fontSize: '32px',
             fontWeight: 700,
+            lineHeight: '38px',
             margin: 0,
-            color: 'var(--color-text-primary)'
+            color: 'var(--color-text-primary)',
+            fontFamily: 'var(--font-family-primary)'
           }}>
             자가진단 결과 더보기
           </h1>
         </div>
         <p id="self-check-more-desc" style={{
           fontSize: '16px',
+          fontFamily: 'var(--font-family-primary)',
           color: 'var(--color-text-secondary)',
           marginBottom: '32px'
         }}>
@@ -57,6 +61,22 @@ export function SelfCheckMore() {
                 icon={level.icon}
               />
             ))}
+          </FilterSection>
+
+          {/* Self Rel Type Filter */}
+          <FilterSection idPrefix="self-check-more-types" title="자립 유형">
+            {SELF_REL_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== 'basic').map((typeCode) => {
+              const typeInfo = SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[typeCode];
+              const counts = { phys: 45, emo: 32, econ: 28, soc: 21 };
+              return (
+                <FilterOption
+                  key={typeCode}
+                  id={`self-check-more-filter-type-${typeCode}`}
+                  name={typeInfo.name}
+                  count={counts[typeCode]}
+                />
+              );
+            })}
           </FilterSection>
 
           {/* Service Type Filter */}

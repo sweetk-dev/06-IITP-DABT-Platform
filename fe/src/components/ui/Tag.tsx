@@ -12,24 +12,24 @@ interface TagProps {
 
 const tagVariants = {
   default: {
-    background: 'var(--color-bg-secondary)',
-    color: 'var(--color-text-secondary)',
-    border: '1px solid var(--color-border-secondary)'
+    background: 'var(--figma-gray-100)',
+    color: 'var(--figma-gray-600)',
+    border: '1px solid var(--figma-gray-200)'
   },
   primary: {
-    background: 'var(--color-primary-light)',
+    background: 'var(--figma-blue-50)',
     color: 'var(--color-primary)',
-    border: '1px solid var(--color-primary)'
+    border: '1px solid var(--figma-blue-200)'
   },
   secondary: {
-    background: 'var(--color-bg-tertiary)',
+    background: 'var(--figma-gray-50)',
     color: 'var(--color-text-primary)',
-    border: '1px solid var(--color-border-primary)'
+    border: '1px solid var(--figma-gray-300)'
   },
   success: {
-    background: '#d4edda',
-    color: '#155724',
-    border: '1px solid #c3e6cb'
+    background: 'var(--figma-economic-50)',
+    color: 'var(--color-success)',
+    border: '1px solid var(--figma-economic-100)'
   },
   warning: {
     background: '#fff3cd',
@@ -42,27 +42,30 @@ const tagVariants = {
     border: '1px solid #f5c6cb'
   },
   info: {
-    background: 'var(--color-bg-info)',
+    background: 'var(--figma-blue-50)',
     color: 'var(--color-info)',
-    border: '1px solid var(--color-info)'
+    border: '1px solid var(--figma-blue-200)'
   }
 };
 
 const tagSizes = {
   s: {
-    padding: '4px 8px',
+    padding: '6px 12px',
     fontSize: '12px',
-    borderRadius: 'var(--radius-sm)'
+    borderRadius: '6px',
+    fontFamily: 'var(--font-family-primary)'
   },
   m: {
-    padding: '6px 12px',
+    padding: '8px 16px',
     fontSize: '14px',
-    borderRadius: 'var(--radius-md)'
+    borderRadius: '8px',
+    fontFamily: 'var(--font-family-primary)'
   },
   l: {
-    padding: '8px 16px',
+    padding: '10px 20px',
     fontSize: '16px',
-    borderRadius: 'var(--radius-lg)'
+    borderRadius: '10px',
+    fontFamily: 'var(--font-family-primary)'
   }
 };
 
@@ -82,7 +85,9 @@ export function Tag({
     alignItems: 'center',
     gap: '6px',
     fontWeight: '500',
-    lineHeight: '1.2'
+    lineHeight: '1.2',
+    transition: 'all 0.2s ease',
+    cursor: 'default'
   };
 
   return (

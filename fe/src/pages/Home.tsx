@@ -48,52 +48,16 @@ export function Home() {
   return (
     <Layout idPrefix="home">
       {/* Body Area - Figma Design */}
-      <div id="home-body-area" style={{
-        width: '100%',
-        position: 'relative',
-        display: 'inline-block'
-      }}>
+      <div id="home-body-area" className="home-body-area">
         {/* About Section + Latest Data Section - 2열 구조 */}
-        <div id="home-main-sections" style={{
-          width: '100%',
-          display: 'flex',
-          gap: '16px',
-          marginTop: '60px'
-        }}>
+        <div id="home-main-sections" className="home-main-sections">
           {/* About Section */}
-          <div id="home-about-section" style={{
-            flex: '1',
-            height: '380px',
-            padding: '32px 40px',
-            position: 'relative',
-            background: '#d0ecff',
-            borderRadius: '16px',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            display: 'flex'
-          }}>
-            <div id="home-about-title" style={{
-              alignSelf: 'stretch',
-              color: 'black',
-              fontSize: '32px',
-              fontFamily: 'Pretendard',
-              fontWeight: 700,
-              wordWrap: 'break-word'
-            }}>
+          <div id="home-about-section" className="home-about-section">
+            <div id="home-about-title" className="home-about-title">
               장애인의 자립에 관하여
             </div>
 
-            <div id="home-about-description" style={{
-              alignSelf: 'stretch',
-              color: 'black',
-              fontSize: '20px',
-              fontFamily: 'Pretendard',
-              fontWeight: 400,
-              lineHeight: '30px',
-              wordWrap: 'break-word',
-              padding: '16px 0'
-            }}>
+            <div id="home-about-description" className="home-about-description">
               장애인 자립 지원 허브와 장애인 자립<br />데이터에
               대해 소개합니다.
             </div>
@@ -101,94 +65,32 @@ export function Home() {
             <Link 
               to="/info"
               id="home-about-detail-btn"
-              style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '2px',
-                display: 'inline-flex',
-                cursor: 'pointer',
-                textDecoration: 'none'
-              }}
+              className="home-about-link"
             >
-              <div style={{
-                color: 'black',
-                fontSize: '20px',
-                fontFamily: 'Pretendard',
-                fontWeight: 700,
-                lineHeight: '26px',
-                wordWrap: 'break-word'
-              }}>
+              <div className="home-about-link-text">
                 자세히 보기
               </div>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  left: '0px',
-                  top: '0px',
-                  position: 'absolute'
-                }} />
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  backgroundImage: 'url(/right_arrow.svg)',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center'
-                }} />
+              <div className="icon-container">
+                <div className="icon-container-inner" />
+                <div 
+                  className="icon-container-image"
+                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                />
               </div>
             </Link>
 
-            <div style={{
-              width: '300px',
-              height: '166px',
-              flexShrink: 0,
-              aspectRatio: '202/111',
-              position: 'absolute',
-              right: '20px',
-              bottom: '20px',
-              background: 'url(/main_top.png) 50% / cover no-repeat',
-              zIndex: 1
-            }} />
+            <div 
+              className="home-about-bg-image"
+              style={{ background: 'url(/main_top.png) 50% / cover no-repeat' }}
+            />
           </div>
 
           {/* Latest Data Section */}
-          <div style={{
-            flex: '1',
-            height: '380px',
-            padding: '28px',
-            background: 'white',
-            boxShadow: '0px 0px 100px rgba(0, 0, 0, 0.08)',
-            borderRadius: '16px',
-            outline: '1px #efefef solid',
-            outlineOffset: '-1px',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            display: 'flex'
-          }}>
-            <div style={{
-              color: 'black',
-              fontSize: '24px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              wordWrap: 'break-word'
-            }}>
+          <div className="home-latest-data-section">
+            <div className="home-latest-data-title">
               최신 데이터
             </div>
-            <div style={{
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: '16px',
-              display: 'flex',
-              marginTop: '24px'
-            }}>
+            <div className="home-latest-data-list">
               {[
                 { category: '기초', title: '장애유형 및 산업별 장애인 근로자 고용현황' },
                 { category: '이동권', title: '서울시 지하철역 엘리베이터 위치정보' },
@@ -197,54 +99,14 @@ export function Home() {
                 { category: '기초', title: '장애인 생활체육 실행 유형' },
                 { category: '고용', title: '한국장애인고용공단 신규고용장려금 지역별 지급 현황' }
               ].map((item, index) => (
-                <div key={index} style={{
-                  width: '100%',
-                  height: '31px',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: '10px',
-                  display: 'flex'
-                }}>
-                  <div style={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    gap: '8px',
-                    display: 'flex'
-                  }}>
-                    <div style={{
-                      width: '62px',
-                      paddingLeft: '8px',
-                      paddingRight: '8px',
-                      paddingTop: '5px',
-                      paddingBottom: '5px',
-                      background: 'rgba(0, 143.88, 255, 0.1)',
-                      borderRadius: '8px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '10px',
-                      display: 'flex'
-                    }}>
-                    <div style={{
-                      color: '#0086ed',
-                      fontSize: '15px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 700,
-                      wordWrap: 'break-word'
-                    }}>
-                      {item.category}
+                <div key={index} className="home-latest-data-item">
+                  <div className="home-latest-data-item-content">
+                    <div className="home-latest-data-category">
+                      <div className="home-latest-data-category-text">
+                        {item.category}
+                      </div>
                     </div>
-                    </div>
-                    <div style={{
-                      color: 'black',
-                      fontSize: '20px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 400,
-                      wordWrap: 'break-word',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: 1
-                    }}>
+                    <div className="home-latest-data-title-text">
                       {item.title}
                     </div>
                   </div>
@@ -255,112 +117,38 @@ export function Home() {
         </div>
 
         {/* Theme Section */}
-        <div id="home-theme-section" style={{
-          width: '1200px',
-          marginTop: '60px',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '20px',
-          display: 'inline-flex'
-        }}>
-          <div style={{
-            alignSelf: 'stretch',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            display: 'inline-flex'
-          }}>
-            <div style={{
-              width: '633px',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '8px',
-              display: 'flex'
-            }}>
-              <div id="home-theme-title" style={{
-                color: 'black',
-                fontSize: '28px',
-                fontFamily: 'Pretendard',
-                fontWeight: 600,
-                wordWrap: 'break-word'
-              }}>
+        <div id="home-theme-section" className="home-section">
+          <div className="home-section-header">
+            <div style={{ width: '633px', justifyContent: 'flex-start', alignItems: 'center', gap: '8px', display: 'flex' }}>
+              <div id="home-theme-title" className="home-section-title">
                 자립 테마별
               </div>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  left: '0px',
-                  top: '0px',
-                  position: 'absolute'
-                }} />
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  position: 'absolute',
-                  backgroundImage: 'url(/question.svg)',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center'
-                }} />
+              <div className="icon-container">
+                <div className="icon-container-inner" />
+                <div 
+                  className="icon-container-image"
+                  style={{ backgroundImage: 'url(/question.svg)' }}
+                />
               </div>
             </div>
-            <div id="home-theme-view-all-btn" style={{
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '2px',
-              display: 'flex',
-              cursor: 'pointer'
-            }}
-            onClick={handleViewAllThemes}
+            <div 
+              id="home-theme-view-all-btn" 
+              className="home-section-view-all"
+              onClick={handleViewAllThemes}
             >
-              <div id="home-theme-view-all-btn-text" style={{
-                color: 'black',
-                fontSize: '20px',
-                fontFamily: 'Pretendard',
-                fontWeight: 600,
-                lineHeight: '26px',
-                wordWrap: 'break-word'
-              }}>
+              <div id="home-theme-view-all-btn-text" className="home-section-view-all-text">
                 전체보기
               </div>
-              <div id="home-theme-view-all-btn-icon" style={{
-                width: '28px',
-                height: '28px',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  left: '0px',
-                  top: '0px',
-                  position: 'absolute'
-                }} />
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  backgroundImage: 'url(/right_arrow.svg)',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center'
-                }} />
+              <div id="home-theme-view-all-btn-icon" className="icon-container">
+                <div className="icon-container-inner" />
+                <div 
+                  className="icon-container-image"
+                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                />
               </div>
             </div>
           </div>
-          <div style={{
-            alignSelf: 'stretch',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: '16px',
-            display: 'inline-flex',
-            height: '160px'
-          }}>
+          <div className="home-theme-grid">
             {THEME_CONSTANTS.ALL_CODES.map((themeCode: ThemeCode) => {
               const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
               
@@ -399,79 +187,49 @@ export function Home() {
               const style = themeStyles[themeCode];
               
               return (
-                <div key={themeCode} id={`home-theme-card-${themeCode}`} style={{
-                  width: '288px',
-                  height: '160px',
-                  padding: '28px',
-                  position: 'relative',
-                  background: style.background,
-                  overflow: 'hidden',
-                  borderRadius: '16px',
-                  outline: `1px ${style.outline} solid`,
-                  outlineOffset: '-1px',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  display: 'inline-flex',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleThemeClick(themeCode)}
+                <div 
+                  key={themeCode} 
+                  id={`home-theme-card-${themeCode}`} 
+                  className="home-theme-card"
+                  style={{
+                    background: style.background,
+                    outline: `1px ${style.outline} solid`
+                  }}
+                  onClick={() => handleThemeClick(themeCode)}
                 >
-                  <div id={`home-theme-card-${themeCode}-title`} style={{
-                    color: 'black',
-                    fontSize: '24px',
-                    fontFamily: 'Pretendard',
-                    fontWeight: 500,
-                    wordWrap: 'break-word'
-                  }}>
+                  <div id={`home-theme-card-${themeCode}-title`} className="home-theme-card-title">
                     {themeInfo.name}
                   </div>
-                  <div id={`home-theme-card-${themeCode}-count`} style={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    gap: '4px',
-                    display: 'inline-flex'
-                  }}>
-                    <div id={`home-theme-card-${themeCode}-count-number`} style={{
-                      color: '#0090ff',
-                      fontSize: '32px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 700,
-                      wordWrap: 'break-word'
-                    }}>
+                  <div id={`home-theme-card-${themeCode}-count`} className="home-theme-card-count">
+                    <div id={`home-theme-card-${themeCode}-count-number`} className="home-theme-card-count-number">
                       {style.count}
                     </div>
-                    <div id={`home-theme-card-${themeCode}-count-unit`} style={{
-                      color: 'black',
-                      fontSize: '24px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 500,
-                      wordWrap: 'break-word'
-                    }}>
+                    <div id={`home-theme-card-${themeCode}-count-unit`} className="home-theme-card-count-unit">
                       건
                     </div>
                   </div>
-                  <div id={`home-theme-card-${themeCode}-image`} style={{
-                    width: '146px',
-                    height: '146px',
-                    position: 'absolute',
-                    backgroundImage: `url(${style.image})`,
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                    ...style.imageStyle
-                  }} />
+                  <div 
+                    id={`home-theme-card-${themeCode}-image`} 
+                    className="home-theme-card-image"
+                    style={{
+                      backgroundImage: `url(${style.image})`,
+                      ...style.imageStyle
+                    }} 
+                  />
                   {/* 정서적 자립 카드에만 있는 특별한 overlay */}
                   {themeCode === 'emo' && (
-                    <div id={`home-theme-card-${themeCode}-overlay`} style={{
-                      width: '65px',
-                      height: '65px',
-                      left: '166px',
-                      top: '24px',
-                      position: 'absolute',
-                      background: 'radial-gradient(ellipse 50% 50% at 50% 50%, white 0%, rgba(255, 255, 255, 0) 42%)',
-                      borderRadius: '9999px'
-                    }} />
+                    <div 
+                      id={`home-theme-card-${themeCode}-overlay`} 
+                      style={{
+                        width: '65px',
+                        height: '65px',
+                        left: '166px',
+                        top: '24px',
+                        position: 'absolute',
+                        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, white 0%, rgba(255, 255, 255, 0) 42%)',
+                        borderRadius: '9999px'
+                      }} 
+                    />
                   )}
                 </div>
               );
@@ -481,121 +239,43 @@ export function Home() {
         </div>
 
         {/* Data Type Section */}
-        <div id="home-data-type-section" style={{
-          width: '1200px',
-          marginTop: '60px',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '20px',
-          display: 'inline-flex'
-        }}>
-          <div style={{
-            alignSelf: 'stretch',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            display: 'inline-flex'
-          }}>
-            <div id="home-data-type-title" style={{
-              color: 'black',
-              fontSize: '28px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              wordWrap: 'break-word'
-            }}>
+        <div id="home-data-type-section" className="home-section">
+          <div className="home-section-header">
+            <div id="home-data-type-title" className="home-section-title">
               데이터 유형별
             </div>
-            <div id="home-data-type-view-all-btn" style={{
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '2px',
-              display: 'flex',
-              cursor: 'pointer'
-            }}
-            onClick={handleViewAllDataTypes}
+            <div 
+              id="home-data-type-view-all-btn" 
+              className="home-section-view-all"
+              onClick={handleViewAllDataTypes}
             >
-              <div id="home-data-type-view-all-btn-text" style={{
-                color: 'black',
-                fontSize: '20px',
-                fontFamily: 'Pretendard',
-                fontWeight: 600,
-                lineHeight: '26px',
-                wordWrap: 'break-word'
-              }}>
+              <div id="home-data-type-view-all-btn-text" className="home-section-view-all-text">
                 전체보기
               </div>
-              <div id="home-data-type-view-all-btn-icon" style={{
-                width: '28px',
-                height: '28px',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  left: '0px',
-                  top: '0px',
-                  position: 'absolute'
-                }} />
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  backgroundImage: 'url(/right_arrow.svg)',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center'
-                }} />
+              <div id="home-data-type-view-all-btn-icon" className="icon-container">
+                <div className="icon-container-inner" />
+                <div 
+                  className="icon-container-image"
+                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                />
               </div>
             </div>
           </div>
-          <div style={{
-            alignSelf: 'stretch',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: '16px',
-            display: 'inline-flex',
-            height: '160px'
-          }}>
+          <div className="home-data-type-grid">
             {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode: DataTypeCode, index: number) => {
               const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
               const counts: { [key in DataTypeCode]: number } = { basic: 2790, poi: 312, emp: 56 };
               
               return (
-                <div key={dataTypeCode} id={`home-data-type-card-${dataTypeCode}`} style={{
-                  width: '389.33px',
-                  height: '160px',
-                  paddingTop: '28px',
-                  paddingBottom: '28px',
-                  paddingLeft: '40px',
-                  paddingRight: '28px',
-                  background: '#fafcfd',
-                  overflow: 'hidden',
-                  borderRadius: '16px',
-                  outline: '1px #e3e3e3 solid',
-                  outlineOffset: '-1px',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  display: 'flex',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleDataTypeClick(dataTypeCode)}
+                <div 
+                  key={dataTypeCode} 
+                  id={`home-data-type-card-${dataTypeCode}`} 
+                  className="home-data-type-card"
+                  onClick={() => handleDataTypeClick(dataTypeCode)}
                 >
-                  <div id={`home-data-type-card-${dataTypeCode}-content`} style={{
-                    flex: '1',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    height: '100%',
-                    display: 'flex'
-                  }}>
+                  <div id={`home-data-type-card-${dataTypeCode}-content`} className="home-data-type-card-content">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
-                      <div id={`home-data-type-card-${dataTypeCode}-title`} style={{
-                        color: 'black',
-                        fontSize: '24px',
-                        fontFamily: 'Pretendard',
-                        fontWeight: 600,
-                        wordWrap: 'break-word'
-                      }}>
+                      <div id={`home-data-type-card-${dataTypeCode}-title`} className="home-data-type-card-title">
                         {dataTypeInfo.name}
                       </div>
                       <div id={`home-data-type-card-${dataTypeCode}-count`} className="card-stats">
@@ -612,27 +292,12 @@ export function Home() {
                       </div>
                     </div>
                   </div>
-                  <div id={`home-data-type-card-${dataTypeCode}-icon`} style={{
-                    width: '52px',
-                    height: '52px',
-                    background: 'white',
-                    overflow: 'hidden',
-                    borderRadius: '100px',
-                    outline: '1px #d9d9d9 solid',
-                    outlineOffset: '-1px',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    display: 'flex',
-                    flexShrink: 0
-                  }}>
-                    <div id={`home-data-type-card-${dataTypeCode}-icon-image`} style={{
-                      width: '32px',
-                      height: '32px',
-                      backgroundImage: 'url(/right_up.svg)',
-                      backgroundSize: 'cover',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center'
-                    }} />
+                  <div id={`home-data-type-card-${dataTypeCode}-icon`} className="home-data-type-card-icon">
+                    <div 
+                      id={`home-data-type-card-${dataTypeCode}-icon-image`} 
+                      className="home-data-type-card-icon-image"
+                      style={{ backgroundImage: 'url(/right_up.svg)' }}
+                    />
                   </div>
                 </div>
               );
@@ -641,116 +306,38 @@ export function Home() {
         </div>
 
         {/* Self Check Section */}
-        <div id="home-self-check-section" style={{
-          width: '100vw',
-          height: '289px',
-          marginLeft: '50%',
-          transform: 'translateX(-50%)',
-          background: '#f0f8ff',
-          marginTop: '60px'
-        }}>
-          <div id="home-self-check-container" style={{
-            margin: '0 auto',
-            width: '1200px',
-            position: 'relative'
-          }}>
-            <div id="home-self-check-title" style={{
-              paddingTop: '52px',
-              color: 'black',
-              fontSize: '28px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              wordWrap: 'break-word'
-            }}>
+        <div id="home-self-check-section" className="home-self-check-section">
+          <div id="home-self-check-container" className="home-self-check-container">
+            <div id="home-self-check-title" className="home-self-check-title">
               자립 수준 자가 진단
             </div>
-            <div id="home-self-check-description" style={{
-              color: 'black',
-              fontSize: '20px',
-              fontFamily: 'Pretendard',
-              fontWeight: 400,
-              lineHeight: '30px',
-              wordWrap: 'break-word',
-              marginTop: '12px'
-            }}>
+            <div id="home-self-check-description" className="home-self-check-description">
               간단한 자가 진단으로 자립 수준을 확인하고, 맞춤
               정보를 바로 만나보세요.
             </div>
             <Link to="/self-check/start">
-              <div id="home-self-check-btn" style={{
-                padding: '18px 28px',
-                background: '#0090ff',
-                borderRadius: '16px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '10px',
-                display: 'inline-flex',
-                marginTop: '44px',
-                cursor: 'pointer'
-              }}>
-                <div id="home-self-check-btn-text" style={{
-                  textAlign: 'center',
-                  color: 'white',
-                  fontSize: '20px',
-                  fontFamily: 'Pretendard',
-                  fontWeight: 700,
-                  wordWrap: 'break-word'
-                }}>
+              <div id="home-self-check-btn" className="home-self-check-btn">
+                <div id="home-self-check-btn-text" className="home-self-check-btn-text">
                   자가 진단 바로가기
                 </div>
               </div>
             </Link>
-            <div id="home-self-check-image" style={{
-              width: '191px',
-              height: '191px',
-              transform: 'rotate(15deg)',
-              transformOrigin: 'top left',
-              backgroundImage: 'url(/contract.png)',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center',
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
-            }} />
+            <div 
+              id="home-self-check-image" 
+              className="home-self-check-image"
+              style={{ backgroundImage: 'url(/contract.png)' }}
+            />
           </div>
         </div>
 
         {/* Services Section */}
-        <div id="home-services-section" style={{
-          width: '1200px',
-          marginTop: '60px',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '24px',
-          display: 'inline-flex'
-        }}>
-          <div style={{
-            alignSelf: 'stretch',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: '20px',
-            display: 'inline-flex'
-          }}>
-            <div id="home-services-title" style={{
-              color: 'black',
-              fontSize: '28px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              wordWrap: 'break-word'
-            }}>
+        <div id="home-services-section" className="home-services-section">
+          <div className="home-services-header">
+            <div id="home-services-title" className="home-services-title">
               자립 지원 서비스
             </div>
           </div>
-          <div           style={{
-            alignSelf: 'stretch',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: '24px',
-            display: 'inline-flex'
-          }}>
+          <div className="home-services-grid">
             {[
               {
                 title: '보행 약자 맵',
@@ -765,85 +352,28 @@ export function Home() {
                 description: '휠체어 접근 가능 시설과 편의시설 정보를\n담아\n누구나 즐길 수 있는 여행지를\n안내하는 지도 서비스'
               }
             ].map((service, index) => (
-              <div key={index} id={`home-service-card-${index + 1}`} style={{
-                flex: '1 1 0',
-                background: 'white',
-                boxShadow: '0px 4px 100px 8px rgba(0, 0, 0, 0.08)',
-                overflow: 'hidden',
-                borderRadius: '16px',
-                outline: '1px #efefef solid',
-                outlineOffset: '-1px',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                display: 'inline-flex',
-                cursor: 'pointer'
-              }}
-              onClick={() => handleServiceClick(service.title)}
+              <div 
+                key={index} 
+                id={`home-service-card-${index + 1}`} 
+                className="home-service-card"
+                onClick={() => handleServiceClick(service.title)}
               >
-                <div id={`home-service-card-${index + 1}-content`} style={{
-                  position: 'relative',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  display: 'flex'
-                }}>
-                  <div id={`home-service-card-${index + 1}-image`} style={{
-                    width: '384px',
-                    height: '248px',
-                    background: '#D9D9D9',
-                    borderRadius: '16px 16px 0 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative'
-                  }}>
+                <div id={`home-service-card-${index + 1}-content`} className="home-service-card-content">
+                  <div id={`home-service-card-${index + 1}-image`} className="home-service-card-image">
                     <img 
                       src="/image-line.svg" 
                       alt="이미지 플레이스홀더"
-                      style={{
-                        width: '24px',
-                        height: '24px'
-                      }}
+                      className="home-service-card-image-placeholder"
                     />
                   </div>
                 </div>
-                <div id={`home-service-card-${index + 1}-text`} style={{
-                  alignSelf: 'stretch',
-                  padding: '28px',
-                  background: 'white',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  display: 'flex'
-                }}>
-                  <div id={`home-service-card-${index + 1}-title-container`} style={{
-                    alignSelf: 'stretch',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    display: 'inline-flex'
-                  }}>
-                    <div id={`home-service-card-${index + 1}-title`} style={{
-                      color: 'black',
-                      fontSize: '24px',
-                      fontFamily: 'Pretendard',
-                      fontWeight: 600,
-                      wordWrap: 'break-word'
-                    }}>
+                <div id={`home-service-card-${index + 1}-text`} className="home-service-card-text">
+                  <div id={`home-service-card-${index + 1}-title-container`} className="home-service-card-title-container">
+                    <div id={`home-service-card-${index + 1}-title`} className="home-service-card-title">
                       {service.title}
                     </div>
                   </div>
-                  <div id={`home-service-card-${index + 1}-description`} style={{
-                    alignSelf: 'stretch',
-                    color: 'black',
-                    fontSize: '16px',
-                    fontFamily: 'Pretendard',
-                    fontWeight: 400,
-                    lineHeight: '24px',
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-line'
-                  }}>
+                  <div id={`home-service-card-${index + 1}-description`} className="home-service-card-description">
                     {service.description}
                   </div>
                 </div>

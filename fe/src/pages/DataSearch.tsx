@@ -3,6 +3,7 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode } from '../../../packages/common/src/types';
 
 import '../styles/data-pages.css';
 
@@ -20,7 +21,7 @@ export function DataSearch() {
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <span key={index} style={{ color: '#0090ff', fontWeight: 600 }}>
+        <span key={index} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
           {part}
         </span>
       ) : part
@@ -28,12 +29,12 @@ export function DataSearch() {
   };
 
   // 자립 테마 클릭 핸들러
-  const handleThemeClick = (theme: string) => {
+  const handleThemeClick = (theme: ThemeCode) => {
     navigate(`/data-list?theme=${theme}`);
   };
 
   // 데이터 유형 클릭 핸들러
-  const handleTypeClick = (type: string) => {
+  const handleTypeClick = (type: DataTypeCode) => {
     navigate(`/data-list?type=${type}`);
   };
 
@@ -43,51 +44,33 @@ export function DataSearch() {
         {/* Sidebar - 공통 컴포넌트 사용 */}
         <Sidebar idPrefix="data-search" title="필터">
           <FilterSection idPrefix="data-search-theme" title="자립 테마별">
-            <FilterOption
-              id="data-search-theme-phy"
-              name="신체적 자립"
-              isActive={false}
-              onClick={() => handleThemeClick('phy')}
-            />
-            <FilterOption
-              id="data-search-theme-emo"
-              name="정서적 자립"
-              isActive={false}
-              onClick={() => handleThemeClick('emo')}
-            />
-            <FilterOption
-              id="data-search-theme-econ"
-              name="경제적 자립"
-              isActive={false}
-              onClick={() => handleThemeClick('econ')}
-            />
-            <FilterOption
-              id="data-search-theme-soc"
-              name="사회적 자립"
-              isActive={false}
-              onClick={() => handleThemeClick('soc')}
-            />
+            {THEME_CONSTANTS.ALL_CODES.map((themeCode) => {
+              const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
+              return (
+                <FilterOption
+                  key={themeCode}
+                  id={`data-search-theme-${themeCode}`}
+                  name={themeInfo.name}
+                  isActive={false}
+                  onClick={() => handleThemeClick(themeCode)}
+                />
+              );
+            })}
           </FilterSection>
           
           <FilterSection idPrefix="data-search-type" title="데이터 유형별">
-            <FilterOption
-              id="data-search-type-basic"
-              name="기초 데이터"
-              isActive={false}
-              onClick={() => handleTypeClick('basic')}
-            />
-            <FilterOption
-              id="data-search-type-poi"
-              name="이동권 데이터"
-              isActive={false}
-              onClick={() => handleTypeClick('poi')}
-            />
-            <FilterOption
-              id="data-search-type-emp"
-              name="고용 데이터"
-              isActive={false}
-              onClick={() => handleTypeClick('emp')}
-            />
+            {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode) => {
+              const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
+              return (
+                <FilterOption
+                  key={dataTypeCode}
+                  id={`data-search-type-${dataTypeCode}`}
+                  name={dataTypeInfo.name}
+                  isActive={false}
+                  onClick={() => handleTypeClick(dataTypeCode)}
+                />
+              );
+            })}
           </FilterSection>
         </Sidebar>
 
@@ -101,7 +84,7 @@ export function DataSearch() {
             <div id="data-search-page-description" className="page-description">
               {searchTerm ? (
                 <>
-                  데이터명에 '<span style={{ color: '#0090ff', fontWeight: 600 }}>{searchTerm}</span>' 키워드를 포함하는 데이터 검색 결과입니다.
+                  데이터명에 '<span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{searchTerm}</span>' 키워드를 포함하는 데이터 검색 결과입니다.
                 </>
               ) : (
                 '모든 데이터를 확인할 수 있습니다.'

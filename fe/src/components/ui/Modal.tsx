@@ -95,11 +95,12 @@ export function Modal({
         className="modal-content"
         style={{
           width: '408px',
+          height: '252px',
           padding: '28px 32px 24px 32px',
           background: 'white',
           boxShadow: '0px 0px 100px rgba(0, 0, 0, 0.08)',
           borderRadius: '16px',
-          border: '1px solid #ececec',
+          border: '1px solid #ECECEC',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -114,29 +115,35 @@ export function Modal({
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            gap: '20px'
+            gap: '24px'
           }}
         >
-          {showIcon && (
-            <div 
-              className="modal-icon"
+          {/* 아이콘 - 이미지 디자인에 맞게 (24x24px 검은색 원형) */}
+          <div 
+            className="modal-icon"
+            style={{
+              width: '24px',
+              height: '24px',
+              background: 'black',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }}
+          >
+            <span 
+              className="warning-icon"
               style={{
-                width: '24px',
-                height: '24px',
-                position: 'relative'
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                lineHeight: '1'
               }}
             >
-              <div 
-                className="warning-icon"
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  background: 'black',
-                  borderRadius: '2px'
-                }}
-              />
-            </div>
-          )}
+              !
+            </span>
+          </div>
           
           <div 
             className="modal-text"
@@ -175,6 +182,7 @@ export function Modal({
                 fontWeight: 400,
                 lineHeight: '20.8px',
                 wordWrap: 'break-word',
+                whiteSpace: 'pre-line',
                 width: '100%'
               }}
             >
@@ -202,10 +210,10 @@ export function Modal({
                   flex: '1 1 0',
                   minWidth: '120px',
                   padding: '14px 24px',
-                  borderRadius: '16px',
-                  fontSize: '20px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
                   fontFamily: 'Pretendard',
-                  fontWeight: 600,
+                  fontWeight: 500,
                   wordWrap: 'break-word',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -214,7 +222,7 @@ export function Modal({
                   alignItems: 'center',
                   gap: '10px',
                   background: 'white',
-                  border: '1px solid #dadada',
+                  border: '1px solid #ECECEC',
                   color: 'black'
                 }}
                 onMouseEnter={(e) => {

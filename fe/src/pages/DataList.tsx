@@ -3,6 +3,7 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode } from '../../../packages/common/src/types';
 import '../styles/data-pages.css';
 
 export function DataList() {
@@ -16,30 +17,19 @@ export function DataList() {
 
   const getTitle = () => {
     if (activeFilter === 'theme') {
-      const themeNames = { phy: '신체적 자립', emo: '정서적 자립', econ: '경제적 자립', soc: '사회적 자립' };
-      return themeNames[activeValue as keyof typeof themeNames] || '신체적 자립';
+      return getThemeName(activeValue as ThemeCode) || '신체적 자립';
     } else {
-      const typeNames = { basic: '기초 데이터', poi: '이동권 데이터', emp: '고용 데이터' };
-      return typeNames[activeValue as keyof typeof typeNames] || '기초 데이터';
+      return getDataTypeName(activeValue as DataTypeCode) || '기초 데이터';
     }
   };
 
   const getDescription = () => {
     if (activeFilter === 'theme') {
-      const descriptions = {
-        phy: '이동 능력, 일상생활 동작, 건강 상태 등\n신체기능과 관련된 데이터',
-        emo: '정서적 안정, 심리적 건강, 사회적 관계 등\n정서적 자립과 관련된 데이터',
-        econ: '경제적 독립, 취업, 소득 등\n경제적 자립과 관련된 데이터',
-        soc: '사회적 참여, 커뮤니케이션, 관계 형성 등\n사회적 자립과 관련된 데이터'
-      };
-      return descriptions[activeValue as keyof typeof descriptions] || descriptions.phy;
+      const themeInfo = THEME_CONSTANTS.THEMES[activeValue as ThemeCode];
+      return themeInfo?.description || THEME_CONSTANTS.THEMES.phy.description;
     } else {
-      const descriptions = {
-        basic: '장애인과 관련된 기본 통계 및 기초 자료',
-        poi: '교통·보행 등 장애인 이동 및 접근성과 관련된 자료',
-        emp: '고용 현황, 취업 지원, 직업 활동과 관련된 자료'
-      };
-      return descriptions[activeValue as keyof typeof descriptions] || descriptions.basic;
+      const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[activeValue as DataTypeCode];
+      return dataTypeInfo?.description || DATA_TYPE_CONSTANTS.DATA_TYPES.basic.description;
     }
   };
 
@@ -59,58 +49,37 @@ export function DataList() {
         {/* Sidebar */}
         <Sidebar idPrefix="data-list" title="필터">
           <FilterSection idPrefix="data-list-theme" title="자립 테마별">
-            <FilterOption
-              id="data-list-theme-phy"
-              name="신체적 자립"
-              count={181}
-              isActive={activeValue === 'phy' && activeFilter === 'theme'}
-              onClick={() => window.location.href = '/data-list?theme=phy'}
-            />
-            <FilterOption
-              id="data-list-theme-emo"
-              name="정서적 자립"
-              count={142}
-              isActive={activeValue === 'emo' && activeFilter === 'theme'}
-              onClick={() => window.location.href = '/data-list?theme=emo'}
-            />
-            <FilterOption
-              id="data-list-theme-econ"
-              name="경제적 자립"
-              count={98}
-              isActive={activeValue === 'econ' && activeFilter === 'theme'}
-              onClick={() => window.location.href = '/data-list?theme=econ'}
-            />
-            <FilterOption
-              id="data-list-theme-soc"
-              name="사회적 자립"
-              count={75}
-              isActive={activeValue === 'soc' && activeFilter === 'theme'}
-              onClick={() => window.location.href = '/data-list?theme=soc'}
-            />
+            {THEME_CONSTANTS.ALL_CODES.map((themeCode) => {
+              const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
+              const counts = { phy: 181, emo: 142, econ: 98, soc: 75 };
+              return (
+                <FilterOption
+                  key={themeCode}
+                  id={`data-list-theme-${themeCode}`}
+                  name={themeInfo.name}
+                  count={counts[themeCode]}
+                  isActive={activeValue === themeCode && activeFilter === 'theme'}
+                  onClick={() => window.location.href = `/data-list?theme=${themeCode}`}
+                />
+              );
+            })}
           </FilterSection>
 
           <FilterSection idPrefix="data-list-type" title="데이터 유형별">
-            <FilterOption
-              id="data-list-type-basic"
-              name="기초 데이터"
-              count={2790}
-              isActive={activeValue === 'basic' && activeFilter === 'type'}
-              onClick={() => window.location.href = '/data-list?type=basic'}
-            />
-            <FilterOption
-              id="data-list-type-poi"
-              name="이동권 데이터"
-              count={312}
-              isActive={activeValue === 'poi' && activeFilter === 'type'}
-              onClick={() => window.location.href = '/data-list?type=poi'}
-            />
-            <FilterOption
-              id="data-list-type-emp"
-              name="고용 데이터"
-              count={56}
-              isActive={activeValue === 'emp' && activeFilter === 'type'}
-              onClick={() => window.location.href = '/data-list?type=emp'}
-            />
+            {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode) => {
+              const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
+              const counts = { basic: 2790, poi: 312, emp: 56 };
+              return (
+                <FilterOption
+                  key={dataTypeCode}
+                  id={`data-list-type-${dataTypeCode}`}
+                  name={dataTypeInfo.name}
+                  count={counts[dataTypeCode]}
+                  isActive={activeValue === dataTypeCode && activeFilter === 'type'}
+                  onClick={() => window.location.href = `/data-list?type=${dataTypeCode}`}
+                />
+              );
+            })}
           </FilterSection>
         </Sidebar>
 

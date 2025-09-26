@@ -1,0 +1,6 @@
+{
+  "name": "iitp-dabt-platform",
+  "version": "1.0.0",
+  "description": "IITP 장애인 데이터 플랫폼",
+  "main": "index.js"
+}

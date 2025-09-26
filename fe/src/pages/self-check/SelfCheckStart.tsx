@@ -1,57 +1,23 @@
-import { Link } from 'react-router-dom';
-import { Layout } from '../../components/layout/Layout';
+import { Link, useNavigate } from 'react-router-dom';
+import { SelfCheckLayout, SelfCheckContainer } from '../../components/self-check';
+import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '../../../../packages/common/src/types';
 
 export function SelfCheckStart() {
+  // Constants에서 계산된 값들
+  const totalQuestions = SELF_CHECK_CONSTANTS.TOTAL_QUESTIONS.SELF_CHECK;
+  const totalTimeMinutes = Math.round((totalQuestions * SELF_CHECK_CONSTANTS.TIME_PER_QUESTION) / 60);
+  const totalAreas = Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).length;
+  
   return (
-    <Layout idPrefix="self-check-start">
-      {/* Main Content Area - 퍼블리싱 파일과 정확히 일치 */}
-      <div style={{
-        width: '100%',
-        minHeight: '750px',
-        background: '#f0f8ff',
-        borderRadius: '16px',
-        padding: '60px 20px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center'
-      }}>
-        {/* Title Section */}
-        <div style={{
-          maxWidth: '800px',
-          marginBottom: '40px'
-        }}>
-          <h2 style={{
-            color: 'black',
-            fontSize: '32px',
-            fontFamily: 'Pretendard',
-            fontWeight: 700,
-            lineHeight: '48px',
-            marginBottom: '24px',
-            wordWrap: 'break-word'
-          }}>
-            자립 수준 자가 진단을 시작합니다.<br />
-            자가 진단 문항은 총{' '}
-            <span style={{ color: '#0090ff' }}>31개</span>로, 약{' '}
-            <span style={{ color: '#0090ff' }}>10분</span> 정도 소요됩니다.
-          </h2>
-          <p style={{
-            color: 'black',
-            fontSize: '20px',
-            fontFamily: 'Pretendard',
-            fontWeight: 400,
-            lineHeight: '30px',
-            wordWrap: 'break-word'
-          }}>
-            테스트는 4개 영역으로 구성되어 있으며<br />
-            각 문항에 대해 1(전혀 아니다) ~ 5(매우 그렇다) 중<br />
-            하나를 선택해 주세요.
-          </p>
-        </div>
+    <SelfCheckLayout idPrefix="self-check-start" showBackButton={false}>
+      {/* Main Content Area - SelfCheckContainer 사용 */}
+      <SelfCheckContainer 
+        title="자립 수준 자가 진단을 시작합니다."
+        subtitle={`자가 진단 문항은 총 ${totalQuestions}개로, 약 ${totalTimeMinutes}분 정도 소요됩니다.`}
+      >
 
         {/* Start Button */}
-        <Link to="/self-check/questions" style={{ textDecoration: 'none' }}>
+        <Link to="/self-check/identity" style={{ textDecoration: 'none' }}>
           <button style={{
             width: '486px',
             minWidth: '280px',
@@ -90,7 +56,7 @@ export function SelfCheckStart() {
             </span>
           </button>
         </Link>
-      </div>
-    </Layout>
+      </SelfCheckContainer>
+    </SelfCheckLayout>
   );
 }
