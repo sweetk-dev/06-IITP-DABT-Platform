@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { SelfThemaCard, CardContent, CardTitle, CardSubtitle, CardIcon } from '../../components/ui/SelfThemaCard';
+import { SELF_CHECK_CONSTANTS } from '@iitp-dabt-platform/common';
 
 export function SelfCheckResult() {
   const scores = {
@@ -13,18 +14,21 @@ export function SelfCheckResult() {
   const recommendations = [
     {
       category: '신체적 자립을 위한',
-      title: '활동보조사(주/야간) 지원 사업\n신청',
-      description: '일상생활 지원을 위한 활동보조사 서비스'
+      title: '활동보조사(주/야간) 지원 사업 신청',
+      description: '일상생활 지원을 위한 활동보조사 서비스',
+      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[0]}` // phys
     },
     {
       category: '경제적 자립을 위한',
       title: '장애 수당 신청',
-      description: '경제적 지원을 위한 장애 수당 신청'
+      description: '경제적 지원을 위한 장애 수당 신청',
+      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1]}` // econ
     },
     {
       category: '경제적 자립을 위한',
       title: '나에게 맞는 일자리 정보',
-      description: '개인 맞춤형 취업 정보 제공'
+      description: '개인 맞춤형 취업 정보 제공',
+      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1]}` // econ
     }
   ];
 
@@ -245,33 +249,34 @@ export function SelfCheckResult() {
           margin: '0 auto'
         }}>
           {recommendations.map((rec, index) => (
-            <SelfThemaCard 
-              key={index} 
-              variant="recommendation" 
-              size="md"
-            >
-              <CardContent style={{ flex: 1 }}>
-                <CardSubtitle>
-                  {rec.category}
-                </CardSubtitle>
-                <CardTitle style={{ 
-                  whiteSpace: 'pre-line',
-                  marginBottom: 0
-                }}>
-                  {rec.title}
-                </CardTitle>
-              </CardContent>
-              <CardIcon style={{ alignSelf: 'flex-end' }}>
-                <img 
-                  src="/right_up.svg" 
-                  alt="arrow" 
-                  style={{
-                    width: '20px',
-                    height: '20px'
-                  }} 
-                />
-              </CardIcon>
-            </SelfThemaCard>
+            <Link key={index} to={rec.link} style={{ textDecoration: 'none' }}>
+              <SelfThemaCard 
+                variant="recommendation" 
+                size="md"
+                onClick={() => window.location.href = rec.link}
+              >
+                <CardContent style={{ flex: 1 }}>
+                  <CardSubtitle>
+                    {rec.category}
+                  </CardSubtitle>
+                  <CardTitle style={{ 
+                    marginBottom: 0
+                  }}>
+                    {rec.title}
+                  </CardTitle>
+                </CardContent>
+                <CardIcon style={{ alignSelf: 'flex-end' }}>
+                  <img 
+                    src="/right_up.svg" 
+                    alt="arrow" 
+                    style={{
+                      width: '20px',
+                      height: '20px'
+                    }} 
+                  />
+                </CardIcon>
+              </SelfThemaCard>
+            </Link>
           ))}
         </div>
 

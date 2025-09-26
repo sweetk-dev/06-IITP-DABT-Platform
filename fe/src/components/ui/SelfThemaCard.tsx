@@ -57,7 +57,7 @@ export function SelfThemaCard({
       alignItems: 'flex-start',
       padding: '28px',
       width: '384px',
-      minHeight: '200px',
+      minHeight: '211px',
       boxShadow: 'none'
     },
     score: {
@@ -120,12 +120,13 @@ export function CardContent({ children, className = '', style = {} }: CardConten
     <div 
       className={`card-content ${className}`}
       style={{
-        flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        height: '100%',
+        gap: '8px',
+        width: '328px',
+        flex: 1,
         ...style
       }}
     >
@@ -149,9 +150,11 @@ export function CardTitle({ children, className = '', style = {} }: CardTitlePro
         fontSize: '24px',
         fontFamily: 'Pretendard',
         fontWeight: 700,
+        fontStyle: 'Bold',
         wordWrap: 'break-word',
-        marginBottom: '8px',
-        lineHeight: '33.6px',
+        width: '328px',
+        lineHeight: '140%',
+        letterSpacing: '0%',
         ...style
       }}
     >
@@ -175,9 +178,10 @@ export function CardSubtitle({ children, className = '', style = {} }: CardSubti
         fontSize: '18px',
         fontFamily: 'Pretendard',
         fontWeight: 600,
-        wordWrap: 'break-word',
-        marginBottom: '8px',
-        lineHeight: '27px',
+        fontStyle: 'SemiBold',
+        whiteSpace: 'nowrap',
+        lineHeight: '150%',
+        letterSpacing: '0%',
         ...style
       }}
     >
