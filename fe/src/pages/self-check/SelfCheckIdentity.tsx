@@ -83,7 +83,7 @@ export function SelfCheckIdentity() {
           display: 'flex',
           flexDirection: 'row',
           gap: '60px',
-          marginBottom: '80px',
+          margin: '0 auto 80px auto', // 상하좌우 중앙 정렬, 하단 80px
           justifyContent: 'center',
           flexWrap: 'wrap',
           maxWidth: '1400px',

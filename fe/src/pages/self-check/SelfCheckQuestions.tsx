@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
+import { SelfCheckLayout, SelfCheckProgress, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
 import { 
   SELF_CHECK_QUESTIONS, 
@@ -142,6 +142,13 @@ export function SelfCheckQuestions() {
       idPrefix="self-check-questions" 
       showBackButton={true}
       onBackClick={() => setShowExitModal(true)}
+      onPrevious={handlePrevious}
+      onNext={handleNext}
+      previousText="이전"
+      nextText={isLastQuestion ? '결과보기' : isLastQuestionInArea ? '다음 영역' : '다음'}
+      showPrevious={true}
+      showNext={true}
+      isNextDisabled={selectedValue === null}
     >
       {/* Progress Steps */}
       <SelfCheckProgress 
@@ -152,82 +159,123 @@ export function SelfCheckQuestions() {
       />
 
       {/* Main Container */}
-      <SelfCheckContainer 
-        title={currentQuestion.question}
-      >
-        {/* Scale Selection - 1840px 컨테이너에 맞게 배치 */}
+      <SelfCheckContainer>
+        {/* Category Title */}
+        <div style={{
+          textAlign: 'center',
+          color: '#0090ff',
+          fontSize: '20px',
+          fontFamily: 'Pretendard',
+          fontWeight: 700,
+          marginBottom: '20px'
+        }}>
+          {AREA_NAMES[currentArea]} 영역
+        </div>
+
+        {/* Question Title */}
+        <h1 style={{
+          color: 'black',
+          fontSize: '32px',
+          fontFamily: 'Pretendard',
+          fontWeight: 700,
+          lineHeight: '48px',
+          wordWrap: 'break-word',
+          marginBottom: '40px',
+          textAlign: 'center'
+        }}>
+          {currentQuestionIndex + 1}. {currentQuestion.question}
+        </h1>
+
+        {/* Scale Section */}
         <div style={{
           display: 'flex',
-          justifyContent: 'center',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '60px',
-          marginBottom: '80px',
+          gap: '20px',
+          margin: '0 auto 40px auto',
           maxWidth: '1000px',
           width: '100%'
         }}>
-          {Array.from({ length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 }, (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN).map((value) => (
-            <button
-              key={value}
-              onClick={() => setSelectedValue(value)}
-              style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: selectedValue === value ? 'var(--color-primary)' : 'var(--figma-white)',
-                color: selectedValue === value ? 'var(--figma-white)' : 'var(--color-text-primary)',
-                border: 'none',
-                fontSize: '24px',
-                fontFamily: 'var(--font-family-primary)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: selectedValue === value 
-                  ? '0 4px 12px rgba(0, 144, 255, 0.3)' 
-                  : '0 2px 8px rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedValue !== value) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedValue !== value) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-                }
-              }}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
-
-        {/* Scale Labels */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '14px',
-          color: '#666',
-          marginBottom: '20px'
-        }}>
-          <span>전혀 아니다</span>
-          <span>매우 그렇다</span>
+          {/* Scale Buttons */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '48px'
+          }}>
+            {/* Left Label */}
+            <div style={{
+              color: 'black',
+              fontSize: '24px',
+              fontFamily: 'Pretendard',
+              fontWeight: 500,
+              textAlign: 'right',
+              wordWrap: 'break-word',
+              whiteSpace: 'nowrap'
+            }}>
+              전혀 아니다
+            </div>
+            
+            {/* Scale Buttons */}
+            {Array.from({ length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 }, (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN).map((value) => (
+              <button
+                key={value}
+                onClick={() => setSelectedValue(value)}
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  background: selectedValue === value ? 'var(--color-primary)' : 'var(--figma-white)',
+                  color: selectedValue === value ? 'var(--figma-white)' : 'var(--color-text-primary)',
+                  border: selectedValue === value ? '5px solid var(--color-primary)' : '5px solid #b2deff',
+                  fontSize: '28px',
+                  fontFamily: 'var(--font-family-primary)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: selectedValue === value 
+                    ? '0 4px 12px rgba(0, 144, 255, 0.3)' 
+                    : '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedValue !== value) {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)';
+                    e.currentTarget.style.background = '#f0f8ff';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedValue !== value) {
+                    e.currentTarget.style.borderColor = '#b2deff';
+                    e.currentTarget.style.background = 'var(--figma-white)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                  }
+                }}
+              >
+                {value}
+              </button>
+            ))}
+            
+            {/* Right Label */}
+            <div style={{
+              color: 'black',
+              fontSize: '24px',
+              fontFamily: 'Pretendard',
+              fontWeight: 500,
+              wordWrap: 'break-word',
+              whiteSpace: 'nowrap'
+            }}>
+              매우 그렇다
+            </div>
+          </div>
         </div>
       </SelfCheckContainer>
 
-      {/* Navigation */}
-      <SelfCheckNavigation
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        previousText="이전"
-        nextText={isLastQuestion ? '결과보기' : isLastQuestionInArea ? '다음 영역' : '다음'}
-        isNextDisabled={selectedValue === null}
-      />
     </SelfCheckLayout>
 
     {/* Exit Modal */}
