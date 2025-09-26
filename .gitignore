@@ -197,6 +197,10 @@ script/deploy-config.json
 docs/build/
 docs/_build/
 01.references/
+script/01.references/
+script/figma/
+.env.figma
+figma-*
 
 iitp_plaform_requirement.md
 iitp_plaform_requirement*.md

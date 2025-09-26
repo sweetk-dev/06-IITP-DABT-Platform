@@ -26,14 +26,16 @@ export function SelfCheckNavigation({
   return (
     <div style={{
       position: 'absolute',
-      top: '600px', // Figma에서 네비게이션 버튼의 정확한 위치
+      bottom: '60px', // SelfCheckLayout 하단에서 60px 위
       left: '50%',
       transform: 'translateX(-50%)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      gap: '24px',
-      width: '280px' // 버튼 하나의 너비
+      gap: '20px',
+      maxWidth: '1200px',
+      width: '100%',
+      padding: '0 40px'
     }}>
       {/* Previous Button - Figma Style */}
       {showPrevious && onPrevious && (

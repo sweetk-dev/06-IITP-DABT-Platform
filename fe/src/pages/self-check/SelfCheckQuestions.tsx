@@ -155,13 +155,15 @@ export function SelfCheckQuestions() {
       <SelfCheckContainer 
         title={currentQuestion.question}
       >
-        {/* Scale Selection - Figma Design */}
+        {/* Scale Selection - 1840px 컨테이너에 맞게 배치 */}
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: '24px',
-          marginBottom: '40px'
+          gap: '60px',
+          marginBottom: '80px',
+          maxWidth: '1000px',
+          width: '100%'
         }}>
           {Array.from({ length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 }, (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN).map((value) => (
             <button

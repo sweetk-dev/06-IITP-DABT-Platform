@@ -25,13 +25,19 @@ export function SelfCheckProgress({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '20px',
-      marginBottom: '40px',
-      padding: '24px 32px',
+      gap: '30px',
+      marginBottom: '80px',
+      padding: '20px 30px',
+      maxWidth: '1200px',
+      width: '1200px',
       background: 'white',
       borderRadius: '100px',
       boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.05)',
-      width: 'fit-content'
+      position: 'absolute',
+      top: '40px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 5
     }}>
       {/* Progress Steps - HTML Design */}
       {stepNames.map((name, index) => {
@@ -45,7 +51,7 @@ export function SelfCheckProgress({
             <div className={`step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`} style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '4px'
             }}>
               {/* Step Icon/Number - HTML Style */}
               {isCompleted ? (
@@ -86,11 +92,12 @@ export function SelfCheckProgress({
               
               {/* Step Text - HTML Style */}
               <div className="step-text" style={{
-                fontSize: '16px',
+                fontSize: '18px',
                 fontWeight: isActive ? '500' : '400',
                 color: isActive ? 'black' : '#666',
                 fontFamily: 'Pretendard',
-                lineHeight: '1.2'
+                lineHeight: '1.2',
+                whiteSpace: 'nowrap'
               }}>
                 {index === 0 ? name : areaProgress[name] || name}
               </div>

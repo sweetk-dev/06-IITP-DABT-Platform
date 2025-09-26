@@ -78,14 +78,16 @@ export function SelfCheckIdentity() {
       <SelfCheckContainer 
         title={currentQuestion.question}
       >
-        {/* Answer Options - Figma Style */}
+        {/* Answer Options - 1840px 컨테이너에 맞게 배치 */}
         <div style={{
           display: 'flex',
           flexDirection: 'row',
-          gap: '24px',
-          marginBottom: '40px',
+          gap: '60px',
+          marginBottom: '80px',
           justifyContent: 'center',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          maxWidth: '1400px',
+          width: '100%'
         }}>
           {currentQuestion.options.map((option) => (
             <button

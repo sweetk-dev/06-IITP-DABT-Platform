@@ -10,11 +10,16 @@ export function SelfCheckContainer({ title, subtitle, children }: SelfCheckConta
   return (
     <div style={{
       width: '100%',
+      maxWidth: '1600px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      textAlign: 'center'
+      textAlign: 'center',
+      padding: '0 60px',
+      height: '100%',
+      minHeight: '600px',
+      marginTop: '120px'
     }}>
       {/* Title - HTML Design Style */}
       <h1 style={{

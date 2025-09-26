@@ -21,19 +21,21 @@ export function SelfCheckLayout({
         id={`${idPrefix}-container`}
         style={{
           margin: '40px auto',
-          width: '100%', // 홈의 메인 컨텐츠 폭과 동일 (1200px)
+          width: '1840px',
+          height: '840px',
           background: '#f0f8ff',
           borderRadius: '40px',
           padding: '40px',
-          minHeight: '600px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          position: 'relative'
+          position: 'relative',
+          left: '50%',
+          transform: 'translateX(-50%)'
         }}
       >
-        {/* 메인화면으로 이동 - 헤더와 왼쪽 정렬 */}
+        {/* 메인화면으로 이동 - 왼쪽 상단에 위치 */}
         {showBackButton && (
           <div
             id={`${idPrefix}-back-button`}
@@ -45,8 +47,9 @@ export function SelfCheckLayout({
               cursor: 'pointer',
               transition: 'opacity 0.2s ease',
               position: 'absolute',
-              top: '44px', // 헤더의 page-title과 동일한 margin-top
-              left: '0px' // 컨테이너의 왼쪽 끝 (padding 내부)
+              top: '40px',
+              left: '40px',
+              zIndex: 10
             }}
             onClick={onBackClick}
             onMouseEnter={(e) => {

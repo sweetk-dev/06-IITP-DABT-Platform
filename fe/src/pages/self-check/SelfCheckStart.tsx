@@ -31,19 +31,20 @@ export function SelfCheckStart() {
         {/* Start Button */}
         <Link to="/self-check/identity" style={{ textDecoration: 'none' }}>
           <button style={{
-            width: '486px',
-            minWidth: '280px',
-            padding: '24px',
+            width: '600px',
+            minWidth: '400px',
+            padding: '32px 48px',
             background: '#0090ff',
             boxShadow: '0px 1px 30px 8px rgba(0, 143.88, 255, 0.2)',
-            borderRadius: '16px',
+            borderRadius: '20px',
             justifyContent: 'center',
             alignItems: 'center',
             gap: '10px',
             display: 'inline-flex',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            border: 'none'
+            border: 'none',
+            marginTop: '40px'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = '#007acc';

@@ -222,14 +222,16 @@ export function Modal({
                   alignItems: 'center',
                   gap: '10px',
                   background: 'white',
-                  border: '1px solid #ECECEC',
+                  border: '2px solid #ddd',
                   color: 'black'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = '#f5f5f5';
+                  e.currentTarget.style.borderColor = '#999';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.borderColor = '#ddd';
                 }}
               >
                 {secondaryButtonText}
