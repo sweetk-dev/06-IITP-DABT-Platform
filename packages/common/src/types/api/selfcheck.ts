@@ -3,7 +3,8 @@ import {
   GenderCode, 
   AgeCondCode, 
   DisLevelCode, 
-  SelfRelTypeCode 
+  SelfRelTypeCode,
+  PAGINATION_CONSTANTS
 } from '../constants.js';
 import { PaginationReq, PaginationRes } from './api.js';
 
@@ -19,6 +20,12 @@ export interface SelfCheckRecommendationsQuery {
   themes?: string; // 콤마분리
   limit?: number; // 기본: 3, 최대: 10
 }
+
+// 기본값 상수
+export const SELF_CHECK_RECOMMENDATIONS_DEFAULTS = {
+  LIMIT: 3,
+  MAX_LIMIT: 10
+} as const;
 
 // 레거시 호환성을 위한 별칭
 export type SelfCheckRecommendationsReq = SelfCheckRecommendationsQuery;
@@ -52,6 +59,12 @@ export interface SelfCheckPoliciesQuery extends PaginationReq {
   pageSize?: number;
 }
 
+// 기본값 상수
+export const SELF_CHECK_POLICIES_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
+} as const;
+
 // 레거시 호환성을 위한 별칭
 export type SelfCheckPoliciesReq = SelfCheckPoliciesQuery;
 
@@ -66,6 +79,12 @@ export interface SelfCheckProvidersQuery extends PaginationReq {
   page?: number;
   pageSize?: number;
 }
+
+// 기본값 상수
+export const SELF_CHECK_PROVIDERS_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
+} as const;
 
 // 레거시 호환성을 위한 별칭
 export type SelfCheckProvidersReq = SelfCheckProvidersQuery;
@@ -90,6 +109,12 @@ export interface SelfCheckFacilitiesQuery extends PaginationReq {
   page?: number;
   pageSize?: number;
 }
+
+// 기본값 상수
+export const SELF_CHECK_FACILITIES_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
+} as const;
 
 // 레거시 호환성을 위한 별칭
 export type SelfCheckFacilitiesReq = SelfCheckFacilitiesQuery;

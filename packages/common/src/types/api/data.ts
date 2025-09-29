@@ -2,7 +2,8 @@
 import { 
   ThemeCode, 
   DataTypeCode, 
-  SelfRelTypeCode 
+  SelfRelTypeCode,
+  PAGINATION_CONSTANTS
 } from '../constants.js';
 import { PaginationReq, PaginationRes, SearchReq, SortReq } from './api.js';
 
@@ -14,6 +15,12 @@ import { PaginationReq, PaginationRes, SearchReq, SortReq } from './api.js';
 export interface DataLatestQuery {
   limit?: number; // 기본: 6, 최대: 12
 }
+
+// 기본값 상수
+export const DATA_LATEST_DEFAULTS = {
+  LIMIT: 6,
+  MAX_LIMIT: 12
+} as const;
 
 // 레거시 호환성을 위한 별칭
 export type DataLatestReq = DataLatestQuery;
@@ -61,6 +68,13 @@ export interface DataSearchQuery extends SearchReq, SortReq {
   sort?: 'recent' | 'alpha';
 }
 
+// 기본값 상수
+export const DATA_SEARCH_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE,
+  SORT: 'recent' as const
+} as const;
+
 // 레거시 호환성을 위한 별칭
 export type DataSearchReq = DataSearchQuery;
 
@@ -107,6 +121,13 @@ export interface DataThemeItemsQuery extends PaginationReq, SortReq {
   sort?: 'recent' | 'alpha';
 }
 
+// 기본값 상수
+export const DATA_THEME_ITEMS_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE,
+  SORT: 'recent' as const
+} as const;
+
 // 레거시 호환성을 위한 별칭
 export type DataThemeItemsReq = DataThemeItemsQuery;
 
@@ -140,6 +161,13 @@ export interface DataTypeItemsQuery extends PaginationReq, SortReq {
   pageSize?: number;
   sort?: 'recent' | 'alpha';
 }
+
+// 기본값 상수
+export const DATA_TYPE_ITEMS_DEFAULTS = {
+  PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
+  PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE,
+  SORT: 'recent' as const
+} as const;
 
 // 레거시 호환성을 위한 별칭
 export type DataTypeItemsReq = DataTypeItemsQuery;
