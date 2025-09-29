@@ -1,4 +1,4 @@
-// 모델 초기화 및 연결 - 완벽한 모듈화
+// 모델 초기화 및 연결 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Sequelize } from 'sequelize';
 import { getSequelize } from '../config/database';
 import { initDataSummaryInfo, DataSummaryInfo } from './data/DataSummaryInfo';

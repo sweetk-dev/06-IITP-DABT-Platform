@@ -1,18 +1,23 @@
-// 서버 시작점 - 완벽한 모듈화
+// 서버 시작점 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { createApp } from './app';
 import { connectDatabase } from './config/database';
 import { logger } from './config/logger';
 import { env } from './config/env';
+import { initializeModels } from './models';
 
 async function startServer(): Promise<void> {
   try {
     // ============================================================================
-    // 데이터베이스 연결
+    // 데이터베이스 연결 및 모델 초기화
     // ============================================================================
     
     logger.info('데이터베이스 연결을 시작합니다...');
     await connectDatabase();
     logger.info('데이터베이스 연결이 성공적으로 완료되었습니다.');
+    
+    logger.info('모델 초기화를 시작합니다...');
+    await initializeModels();
+    logger.info('모델 초기화가 성공적으로 완료되었습니다.');
 
     // ============================================================================
     // Express 앱 생성

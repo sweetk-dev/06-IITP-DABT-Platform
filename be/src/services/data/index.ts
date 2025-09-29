@@ -1,4 +1,4 @@
-// 데이터 서비스 - 완벽한 모듈화
+// 데이터 서비스 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
   DataLatestRes,
   DataThemeCountsRes,
@@ -14,8 +14,12 @@ import {
   DataSearchQuery,
   DataThemeItemsQuery,
   DataTypeItemsQuery,
-  DataPreviewQuery
-} from '../../../../packages/common/src/types';
+  DataPreviewQuery,
+  DATA_LATEST_DEFAULTS,
+  DATA_SEARCH_DEFAULTS,
+  DATA_THEME_ITEMS_DEFAULTS,
+  DATA_TYPE_ITEMS_DEFAULTS
+} from '@iitp-dabt-platform/common';
 import { dataRepository } from '../../repositories/data';
 import { logger } from '../../config/logger';
 import { createPaginationParams, createPaginationMeta } from '../../utils/pagination';
@@ -28,8 +32,11 @@ export async function getLatestData(query: DataLatestQuery = {}): Promise<DataLa
     
     const startTime = Date.now();
     
-    // 페이지네이션 파라미터 적용
-    const { page, pageSize } = createPaginationParams(query.page, query.pageSize);
+    // 페이지네이션 파라미터 적용 - common 패키지의 기본값 활용
+    const { page, pageSize } = createPaginationParams(
+      query.page ?? DATA_LATEST_DEFAULTS.PAGE, 
+      query.pageSize ?? DATA_LATEST_DEFAULTS.PAGE_SIZE
+    );
     
     // 정렬 옵션 처리
     const { orderBy, direction } = processSortOption(query.sort);

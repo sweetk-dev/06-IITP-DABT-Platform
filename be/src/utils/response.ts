@@ -1,10 +1,10 @@
-// 응답 포맷팅 유틸리티 - 완벽한 모듈화
+// 응답 포맷팅 유틸리티 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Response } from 'express';
 import { 
   ApiResponse, 
   PaginationRes, 
   PAGINATION_CONSTANTS 
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // 성공 응답 생성 함수
 export function createSuccessResponse<T>(

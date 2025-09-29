@@ -1,4 +1,4 @@
-// Express 앱 설정 및 미들웨어 - 완벽한 모듈화
+// Express 앱 설정 및 미들웨어 - 완벽한 모듈화 (common 패키지 완전 활용)
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -11,6 +11,7 @@ import { dataRoutes } from './routes/data';
 import { selfCheckRoutes } from './routes/selfcheck';
 import { logger } from './config/logger';
 import { env } from './config/env';
+import { API_URLS } from '@iitp-dabt-platform/common';
 
 export function createApp(): express.Application {
   const app = express();
@@ -53,7 +54,7 @@ export function createApp(): express.Application {
   app.use(requestLogger);
 
   // ============================================================================
-  // API 라우트
+  // API 라우트 - common 패키지의 API_URLS 활용
   // ============================================================================
   
   // 공통 API

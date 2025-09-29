@@ -1,13 +1,14 @@
-// 자가진단 관련 API 라우트 - 완벽한 모듈화
+// 자가진단 관련 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
 import { selfCheckController } from '../controllers/selfcheck';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
+import { API_URLS } from '@iitp-dabt-platform/common';
 
 const router = Router();
 
 // ============================================================================
-// 자가진단 정책 관련 API
+// 자가진단 정책 관련 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -16,7 +17,7 @@ const router = Router();
  * @access Public
  */
 router.get(
-  '/recommendations',
+  API_URLS.SELF_CHK.RECOMMENDATIONS,
   validateRequest({
     query: commonSchemas.selfCheckQuery,
   }),
@@ -29,7 +30,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/policies',
+  API_URLS.SELF_CHK.POLICIES,
   validateRequest({
     query: commonSchemas.selfCheckQuery,
   }),
@@ -37,7 +38,7 @@ router.get(
 );
 
 // ============================================================================
-// 자가진단 기관 관련 API
+// 자가진단 기관 관련 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -46,7 +47,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/providers',
+  API_URLS.SELF_CHK.PROVIDERS,
   validateRequest({
     query: commonSchemas.selfCheckQuery.pick({ page: true, pageSize: true }),
   }),
@@ -54,7 +55,7 @@ router.get(
 );
 
 // ============================================================================
-// 자가진단 시설 관련 API
+// 자가진단 시설 관련 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -63,7 +64,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/facilities',
+  API_URLS.SELF_CHK.FACILITIES,
   validateRequest({
     query: commonSchemas.selfCheckQuery.pick({ page: true, pageSize: true }),
   }),

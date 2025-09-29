@@ -1,13 +1,14 @@
-// 데이터 관련 API 라우트 - 완벽한 모듈화
+// 데이터 관련 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
 import { dataController } from '../controllers/data';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
+import { API_URLS } from '@iitp-dabt-platform/common';
 
 const router = Router();
 
 // ============================================================================
-// 데이터 요약 API
+// 데이터 요약 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -16,7 +17,7 @@ const router = Router();
  * @access Public
  */
 router.get(
-  '/summary/latest',
+  API_URLS.DATA.SUMMARY.LATEST,
   validateRequest({
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),
   }),
@@ -29,7 +30,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/counts/themes',
+  API_URLS.DATA.COUNTS.THEMES,
   asyncHandler(dataController.getThemeCounts)
 );
 
@@ -39,12 +40,12 @@ router.get(
  * @access Public
  */
 router.get(
-  '/counts/types',
+  API_URLS.DATA.COUNTS.TYPES,
   asyncHandler(dataController.getTypeCounts)
 );
 
 // ============================================================================
-// 데이터 검색 API
+// 데이터 검색 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -53,7 +54,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/search',
+  API_URLS.DATA.SEARCH,
   validateRequest({
     query: commonSchemas.searchQuery,
   }),
@@ -61,7 +62,7 @@ router.get(
 );
 
 // ============================================================================
-// 테마 관련 API
+// 테마 관련 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -70,7 +71,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/themes',
+  API_URLS.DATA.THEMES,
   asyncHandler(dataController.getThemes)
 );
 
@@ -80,7 +81,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/themes/:theme/items',
+  API_URLS.DATA.THEME_ITEMS(':theme'),
   validateRequest({
     params: commonSchemas.themeParam,
     query: commonSchemas.paginationQuery,
@@ -89,7 +90,7 @@ router.get(
 );
 
 // ============================================================================
-// 데이터 유형 관련 API
+// 데이터 유형 관련 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -98,7 +99,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/types',
+  API_URLS.DATA.TYPES,
   asyncHandler(dataController.getTypes)
 );
 
@@ -108,7 +109,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/types/:type/items',
+  API_URLS.DATA.TYPE_ITEMS(':type'),
   validateRequest({
     params: commonSchemas.typeParam,
     query: commonSchemas.paginationQuery,
@@ -117,7 +118,7 @@ router.get(
 );
 
 // ============================================================================
-// 데이터 상세 API
+// 데이터 상세 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -126,7 +127,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/:id',
+  API_URLS.DATA.DETAIL(':id'),
   validateRequest({
     params: commonSchemas.idParam,
   }),
@@ -139,7 +140,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/:id/preview',
+  API_URLS.DATA.PREVIEW(':id'),
   validateRequest({
     params: commonSchemas.idParam,
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),

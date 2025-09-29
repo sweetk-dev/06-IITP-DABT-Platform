@@ -1,4 +1,4 @@
-// 데이터 Repository - 완벽한 모듈화
+// 데이터 Repository - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
   DataLatestRes,
   DataThemeCountsRes,
@@ -9,8 +9,10 @@ import {
   DataTypesRes,
   DataTypeItemsRes,
   DataDetailRes,
-  DataPreviewRes
-} from '../../../../packages/common/src/types';
+  DataPreviewRes,
+  THEME_CONSTANTS,
+  DATA_TYPE_CONSTANTS
+} from '@iitp-dabt-platform/common';
 import { BaseRepository } from '../base/BaseRepository';
 import { DataSummaryInfo } from '../../models/data/DataSummaryInfo';
 import { SelfDiagDataCategory } from '../../models/data/SelfDiagDataCategory';

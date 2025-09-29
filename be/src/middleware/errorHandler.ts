@@ -1,7 +1,7 @@
-// 공통 에러 처리 미들웨어 - 완벽한 모듈화
+// 공통 에러 처리 미들웨어 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../config/logger';
-import { ErrorCode, ErrorMetaMap } from '../../../packages/common/src/types';
+import { ErrorCode, ErrorMetaMap } from '@iitp-dabt-platform/common';
 
 // API 에러 인터페이스
 export interface ApiError extends Error {

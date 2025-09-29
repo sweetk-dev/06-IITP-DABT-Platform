@@ -1,8 +1,14 @@
-// 요청 검증 미들웨어 - 완벽한 모듈화
+// 요청 검증 미들웨어 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { createError, ErrorCode } from './errorHandler';
 import { logger } from '../config/logger';
+import { 
+  THEME_CONSTANTS, 
+  DATA_TYPE_CONSTANTS, 
+  SELF_REL_TYPE_CONSTANTS,
+  PAGINATION_CONSTANTS 
+} from '@iitp-dabt-platform/common';
 
 // 검증 스키마 타입
 export type ValidationSchema = {
@@ -62,12 +68,12 @@ export function validateRequest(schema: ValidationSchema) {
   };
 }
 
-// 공통 검증 스키마들
+// 공통 검증 스키마들 - common 패키지의 상수 활용
 export const commonSchemas = {
-  // 페이지네이션 쿼리
+  // 페이지네이션 쿼리 - common 패키지의 PAGINATION_CONSTANTS 활용
   paginationQuery: z.object({
-    page: z.string().transform(Number).pipe(z.number().min(0)).optional(),
-    pageSize: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional(),
+    page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
+    pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
     sort: z.enum(['recent', 'alpha']).optional(),
   }),
 
@@ -76,35 +82,35 @@ export const commonSchemas = {
     id: z.string().transform(Number).pipe(z.number().positive()),
   }),
 
-  // 테마 파라미터
+  // 테마 파라미터 - common 패키지의 THEME_CONSTANTS 활용
   themeParam: z.object({
-    theme: z.enum(['phy', 'emo', 'econ', 'soc']),
+    theme: z.enum(THEME_CONSTANTS.CODES as [string, ...string[]]),
   }),
 
-  // 데이터 타입 파라미터
+  // 데이터 타입 파라미터 - common 패키지의 DATA_TYPE_CONSTANTS 활용
   typeParam: z.object({
-    type: z.enum(['basic', 'poi', 'emp']),
+    type: z.enum(DATA_TYPE_CONSTANTS.CODES as [string, ...string[]]),
   }),
 
-  // 검색 쿼리
+  // 검색 쿼리 - common 패키지의 상수 활용
   searchQuery: z.object({
     q: z.string().min(1).max(100).optional(),
     themes: z.string().optional(),
     types: z.string().optional(),
-    page: z.string().transform(Number).pipe(z.number().min(0)).optional(),
-    pageSize: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional(),
+    page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
+    pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
     sort: z.enum(['recent', 'alpha']).optional(),
   }),
 
-  // 자가진단 쿼리
+  // 자가진단 쿼리 - common 패키지의 상수 활용
   selfCheckQuery: z.object({
     gender: z.enum(['남성', '여성']).optional(),
     disLevel: z.enum(['경증', '중증']).optional(),
     ageCond: z.enum(['minor', 'adult', 'all']).optional(),
     themes: z.string().optional(),
     limit: z.string().transform(Number).pipe(z.number().min(1).max(10)).optional(),
-    page: z.string().transform(Number).pipe(z.number().min(0)).optional(),
-    pageSize: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional(),
+    page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
+    pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
   }),
 };
 

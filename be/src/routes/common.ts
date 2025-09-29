@@ -1,13 +1,14 @@
-// 공통 API 라우트 - 완벽한 모듈화
+// 공통 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
 import { commonController } from '../controllers/common';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
+import { API_URLS } from '@iitp-dabt-platform/common';
 
 const router = Router();
 
 // ============================================================================
-// 헬스 체크 API
+// 헬스 체크 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -16,7 +17,7 @@ const router = Router();
  * @access Public
  */
 router.get(
-  '/health',
+  API_URLS.COMMON.HEALTH_CHECK,
   validateRequest({
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),
   }),
@@ -24,7 +25,7 @@ router.get(
 );
 
 // ============================================================================
-// 버전 정보 API
+// 버전 정보 API - common 패키지의 API_URLS 활용
 // ============================================================================
 
 /**
@@ -33,7 +34,7 @@ router.get(
  * @access Public
  */
 router.get(
-  '/version',
+  API_URLS.COMMON.VERSION,
   validateRequest({
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),
   }),

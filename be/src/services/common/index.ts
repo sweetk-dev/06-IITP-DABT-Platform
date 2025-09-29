@@ -2,7 +2,7 @@
 import { 
   CommonHealthRes, 
   CommonVersionRes 
-} from '../../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 import { logger } from '../../config/logger';
 import { env } from '../../config/env';
 

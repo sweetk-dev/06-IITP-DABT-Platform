@@ -1,4 +1,4 @@
-// 검증 유틸리티 - 완벽한 모듈화
+// 검증 유틸리티 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { z } from 'zod';
 import { 
   ThemeCode, 
@@ -6,8 +6,9 @@ import {
   SelfRelTypeCode,
   THEME_CONSTANTS,
   DATA_TYPE_CONSTANTS,
-  SELF_REL_TYPE_CONSTANTS
-} from '../../../packages/common/src/types';
+  SELF_REL_TYPE_CONSTANTS,
+  PAGINATION_CONSTANTS
+} from '@iitp-dabt-platform/common';
 
 // 공통 검증 스키마들
 export const validationSchemas = {
@@ -15,9 +16,9 @@ export const validationSchemas = {
   id: z.number().int().positive(),
   idString: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().positive()),
 
-  // 페이지네이션 검증
-  page: z.number().int().min(0),
-  pageSize: z.number().int().min(1).max(100),
+  // 페이지네이션 검증 - common 패키지의 PAGINATION_CONSTANTS 활용
+  page: z.number().int().min(PAGINATION_CONSTANTS.DEFAULT_PAGE),
+  pageSize: z.number().int().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE),
 
   // 정렬 검증
   sort: z.enum(['recent', 'alpha']),

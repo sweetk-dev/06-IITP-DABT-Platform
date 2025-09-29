@@ -1,9 +1,9 @@
-// 페이지네이션 처리 유틸리티 - 완벽한 모듈화
+// 페이지네이션 처리 유틸리티 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
   PAGINATION_CONSTANTS,
   type PaginationReq,
   type PaginationRes 
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // 페이지네이션 파라미터 인터페이스
 export interface PaginationParams {

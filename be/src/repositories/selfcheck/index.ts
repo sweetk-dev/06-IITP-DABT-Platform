@@ -4,7 +4,7 @@ import {
   SelfCheckPoliciesRes,
   SelfCheckProvidersRes,
   SelfCheckFacilitiesRes
-} from '../../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 import { BaseRepository } from '../base/BaseRepository';
 import { SelfDiagPolicy } from '../../models/selfcheck/SelfDiagPolicy';
 import { SelfDiagProvider } from '../../models/selfcheck/SelfDiagProvider';

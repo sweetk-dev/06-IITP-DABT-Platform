@@ -1,4 +1,4 @@
-// 자가진단 서비스 - 완벽한 모듈화
+// 자가진단 서비스 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
   SelfCheckRecommendationsRes,
   SelfCheckPoliciesRes,
@@ -7,8 +7,12 @@ import {
   SelfCheckRecommendationsQuery,
   SelfCheckPoliciesQuery,
   SelfCheckProvidersQuery,
-  SelfCheckFacilitiesQuery
-} from '../../../../packages/common/src/types';
+  SelfCheckFacilitiesQuery,
+  SELF_CHECK_RECOMMENDATIONS_DEFAULTS,
+  SELF_CHECK_POLICIES_DEFAULTS,
+  SELF_CHECK_PROVIDERS_DEFAULTS,
+  SELF_CHECK_FACILITIES_DEFAULTS
+} from '@iitp-dabt-platform/common';
 import { selfCheckRepository } from '../../repositories/selfcheck';
 import { logger } from '../../config/logger';
 import { createPaginationParams, createPaginationMeta } from '../../utils/pagination';
@@ -21,8 +25,8 @@ export async function getRecommendations(query: SelfCheckRecommendationsQuery = 
     
     const startTime = Date.now();
     
-    // 제한값 처리
-    const limit = Math.min(query.limit || 3, 10);
+    // 제한값 처리 - common 패키지의 기본값 활용
+    const limit = Math.min(query.limit ?? SELF_CHECK_RECOMMENDATIONS_DEFAULTS.LIMIT, SELF_CHECK_RECOMMENDATIONS_DEFAULTS.MAX_LIMIT);
     
     // 필터 조건 처리
     const filterConditions = processFilterConditions({
