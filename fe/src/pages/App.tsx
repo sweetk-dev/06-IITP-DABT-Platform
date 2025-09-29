@@ -1,7 +1,9 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Spinner } from '../components/ui/Spinner';
+import { ErrorAlert } from '../components/ui/ErrorAlert';
 import { useRouteChange } from '../hooks/useRouteChange';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 
 // Lazy load pages for better performance - 중앙 집중식 관리
 const LAZY_COMPONENTS = {
@@ -314,22 +316,30 @@ function PageLoader() {
 export function App() {
   // 라우트 변경 감지 및 데이터 리셋 처리
   useRouteChange();
+  
+  // 에러 처리
+  const { error, clearError } = useErrorHandler();
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        {ROUTE_CONFIGS.map((route) => {
-          const Component = LAZY_COMPONENTS[route.component];
-          return (
-            <Route 
-              key={route.path} 
-              path={route.path} 
-              element={<Component />} 
-            />
-          );
-        })}
-      </Routes>
-    </Suspense>
+    <>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {ROUTE_CONFIGS.map((route) => {
+            const Component = LAZY_COMPONENTS[route.component];
+            return (
+              <Route 
+                key={route.path} 
+                path={route.path} 
+                element={<Component />} 
+              />
+            );
+          })}
+        </Routes>
+      </Suspense>
+      
+      {/* 전역 에러 알림 */}
+      <ErrorAlert error={error} onClose={clearError} />
+    </>
   );
 }
 
