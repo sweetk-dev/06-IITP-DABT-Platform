@@ -3,7 +3,11 @@ import {
   SelfCheckRecommendationsRes,
   SelfCheckPoliciesRes,
   SelfCheckProvidersRes,
-  SelfCheckFacilitiesRes
+  SelfCheckFacilitiesRes,
+  SelfRelTypeCode,
+  GenderCode,
+  AgeCondCode,
+  DisLevelCode
 } from '@iitp-dabt-platform/common';
 import { BaseRepository } from '../base/BaseRepository';
 import { SelfDiagPolicy } from '../../models/selfcheck/SelfDiagPolicy';
@@ -11,17 +15,37 @@ import { SelfDiagProvider } from '../../models/selfcheck/SelfDiagProvider';
 import { SelfDiagFacility } from '../../models/selfcheck/SelfDiagFacility';
 import { logger } from '../../config/logger';
 import { getSequelize } from '../../config/database';
+import { Op } from 'sequelize';
+
+// 구체적인 Repository 클래스들
+class PolicyRepository extends BaseRepository<SelfDiagPolicy> {
+  constructor() {
+    super(SelfDiagPolicy, 'SelfDiagPolicy');
+  }
+}
+
+class ProviderRepository extends BaseRepository<SelfDiagProvider> {
+  constructor() {
+    super(SelfDiagProvider, 'SelfDiagProvider');
+  }
+}
+
+class FacilityRepository extends BaseRepository<SelfDiagFacility> {
+  constructor() {
+    super(SelfDiagFacility, 'SelfDiagFacility');
+  }
+}
 
 // 자가진단 Repository 클래스
 class SelfCheckRepository {
-  private policyRepo: BaseRepository<SelfDiagPolicy>;
-  private providerRepo: BaseRepository<SelfDiagProvider>;
-  private facilityRepo: BaseRepository<SelfDiagFacility>;
+  private policyRepo: PolicyRepository;
+  private providerRepo: ProviderRepository;
+  private facilityRepo: FacilityRepository;
 
   constructor() {
-    this.policyRepo = new BaseRepository(SelfDiagPolicy, 'SelfDiagPolicy');
-    this.providerRepo = new BaseRepository(SelfDiagProvider, 'SelfDiagProvider');
-    this.facilityRepo = new BaseRepository(SelfDiagFacility, 'SelfDiagFacility');
+    this.policyRepo = new PolicyRepository();
+    this.providerRepo = new ProviderRepository();
+    this.facilityRepo = new FacilityRepository();
   }
 
   // 추천 정책 조회
@@ -38,7 +62,7 @@ class SelfCheckRepository {
       Object.entries(options.filterConditions).forEach(([key, value]) => {
         if (value) {
           if (key === 'themes' && Array.isArray(value)) {
-            where.self_rlty_type = { [getSequelize().Op.in]: value };
+            where.self_rlty_type = { [Op.in]: value };
           } else if (key === 'gender' && value) {
             where.gender = value;
           } else if (key === 'disLevel' && value) {
@@ -50,7 +74,7 @@ class SelfCheckRepository {
       });
 
       // 링크가 있는 정책만 조회
-      where.link = { [getSequelize().Op.ne]: null };
+      where.link = { [Op.ne]: null };
 
       const data = await this.policyRepo.findAll({
         where,
@@ -74,13 +98,13 @@ class SelfCheckRepository {
         policy_id: item.policy_id,
         category: item.category,
         policy_name: item.policy_name,
-        self_rlty_type: item.self_rlty_type,
-        region: item.region,
-        gender: item.gender,
-        age_cond: item.age_cond,
-        dis_level: item.dis_level,
-        fin_cond: item.fin_cond,
-        link: item.link,
+        self_rlty_type: item.self_rlty_type as SelfRelTypeCode | undefined,
+        region: item.region || undefined,
+        gender: item.gender as GenderCode | undefined,
+        age_cond: item.age_cond as AgeCondCode | undefined,
+        dis_level: item.dis_level as DisLevelCode | undefined,
+        fin_cond: item.fin_cond || undefined,
+        link: item.link || undefined,
       }));
     } catch (error) {
       logger.error('자가진단 Repository - 추천 정책 조회 오류', { error });
@@ -103,7 +127,7 @@ class SelfCheckRepository {
       Object.entries(options.filterConditions).forEach(([key, value]) => {
         if (value) {
           if (key === 'themes' && Array.isArray(value)) {
-            where.self_rlty_type = { [getSequelize().Op.in]: value };
+            where.self_rlty_type = { [Op.in]: value };
           } else if (key === 'gender' && value) {
             where.gender = value;
           } else if (key === 'disLevel' && value) {

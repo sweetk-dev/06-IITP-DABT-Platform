@@ -12,8 +12,7 @@ export async function getLatestData(req: Request, res: Response): Promise<void> 
     logger.debug('최신 데이터 조회 요청 처리 시작', { page, pageSize });
     
     const result = await dataService.getLatestData({
-      page: page ? Number(page) : undefined,
-      pageSize: pageSize ? Number(pageSize) : undefined,
+      limit: pageSize ? Number(pageSize) : undefined,
     });
     
     createSuccessResponse(res, result, 200);
@@ -70,17 +69,16 @@ export async function searchData(req: Request, res: Response): Promise<void> {
       types: types as string,
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as string,
+      sort: sort as 'recent' | 'alpha',
     });
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
-      200,
-      { sort: result.meta.sort }
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
     );
     
     logger.debug('데이터 검색 요청 처리 완료', { result });
@@ -117,17 +115,16 @@ export async function getThemeItems(req: Request, res: Response): Promise<void> 
     const result = await dataService.getThemeItems(theme, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as string,
+      sort: sort as 'recent' | 'alpha',
     });
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
-      200,
-      { theme, sort: result.meta.sort }
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
     );
     
     logger.debug('테마별 아이템 조회 요청 처리 완료', { result });
@@ -164,17 +161,16 @@ export async function getTypeItems(req: Request, res: Response): Promise<void> {
     const result = await dataService.getTypeItems(type, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as string,
+      sort: sort as 'recent' | 'alpha',
     });
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
-      200,
-      { type, sort: result.meta.sort }
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
     );
     
     logger.debug('데이터 유형별 아이템 조회 요청 처리 완료', { result });
@@ -211,8 +207,8 @@ export async function getDataPreview(req: Request, res: Response): Promise<void>
     logger.debug('데이터 미리보기 조회 요청 처리 시작', { id, page, pageSize });
     
     const result = await dataService.getDataPreview(Number(id), {
-      page: page ? Number(page) : undefined,
-      pageSize: pageSize ? Number(pageSize) : undefined,
+      limit: pageSize ? Number(pageSize) : undefined,
+      offset: page ? Number(page) * (pageSize ? Number(pageSize) : 10) : undefined,
     });
     
     createSuccessResponse(res, result, 200);

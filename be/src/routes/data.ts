@@ -127,7 +127,7 @@ router.get(
  * @access Public
  */
 router.get(
-  API_URLS.DATA.DETAIL(':id'),
+  '/:id',
   validateRequest({
     params: commonSchemas.idParam,
   }),
@@ -140,7 +140,7 @@ router.get(
  * @access Public
  */
 router.get(
-  API_URLS.DATA.PREVIEW(':id'),
+  '/:id/preview',
   validateRequest({
     params: commonSchemas.idParam,
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),

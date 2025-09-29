@@ -37,16 +37,15 @@ export function createPaginationMeta(
   page: number,
   pageSize: number,
   totalItems: number
-): PaginationRes {
+): PaginationRes<any> {
   const totalPages = Math.ceil(totalItems / pageSize);
   
   return {
+    items: [],
+    total: totalItems,
     page,
-    pageSize,
-    totalItems,
+    limit: pageSize,
     totalPages,
-    hasNext: page < totalPages - 1,
-    hasPrev: page > 0,
   };
 }
 

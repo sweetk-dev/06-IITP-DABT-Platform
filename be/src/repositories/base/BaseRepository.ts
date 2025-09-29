@@ -1,5 +1,5 @@
 // 기본 Repository 클래스 - 완벽한 모듈화
-import { Model, ModelCtor, WhereOptions, FindOptions, Transaction } from 'sequelize';
+import { Model, ModelCtor, WhereOptions, FindOptions, Transaction, Op } from 'sequelize';
 import { getSequelize } from '../../config/database';
 import { logger } from '../../config/logger';
 
@@ -66,7 +66,7 @@ export abstract class BaseRepository<T extends Model> {
   async update(id: number, data: any, transaction?: Transaction): Promise<[number, T[]]> {
     try {
       const result = await this.model.update(data, {
-        where: { id },
+        where: { id } as any,
         returning: true,
         transaction,
       });
@@ -80,7 +80,7 @@ export abstract class BaseRepository<T extends Model> {
   async delete(id: number, transaction?: Transaction): Promise<number> {
     try {
       const result = await this.model.destroy({
-        where: { id },
+        where: { id } as any,
         transaction,
       });
       return result;
@@ -145,13 +145,13 @@ export abstract class BaseRepository<T extends Model> {
       if (searchQuery && searchFields.length > 0) {
         const searchConditions = searchFields.map(field => ({
           [field]: {
-            [getSequelize().Op.iLike]: `%${searchQuery}%`,
+            [Op.iLike]: `%${searchQuery}%`,
           },
         }));
 
         searchWhere = {
           ...searchWhere,
-          [getSequelize().Op.or]: searchConditions,
+          [Op.or]: searchConditions,
         };
       }
 

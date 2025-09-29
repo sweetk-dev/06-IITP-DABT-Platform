@@ -85,8 +85,11 @@ export async function getPolicies(query: SelfCheckPoliciesQuery = {}): Promise<S
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: SelfCheckPoliciesRes = {
-      data,
-      meta,
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;
@@ -123,8 +126,11 @@ export async function getProviders(query: SelfCheckProvidersQuery = {}): Promise
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: SelfCheckProvidersRes = {
-      data,
-      meta,
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;
@@ -161,8 +167,11 @@ export async function getFacilities(query: SelfCheckFacilitiesQuery = {}): Promi
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: SelfCheckFacilitiesRes = {
-      data,
-      meta,
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;

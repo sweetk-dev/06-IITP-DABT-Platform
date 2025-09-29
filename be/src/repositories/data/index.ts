@@ -11,13 +11,17 @@ import {
   DataDetailRes,
   DataPreviewRes,
   THEME_CONSTANTS,
-  DATA_TYPE_CONSTANTS
+  DATA_TYPE_CONSTANTS,
+  DataTypeCode,
+  SelfRelTypeCode,
+  ThemeCode
 } from '@iitp-dabt-platform/common';
 import { BaseRepository } from '../base/BaseRepository';
 import { DataSummaryInfo } from '../../models/data/DataSummaryInfo';
 import { SelfDiagDataCategory } from '../../models/data/SelfDiagDataCategory';
 import { logger } from '../../config/logger';
 import { getSequelize } from '../../config/database';
+import { Op } from 'sequelize';
 
 // 데이터 Repository 클래스
 class DataRepository extends BaseRepository<DataSummaryInfo> {
@@ -27,21 +31,19 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
 
   // 최신 데이터 조회
   async getLatestData(options: {
-    page: number;
-    pageSize: number;
+    limit: number;
     orderBy: string;
     direction: 'ASC' | 'DESC';
   }): Promise<DataLatestRes> {
     try {
       logger.debug('데이터 Repository - 최신 데이터 조회', { options });
       
-      const { data } = await this.findWithPagination({
+      const data = await this.model.findAll({
         where: {
           status: 'A',
           del_yn: 'N',
         },
-        page: options.page,
-        pageSize: options.pageSize,
+        limit: options.limit,
         order: [[options.orderBy, options.direction]],
         attributes: ['data_id', 'title', 'data_type'],
       });
@@ -49,7 +51,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       return data.map(item => ({
         id: item.data_id,
         title: item.title,
-        data_type: item.data_type,
+        data_type: item.data_type as DataTypeCode,
       }));
     } catch (error) {
       logger.error('데이터 Repository - 최신 데이터 조회 오류', { error });
@@ -158,7 +160,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       Object.entries(options.filterConditions).forEach(([key, value]) => {
         if (value) {
           if (Array.isArray(value)) {
-            where[key] = { [getSequelize().Op.in]: value };
+            where[key] = { [Op.in]: value };
           } else {
             where[key] = value;
           }
@@ -189,9 +191,9 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         data: data.map(item => ({
           id: item.data_id,
           title: item.title,
-          data_type: item.data_type,
-          self_rel_type: item.self_rel_type,
-          category: item.category,
+          data_type: item.data_type as DataTypeCode,
+          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
@@ -226,7 +228,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         const theme = item.self_rel_type;
         const count = parseInt(item.dataValues.total_count);
         
-        let id = '';
+        let id: ThemeCode = 'phy';
         let name = '';
         
         if (theme === 'physical') { id = 'phy'; name = '신체적 자립'; }
@@ -237,7 +239,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         return {
           id,
           name,
-          description: `${name} 관련 데이터`,
+          description: THEME_CONSTANTS.THEMES[id]?.description || '',
           total_count: count,
         };
       });
@@ -289,9 +291,9 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         data: data.map(item => ({
           id: item.data_id,
           title: item.title,
-          data_type: item.data_type,
-          self_rel_type: item.self_rel_type,
-          category: item.category,
+          data_type: item.data_type as DataTypeCode,
+          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
@@ -326,7 +328,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         const type = item.data_type;
         const count = parseInt(item.dataValues.total_count);
         
-        let id = '';
+        let id: DataTypeCode = 'basic';
         let name = '';
         
         if (type === 'basic') { id = 'basic'; name = '기초 데이터'; }
@@ -382,9 +384,9 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         data: data.map(item => ({
           id: item.data_id,
           title: item.title,
-          data_type: item.data_type,
-          self_rel_type: item.self_rel_type,
-          category: item.category,
+          data_type: item.data_type as DataTypeCode,
+          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
@@ -435,17 +437,17 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       return {
         id: item.data_id,
         title: item.title,
-        data_type: item.data_type,
-        self_rel_type: item.self_rel_type,
-        category: item.category,
+        data_type: item.data_type as DataTypeCode,
+        self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+        category: item.category || undefined,
         sys_tbl_id: item.sys_tbl_id,
-        data_desc: item.data_desc,
-        data_keywords: item.data_keywords,
-        data_format: item.data_format,
-        data_usage_scope: item.data_usage_scope,
+        data_desc: item.data_desc || undefined,
+        data_keywords: item.data_keywords || undefined,
+        data_format: item.data_format || undefined,
+        data_usage_scope: item.data_usage_scope || undefined,
         src_org_name: item.src_org_name,
         src_latest_chn_dt: item.src_latest_chn_dt,
-        sys_data_ref_dt: item.sys_data_ref_dt,
+        sys_data_ref_dt: item.sys_data_ref_dt || undefined,
         sys_data_reg_dt: item.sys_data_reg_dt,
         open_api_url: item.open_api_url,
       };

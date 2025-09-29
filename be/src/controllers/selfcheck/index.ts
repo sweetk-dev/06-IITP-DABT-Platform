@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { selfCheckService } from '../../services/selfcheck';
 import { createSuccessResponse, createPaginatedResponse } from '../../utils/response';
 import { logger } from '../../config/logger';
+import { GenderCode, DisLevelCode, AgeCondCode } from '@iitp-dabt-platform/common';
 
 // 추천 정책 조회 컨트롤러
 export async function getRecommendations(req: Request, res: Response): Promise<void> {
@@ -12,9 +13,9 @@ export async function getRecommendations(req: Request, res: Response): Promise<v
     logger.debug('추천 정책 조회 요청 처리 시작', { gender, disLevel, ageCond, themes, limit });
     
     const result = await selfCheckService.getRecommendations({
-      gender: gender as string,
-      disLevel: disLevel as string,
-      ageCond: ageCond as string,
+      gender: gender as GenderCode,
+      disLevel: disLevel as DisLevelCode,
+      ageCond: ageCond as AgeCondCode,
       themes: themes as string,
       limit: limit ? Number(limit) : undefined,
     });
@@ -36,9 +37,9 @@ export async function getPolicies(req: Request, res: Response): Promise<void> {
     logger.debug('자립 지원 정책 조회 요청 처리 시작', { gender, disLevel, ageCond, themes, page, pageSize });
     
     const result = await selfCheckService.getPolicies({
-      gender: gender as string,
-      disLevel: disLevel as string,
-      ageCond: ageCond as string,
+      gender: gender as GenderCode,
+      disLevel: disLevel as DisLevelCode,
+      ageCond: ageCond as AgeCondCode,
       themes: themes as string,
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
@@ -46,12 +47,11 @@ export async function getPolicies(req: Request, res: Response): Promise<void> {
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
-      200,
-      { gender, disLevel, ageCond, themes }
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
     );
     
     logger.debug('자립 지원 정책 조회 요청 처리 완료', { result });
@@ -75,10 +75,10 @@ export async function getProviders(req: Request, res: Response): Promise<void> {
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
       200
     );
     
@@ -103,10 +103,10 @@ export async function getFacilities(req: Request, res: Response): Promise<void> 
     
     createPaginatedResponse(
       res,
-      result.data,
-      result.meta.page,
-      result.meta.pageSize,
-      result.meta.totalItems,
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
       200
     );
     

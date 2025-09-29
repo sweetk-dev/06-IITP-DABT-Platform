@@ -41,7 +41,7 @@ export function createErrorResponse(error: ApiError): ErrorResponse {
   return {
     success: false,
     error: {
-      code: error.code || ErrorCode.UNKNOWN_ERROR,
+      code: (error.code || ErrorCode.UNKNOWN_ERROR).toString(),
       message: error.details?.message || error.message || errorMeta?.message || '알 수 없는 오류가 발생했습니다.',
       details: error.details,
     },
@@ -87,7 +87,7 @@ export function notFoundHandler(req: Request, res: Response, next: NextFunction)
   const error = createError(
     '요청한 리소스를 찾을 수 없습니다.',
     404,
-    ErrorCode.NOT_FOUND,
+    ErrorCode.INVALID_REQUEST,
     {
       method: req.method,
       url: req.originalUrl,

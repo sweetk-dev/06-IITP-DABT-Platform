@@ -27,16 +27,15 @@ export function createPaginationMeta(
   page: number,
   pageSize: number,
   totalItems: number
-): PaginationRes {
+): PaginationRes<any> {
   const totalPages = Math.ceil(totalItems / pageSize);
   
   return {
+    items: [],
+    total: totalItems,
     page,
-    pageSize,
-    totalItems,
+    limit: pageSize,
     totalPages,
-    hasNext: page < totalPages - 1,
-    hasPrev: page > 0,
   };
 }
 
@@ -50,15 +49,14 @@ export function createPaginatedResponse<T>(
   statusCode: number = 200,
   additionalMeta?: any
 ): void {
-  const paginationMeta = createPaginationMeta(page, pageSize, totalItems);
+  const totalPages = Math.ceil(totalItems / pageSize);
   
-  const response: ApiResponse<T[]> = {
-    success: true,
-    data,
-    meta: {
-      ...paginationMeta,
-      ...additionalMeta,
-    },
+  const response: PaginationRes<T> = {
+    items: data,
+    total: totalItems,
+    page,
+    limit: pageSize,
+    totalPages,
   };
 
   res.status(statusCode).json(response);

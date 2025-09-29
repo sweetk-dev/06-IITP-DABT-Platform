@@ -32,19 +32,15 @@ export async function getLatestData(query: DataLatestQuery = {}): Promise<DataLa
     
     const startTime = Date.now();
     
-    // 페이지네이션 파라미터 적용 - common 패키지의 기본값 활용
-    const { page, pageSize } = createPaginationParams(
-      query.page ?? DATA_LATEST_DEFAULTS.PAGE, 
-      query.pageSize ?? DATA_LATEST_DEFAULTS.PAGE_SIZE
-    );
+    // 제한값 처리 - common 패키지의 기본값 활용
+    const limit = Math.min(query.limit ?? DATA_LATEST_DEFAULTS.LIMIT, DATA_LATEST_DEFAULTS.MAX_LIMIT);
     
-    // 정렬 옵션 처리
-    const { orderBy, direction } = processSortOption(query.sort);
+    // 정렬 옵션 처리 (최신순)
+    const { orderBy, direction } = processSortOption('recent');
     
     // 데이터 조회
     const result = await dataRepository.getLatestData({
-      page,
-      pageSize,
+      limit,
       orderBy,
       direction,
     });
@@ -132,7 +128,7 @@ export async function searchData(query: DataSearchQuery): Promise<DataSearchRes>
     
     // 데이터 검색
     const { data, totalItems } = await dataRepository.searchData({
-      searchQuery,
+      searchQuery: searchQuery || undefined,
       filterConditions,
       page,
       pageSize,
@@ -144,11 +140,11 @@ export async function searchData(query: DataSearchQuery): Promise<DataSearchRes>
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: DataSearchRes = {
-      data,
-      meta: {
-        ...meta,
-        sort: query.sort || 'recent',
-      },
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;
@@ -213,12 +209,11 @@ export async function getThemeItems(theme: string, query: DataThemeItemsQuery = 
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: DataThemeItemsRes = {
-      data,
-      meta: {
-        ...meta,
-        theme,
-        sort: query.sort || 'recent',
-      },
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;
@@ -284,12 +279,11 @@ export async function getTypeItems(type: string, query: DataTypeItemsQuery = {})
     const meta = createPaginationMeta(page, pageSize, totalItems);
     
     const result: DataTypeItemsRes = {
-      data,
-      meta: {
-        ...meta,
-        type,
-        sort: query.sort || 'recent',
-      },
+      items: data,
+      total: totalItems,
+      page,
+      limit: pageSize,
+      totalPages: meta.totalPages,
     };
     
     const duration = Date.now() - startTime;

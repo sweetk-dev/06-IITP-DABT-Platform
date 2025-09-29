@@ -13,11 +13,11 @@ const envSchema = z.object({
   
   // 데이터베이스 설정
   DB_HOST: z.string().default('localhost'),
-  DB_PORT: z.string().transform(Number).default(5432),
+  DB_PORT: z.string().transform(Number).default('5432'),
   DB_NAME: z.string().default('iitp_dabt_platform'),
   DB_USER: z.string().default('postgres'),
   DB_PASSWORD: z.string().default(''),
-  DB_SSL: z.string().transform(val => val === 'true').default(false),
+  DB_SSL: z.string().transform(val => val === 'true').default('false'),
   
   // CORS 설정
   CORS_ORIGINS: z.string().transform(val => val.split(',')).default('http://localhost:3000'),
@@ -26,16 +26,16 @@ const envSchema = z.object({
   OPEN_API_SERVER_URL: z.string().default('https://api.example.com'),
   OPEN_API_AUTH_KEY: z.string().optional(),
   OPEN_API_AUTH_SECRET: z.string().optional(),
-  OPEN_API_PAGE_SIZE: z.string().transform(Number).default(100),
-  OPEN_API_TIMEOUT: z.string().transform(Number).default(30000),
+  OPEN_API_PAGE_SIZE: z.string().transform(Number).default('100'),
+  OPEN_API_TIMEOUT: z.string().transform(Number).default('30000'),
   
   // 로깅 설정
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
   LOG_DIR: z.string().default('./logs'),
   
   // 기타 설정
-  API_RATE_LIMIT: z.string().transform(Number).default(100),
-  REQUEST_TIMEOUT: z.string().transform(Number).default(30000),
+  API_RATE_LIMIT: z.string().transform(Number).default('100'),
+  REQUEST_TIMEOUT: z.string().transform(Number).default('30000'),
 });
 
 // 환경변수 검증 및 파싱

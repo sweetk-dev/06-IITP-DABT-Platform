@@ -1,7 +1,8 @@
 // 요청 검증 미들웨어 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { createError, ErrorCode } from './errorHandler';
+import { createError } from './errorHandler';
+import { ErrorCode } from '@iitp-dabt-platform/common';
 import { logger } from '../config/logger';
 import { 
   THEME_CONSTANTS, 
@@ -84,12 +85,12 @@ export const commonSchemas = {
 
   // 테마 파라미터 - common 패키지의 THEME_CONSTANTS 활용
   themeParam: z.object({
-    theme: z.enum(THEME_CONSTANTS.CODES as [string, ...string[]]),
+    theme: z.enum(THEME_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
   }),
 
   // 데이터 타입 파라미터 - common 패키지의 DATA_TYPE_CONSTANTS 활용
   typeParam: z.object({
-    type: z.enum(DATA_TYPE_CONSTANTS.CODES as [string, ...string[]]),
+    type: z.enum(DATA_TYPE_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
   }),
 
   // 검색 쿼리 - common 패키지의 상수 활용

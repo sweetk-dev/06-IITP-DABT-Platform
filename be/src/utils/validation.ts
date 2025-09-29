@@ -24,19 +24,19 @@ export const validationSchemas = {
   sort: z.enum(['recent', 'alpha']),
 
   // 테마 코드 검증
-  theme: z.enum(THEME_CONSTANTS.CODES as [string, ...string[]]),
+  theme: z.enum(THEME_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
   themes: z.string().regex(/^[a-z,]+$/).transform(str => 
     str.split(',').map(t => t.trim()).filter(t => t.length > 0)
   ),
 
   // 데이터 타입 코드 검증
-  dataType: z.enum(DATA_TYPE_CONSTANTS.CODES as [string, ...string[]]),
+  dataType: z.enum(DATA_TYPE_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
   dataTypes: z.string().regex(/^[a-z,]+$/).transform(str => 
     str.split(',').map(t => t.trim()).filter(t => t.length > 0)
   ),
 
   // 자립 유형 코드 검증
-  selfRelType: z.enum(SELF_REL_TYPE_CONSTANTS.CODES as [string, ...string[]]),
+  selfRelType: z.enum(SELF_REL_TYPE_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
 
   // 검색어 검증
   searchQuery: z.string().min(1).max(100).regex(/^[가-힣a-zA-Z0-9\s]+$/),
@@ -91,7 +91,7 @@ export const validators = {
 
   // 테마 코드 검증
   validateTheme: (value: string): ThemeCode => {
-    if (!THEME_CONSTANTS.CODES.includes(value as ThemeCode)) {
+    if (!THEME_CONSTANTS.ALL_CODES.includes(value as ThemeCode)) {
       throw new Error('유효하지 않은 테마 코드입니다.');
     }
     return value as ThemeCode;
@@ -99,7 +99,7 @@ export const validators = {
 
   // 데이터 타입 코드 검증
   validateDataType: (value: string): DataTypeCode => {
-    if (!DATA_TYPE_CONSTANTS.CODES.includes(value as DataTypeCode)) {
+    if (!DATA_TYPE_CONSTANTS.ALL_CODES.includes(value as DataTypeCode)) {
       throw new Error('유효하지 않은 데이터 타입 코드입니다.');
     }
     return value as DataTypeCode;
@@ -107,7 +107,7 @@ export const validators = {
 
   // 자립 유형 코드 검증
   validateSelfRelType: (value: string): SelfRelTypeCode => {
-    if (!SELF_REL_TYPE_CONSTANTS.CODES.includes(value as SelfRelTypeCode)) {
+    if (!SELF_REL_TYPE_CONSTANTS.ALL_CODES.includes(value as SelfRelTypeCode)) {
       throw new Error('유효하지 않은 자립 유형 코드입니다.');
     }
     return value as SelfRelTypeCode;
@@ -201,7 +201,7 @@ export function validateMultipleFields(
     try {
       result[field] = validator(data[field]);
     } catch (error) {
-      errors.push(`${field}: ${error.message}`);
+      errors.push(`${field}: ${(error as Error).message}`);
     }
   }
 
