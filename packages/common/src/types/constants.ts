@@ -180,6 +180,43 @@ export const USER_INFO_CONSTANTS = {
 } as const;
 
 // ============================================================================
+// 자립 지원 정보 메뉴 타입 관련 상수
+// ============================================================================
+
+export type SelfCheckMoreMenuType = 'policies' | 'providers' | 'facilities';
+
+export const SELF_CHECK_MORE_CONSTANTS = {
+  // 자립 지원 정보 메뉴별 코드와 정보 (API 엔드포인트와 일치)
+  MENU_TYPES: {
+    policies: {
+      code: 'policies',
+      name: '자립 지원 정책',
+      description: '장애인 자립생활을 위한 다양한 정책 및 지원제도 정보'
+    },
+    providers: {
+      code: 'providers', 
+      name: '자립 지원 기관',
+      description: '장애인 자립생활을 지원하는 기관 및 서비스 제공업체 정보'
+    },
+    facilities: {
+      code: 'facilities',
+      name: '자립 지원 시설', 
+      description: '장애인 접근성을 고려한 시설 및 편의시설 정보'
+    }
+  },
+  
+  // 모든 메뉴 타입 코드 배열 (API 엔드포인트와 일치)
+  ALL_CODES: ['policies', 'providers', 'facilities'] as const,
+  
+  // 메뉴 타입별 한글명 매핑
+  NAMES: {
+    policies: '자립 지원 정책',
+    providers: '자립 지원 기관',
+    facilities: '자립 지원 시설'
+  } as const
+} as const;
+
+// ============================================================================
 // 유틸리티 함수
 // ============================================================================
 
@@ -202,6 +239,13 @@ export function getDataTypeName(code: DataTypeCode): string {
  */
 export function getSelfRelTypeName(code: SelfRelTypeCode): string {
   return SELF_REL_TYPE_CONSTANTS.NAMES[code];
+}
+
+/**
+ * 자립 지원 정보 메뉴 타입 코드로 한글명 가져오기
+ */
+export function getSelfCheckMoreMenuName(code: SelfCheckMoreMenuType): string {
+  return SELF_CHECK_MORE_CONSTANTS.NAMES[code];
 }
 
 /**
