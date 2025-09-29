@@ -1,6 +1,7 @@
-// 환경변수 관리 - 완벽한 모듈화
+// 환경변수 관리 - 완벽한 모듈화 (암호화된 비밀번호 지원)
 import { config } from 'dotenv';
 import { z } from 'zod';
+import { getDecryptedEnv } from '../utils/decrypt';
 
 // .env 파일 로드
 config();
@@ -16,7 +17,7 @@ const envSchema = z.object({
   DB_PORT: z.string().transform(Number).default('5432'),
   DB_NAME: z.string().default('iitp_dabt_platform'),
   DB_USER: z.string().default('postgres'),
-  DB_PASSWORD: z.string().default(''),
+  DB_PASSWORD: z.string().transform(val => getDecryptedEnv('DB_PASSWORD') || val).default(''),
   DB_SSL: z.string().transform(val => val === 'true').default('false'),
   
   // CORS 설정

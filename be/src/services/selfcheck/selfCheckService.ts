@@ -13,7 +13,7 @@ import {
   SELF_CHECK_PROVIDERS_DEFAULTS,
   SELF_CHECK_FACILITIES_DEFAULTS
 } from '@iitp-dabt-platform/common';
-import { selfCheckRepository } from '../../repositories/selfcheck';
+import { selfCheckRepository } from '../../repositories/selfcheck/selfCheckRepository';
 import { logger } from '../../config/logger';
 import { createPaginationParams, createPaginationMeta } from '../../utils/pagination';
 import { processFilterConditions } from '../../utils/response';

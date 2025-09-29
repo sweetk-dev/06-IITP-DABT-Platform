@@ -1,6 +1,6 @@
 // 자가진단 컨트롤러 - 완벽한 모듈화
 import { Request, Response } from 'express';
-import { selfCheckService } from '../../services/selfcheck';
+import { selfCheckService } from '../../services/selfcheck/selfCheckService';
 import { createSuccessResponse, createPaginatedResponse } from '../../utils/response';
 import { logger } from '../../config/logger';
 import { GenderCode, DisLevelCode, AgeCondCode } from '@iitp-dabt-platform/common';
@@ -13,10 +13,10 @@ export async function getRecommendations(req: Request, res: Response): Promise<v
     logger.debug('추천 정책 조회 요청 처리 시작', { gender, disLevel, ageCond, themes, limit });
     
     const result = await selfCheckService.getRecommendations({
-      gender: gender as GenderCode,
-      disLevel: disLevel as DisLevelCode,
-      ageCond: ageCond as AgeCondCode,
-      themes: themes as string,
+      gender: gender as GenderCode | undefined,
+      disLevel: disLevel as DisLevelCode | undefined,
+      ageCond: ageCond as AgeCondCode | undefined,
+      themes: themes as string | undefined,
       limit: limit ? Number(limit) : undefined,
     });
     
@@ -37,10 +37,10 @@ export async function getPolicies(req: Request, res: Response): Promise<void> {
     logger.debug('자립 지원 정책 조회 요청 처리 시작', { gender, disLevel, ageCond, themes, page, pageSize });
     
     const result = await selfCheckService.getPolicies({
-      gender: gender as GenderCode,
-      disLevel: disLevel as DisLevelCode,
-      ageCond: ageCond as AgeCondCode,
-      themes: themes as string,
+      gender: gender as GenderCode | undefined,
+      disLevel: disLevel as DisLevelCode | undefined,
+      ageCond: ageCond as AgeCondCode | undefined,
+      themes: themes as string | undefined,
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
     });

@@ -1,6 +1,6 @@
 // 공통 컨트롤러 - 완벽한 모듈화
 import { Request, Response } from 'express';
-import { commonService } from '../../services/common';
+import { commonService } from '../../services/common/commonService';
 import { createSuccessResponse } from '../../utils/response';
 import { logger } from '../../config/logger';
 

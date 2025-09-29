@@ -20,7 +20,7 @@ import {
   DATA_THEME_ITEMS_DEFAULTS,
   DATA_TYPE_ITEMS_DEFAULTS
 } from '@iitp-dabt-platform/common';
-import { dataRepository } from '../../repositories/data';
+import { dataRepository } from '../../repositories/data/dataRepository';
 import { logger } from '../../config/logger';
 import { createPaginationParams, createPaginationMeta } from '../../utils/pagination';
 import { processSortOption, processSearchQuery, processFilterConditions } from '../../utils/response';

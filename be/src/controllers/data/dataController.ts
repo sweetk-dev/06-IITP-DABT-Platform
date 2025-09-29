@@ -1,6 +1,6 @@
 // 데이터 컨트롤러 - 완벽한 모듈화
 import { Request, Response } from 'express';
-import { dataService } from '../../services/data';
+import { dataService } from '../../services/data/dataService';
 import { createSuccessResponse, createPaginatedResponse } from '../../utils/response';
 import { logger } from '../../config/logger';
 
@@ -107,12 +107,13 @@ export async function getThemes(req: Request, res: Response): Promise<void> {
 // 테마별 아이템 조회 컨트롤러
 export async function getThemeItems(req: Request, res: Response): Promise<void> {
   try {
-    const { theme } = req.params;
+    // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
+    const { theme } = req.convertedParams || req.params;
     const { page, pageSize, sort } = req.query;
     
     logger.debug('테마별 아이템 조회 요청 처리 시작', { theme, page, pageSize, sort });
     
-    const result = await dataService.getThemeItems(theme, {
+    const result = await dataService.getThemeItems(theme as string, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
       sort: sort as 'recent' | 'alpha',
@@ -153,12 +154,13 @@ export async function getTypes(req: Request, res: Response): Promise<void> {
 // 데이터 유형별 아이템 조회 컨트롤러
 export async function getTypeItems(req: Request, res: Response): Promise<void> {
   try {
-    const { type } = req.params;
+    // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
+    const { type } = req.convertedParams || req.params;
     const { page, pageSize, sort } = req.query;
     
     logger.debug('데이터 유형별 아이템 조회 요청 처리 시작', { type, page, pageSize, sort });
     
-    const result = await dataService.getTypeItems(type, {
+    const result = await dataService.getTypeItems(type as string, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
       sort: sort as 'recent' | 'alpha',
@@ -183,11 +185,12 @@ export async function getTypeItems(req: Request, res: Response): Promise<void> {
 // 데이터 상세 조회 컨트롤러
 export async function getDataDetail(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
+    // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
+    const { id } = req.convertedParams || req.params;
     
     logger.debug('데이터 상세 조회 요청 처리 시작', { id });
     
-    const result = await dataService.getDataDetail(Number(id));
+    const result = await dataService.getDataDetail(id);
     
     createSuccessResponse(res, result, 200);
     
@@ -201,12 +204,13 @@ export async function getDataDetail(req: Request, res: Response): Promise<void> 
 // 데이터 미리보기 조회 컨트롤러
 export async function getDataPreview(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
+    // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
+    const { id } = req.convertedParams || req.params;
     const { page, pageSize } = req.query;
     
     logger.debug('데이터 미리보기 조회 요청 처리 시작', { id, page, pageSize });
     
-    const result = await dataService.getDataPreview(Number(id), {
+    const result = await dataService.getDataPreview(id, {
       limit: pageSize ? Number(pageSize) : undefined,
       offset: page ? Number(page) * (pageSize ? Number(pageSize) : 10) : undefined,
     });

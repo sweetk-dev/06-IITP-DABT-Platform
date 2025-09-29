@@ -1,6 +1,6 @@
 // 공통 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
-import { commonController } from '../controllers/common';
+import { commonController } from '../controllers/common/commonController';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
 import { API_URLS } from '@iitp-dabt-platform/common';

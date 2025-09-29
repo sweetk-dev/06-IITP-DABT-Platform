@@ -1,8 +1,9 @@
 // 데이터 관련 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
-import { dataController } from '../controllers/data';
+import { dataController } from '../controllers/data/dataController';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
+import { paramConverter } from '../middleware/paramConverter';
 import { API_URLS } from '@iitp-dabt-platform/common';
 
 const router = Router();
@@ -82,6 +83,7 @@ router.get(
  */
 router.get(
   API_URLS.DATA.THEME_ITEMS(':theme'),
+  paramConverter, // 파라미터 변환 미들웨어 먼저 실행
   validateRequest({
     params: commonSchemas.themeParam,
     query: commonSchemas.paginationQuery,
@@ -110,6 +112,7 @@ router.get(
  */
 router.get(
   API_URLS.DATA.TYPE_ITEMS(':type'),
+  paramConverter, // 파라미터 변환 미들웨어 먼저 실행
   validateRequest({
     params: commonSchemas.typeParam,
     query: commonSchemas.paginationQuery,
@@ -128,6 +131,7 @@ router.get(
  */
 router.get(
   '/:id',
+  paramConverter, // 파라미터 변환 미들웨어 먼저 실행
   validateRequest({
     params: commonSchemas.idParam,
   }),
@@ -141,6 +145,7 @@ router.get(
  */
 router.get(
   '/:id/preview',
+  paramConverter, // 파라미터 변환 미들웨어 먼저 실행
   validateRequest({
     params: commonSchemas.idParam,
     query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),

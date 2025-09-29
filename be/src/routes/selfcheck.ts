@@ -1,6 +1,6 @@
 // 자가진단 관련 API 라우트 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { Router } from 'express';
-import { selfCheckController } from '../controllers/selfcheck';
+import { selfCheckController } from '../controllers/selfcheck/selfCheckController';
 import { validateRequest, commonSchemas } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
 import { API_URLS } from '@iitp-dabt-platform/common';

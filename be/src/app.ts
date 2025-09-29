@@ -6,6 +6,7 @@ import compression from 'compression';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logger';
 import { validateRequest } from './middleware/validator';
+import { paramConverter } from './middleware/paramConverter';
 import { commonRoutes } from './routes/common';
 import { dataRoutes } from './routes/data';
 import { selfCheckRoutes } from './routes/selfcheck';
@@ -52,6 +53,10 @@ export function createApp(): express.Application {
   // ============================================================================
   
   app.use(requestLogger);
+
+  // ============================================================================
+  // 파라미터 변환 미들웨어는 개별 라우터에서 적용
+  // ============================================================================
 
   // ============================================================================
   // API 라우트 - common 패키지의 API_URLS 활용
