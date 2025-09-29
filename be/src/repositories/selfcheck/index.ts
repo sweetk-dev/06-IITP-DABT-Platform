@@ -1,0 +1,245 @@
+// 자가진단 Repository - 완벽한 모듈화
+import { 
+  SelfCheckRecommendationsRes,
+  SelfCheckPoliciesRes,
+  SelfCheckProvidersRes,
+  SelfCheckFacilitiesRes
+} from '../../../../packages/common/src/types';
+import { BaseRepository } from '../base/BaseRepository';
+import { SelfDiagPolicy } from '../../models/selfcheck/SelfDiagPolicy';
+import { SelfDiagProvider } from '../../models/selfcheck/SelfDiagProvider';
+import { SelfDiagFacility } from '../../models/selfcheck/SelfDiagFacility';
+import { logger } from '../../config/logger';
+import { getSequelize } from '../../config/database';
+
+// 자가진단 Repository 클래스
+class SelfCheckRepository {
+  private policyRepo: BaseRepository<SelfDiagPolicy>;
+  private providerRepo: BaseRepository<SelfDiagProvider>;
+  private facilityRepo: BaseRepository<SelfDiagFacility>;
+
+  constructor() {
+    this.policyRepo = new BaseRepository(SelfDiagPolicy, 'SelfDiagPolicy');
+    this.providerRepo = new BaseRepository(SelfDiagProvider, 'SelfDiagProvider');
+    this.facilityRepo = new BaseRepository(SelfDiagFacility, 'SelfDiagFacility');
+  }
+
+  // 추천 정책 조회
+  async getRecommendations(options: {
+    filterConditions: Record<string, any>;
+    limit: number;
+  }): Promise<SelfCheckRecommendationsRes> {
+    try {
+      logger.debug('자가진단 Repository - 추천 정책 조회', { options });
+      
+      const where: any = {};
+
+      // 필터 조건 적용
+      Object.entries(options.filterConditions).forEach(([key, value]) => {
+        if (value) {
+          if (key === 'themes' && Array.isArray(value)) {
+            where.self_rlty_type = { [getSequelize().Op.in]: value };
+          } else if (key === 'gender' && value) {
+            where.gender = value;
+          } else if (key === 'disLevel' && value) {
+            where.dis_level = value;
+          } else if (key === 'ageCond' && value) {
+            where.age_cond = value;
+          }
+        }
+      });
+
+      // 링크가 있는 정책만 조회
+      where.link = { [getSequelize().Op.ne]: null };
+
+      const data = await this.policyRepo.findAll({
+        where,
+        limit: options.limit,
+        order: [['created_at', 'DESC']],
+        attributes: [
+          'policy_id',
+          'category',
+          'policy_name',
+          'self_rlty_type',
+          'region',
+          'gender',
+          'age_cond',
+          'dis_level',
+          'fin_cond',
+          'link',
+        ],
+      });
+
+      return data.map(item => ({
+        policy_id: item.policy_id,
+        category: item.category,
+        policy_name: item.policy_name,
+        self_rlty_type: item.self_rlty_type,
+        region: item.region,
+        gender: item.gender,
+        age_cond: item.age_cond,
+        dis_level: item.dis_level,
+        fin_cond: item.fin_cond,
+        link: item.link,
+      }));
+    } catch (error) {
+      logger.error('자가진단 Repository - 추천 정책 조회 오류', { error });
+      throw error;
+    }
+  }
+
+  // 자립 지원 정책 조회
+  async getPolicies(options: {
+    filterConditions: Record<string, any>;
+    page: number;
+    pageSize: number;
+  }): Promise<{ data: any[]; totalItems: number }> {
+    try {
+      logger.debug('자가진단 Repository - 자립 지원 정책 조회', { options });
+      
+      const where: any = {};
+
+      // 필터 조건 적용
+      Object.entries(options.filterConditions).forEach(([key, value]) => {
+        if (value) {
+          if (key === 'themes' && Array.isArray(value)) {
+            where.self_rlty_type = { [getSequelize().Op.in]: value };
+          } else if (key === 'gender' && value) {
+            where.gender = value;
+          } else if (key === 'disLevel' && value) {
+            where.dis_level = value;
+          } else if (key === 'ageCond' && value) {
+            where.age_cond = value;
+          }
+        }
+      });
+
+      const { data, totalItems } = await this.policyRepo.findWithPagination({
+        where,
+        page: options.page,
+        pageSize: options.pageSize,
+        order: [['created_at', 'DESC']],
+        attributes: [
+          'policy_id',
+          'category',
+          'policy_name',
+          'self_rlty_type',
+          'region',
+          'gender',
+          'age_cond',
+          'dis_level',
+          'fin_cond',
+        ],
+      });
+
+      return {
+        data: data.map(item => ({
+          policy_id: item.policy_id,
+          category: item.category,
+          policy_name: item.policy_name,
+          self_rlty_type: item.self_rlty_type,
+          region: item.region,
+          gender: item.gender,
+          age_cond: item.age_cond,
+          dis_level: item.dis_level,
+          fin_cond: item.fin_cond,
+        })),
+        totalItems,
+      };
+    } catch (error) {
+      logger.error('자가진단 Repository - 자립 지원 정책 조회 오류', { error });
+      throw error;
+    }
+  }
+
+  // 자립 지원 기관 조회
+  async getProviders(options: {
+    page: number;
+    pageSize: number;
+  }): Promise<{ data: any[]; totalItems: number }> {
+    try {
+      logger.debug('자가진단 Repository - 자립 지원 기관 조회', { options });
+      
+      const { data, totalItems } = await this.providerRepo.findWithPagination({
+        where: {},
+        page: options.page,
+        pageSize: options.pageSize,
+        order: [['created_at', 'DESC']],
+        attributes: [
+          'provider_id',
+          'provider_name',
+          'service_name',
+          'address',
+          'phone',
+          'description',
+        ],
+      });
+
+      return {
+        data: data.map(item => ({
+          provider_id: item.provider_id,
+          provider_name: item.provider_name,
+          service_name: item.service_name,
+          address: item.address,
+          phone: item.phone,
+          description: item.description,
+        })),
+        totalItems,
+      };
+    } catch (error) {
+      logger.error('자가진단 Repository - 자립 지원 기관 조회 오류', { error });
+      throw error;
+    }
+  }
+
+  // 자립 지원 시설 조회
+  async getFacilities(options: {
+    page: number;
+    pageSize: number;
+  }): Promise<{ data: any[]; totalItems: number }> {
+    try {
+      logger.debug('자가진단 Repository - 자립 지원 시설 조회', { options });
+      
+      const { data, totalItems } = await this.facilityRepo.findWithPagination({
+        where: {},
+        page: options.page,
+        pageSize: options.pageSize,
+        order: [['created_at', 'DESC']],
+        attributes: [
+          'facility_id',
+          'device',
+          'install_area',
+          'install_site',
+          'install_spot',
+          'hang_dong',
+          'address',
+          'opening_hours',
+          'quantity',
+          'note',
+        ],
+      });
+
+      return {
+        data: data.map(item => ({
+          facility_id: item.facility_id,
+          device: item.device,
+          install_area: item.install_area,
+          install_site: item.install_site,
+          install_spot: item.install_spot,
+          hang_dong: item.hang_dong,
+          address: item.address,
+          opening_hours: item.opening_hours,
+          quantity: item.quantity,
+          note: item.note,
+        })),
+        totalItems,
+      };
+    } catch (error) {
+      logger.error('자가진단 Repository - 자립 지원 시설 조회 오류', { error });
+      throw error;
+    }
+  }
+}
+
+// Repository 인스턴스 생성 및 내보내기
+export const selfCheckRepository = new SelfCheckRepository();
