@@ -89,7 +89,7 @@ be/
 │       ├── data.ts        # 데이터 라우트
 │       └── selfcheck.ts   # 자가진단 라우트
 ├── script/                # 유틸리티 스크립트
-│   └── test-password-hash.js # 비밀번호 해싱 테스트
+│   └── encrypt-env.js # 환경변수 암호화 도구
 ├── dist/                  # 빌드 결과물
 ├── logs/                  # 로그 파일
 ├── .env                   # 환경변수 (암호화된 비밀번호 포함)
@@ -249,20 +249,20 @@ npm run test:coverage
   - `decryptAes256()`: Base64 인코딩된 암호화 데이터 복호화
   - `getDecryptedEnv()`: ENC() 형태의 환경변수 자동 복호화
 
-### 비밀번호 해싱 스크립트
-- **`script/test-password-hash.js`**: 관리자 계정 초기 비밀번호 설정 도구
+### 환경변수 암호화 스크립트
+- **`script/encrypt-env.js`**: 민감한 환경변수 암호화 도구
   ```bash
   # 사용법
-  node script/test-password-hash.js [비밀번호]
+  node script/encrypt-env.js
   
-  # 예시
-  node script/test-password-hash.js admin123
+  # 또는 ENC_SECRET 환경변수 설정 후
+  ENC_SECRET=your_secret_key node script/encrypt-env.js
   ```
   
   **기능:**
-  - bcrypt를 사용한 비밀번호 해싱
-  - SQL INSERT 문 자동 생성
-  - 비밀번호 검증 테스트
+  - AES-256-CBC 암호화를 사용한 민감한 값 암호화
+  - `ENC()` 형식으로 암호화된 값 출력
+  - 데이터베이스 비밀번호 등 민감한 정보 안전 저장
   - 관리자 계정 초기 설정 지원
 
 ### 환경변수 암호화 지원
