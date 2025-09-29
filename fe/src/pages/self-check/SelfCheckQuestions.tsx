@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATHS } from '../App';
 import { useEffect, useState } from 'react';
 import { SelfCheckLayout, SelfCheckProgress, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
@@ -34,7 +35,7 @@ export function SelfCheckQuestions() {
   const handleExit = () => {
     localStorage.removeItem('selfCheckUserInfo');
     localStorage.removeItem('selfCheckResponses');
-    navigate('/');
+    navigate(ROUTE_PATHS.HOME);
   };
 
   // 컴포넌트 마운트 시 사용자 정보 로드
@@ -43,7 +44,7 @@ export function SelfCheckQuestions() {
     if (savedUserInfo) {
       setUserInfo(JSON.parse(savedUserInfo));
     } else {
-      navigate('/self-check/identity');
+      navigate(ROUTE_PATHS.SELF_CHECK_IDENTITY);
     }
   }, [navigate]);
 
@@ -76,7 +77,7 @@ export function SelfCheckQuestions() {
   // 이전 버튼 처리
   const handlePrevious = () => {
     if (isFirstQuestion) {
-      navigate('/self-check/identity');
+      navigate(ROUTE_PATHS.SELF_CHECK_IDENTITY);
     } else if (currentQuestionIndex === 0) {
       // 이전 영역의 마지막 질문으로 이동
       const prevAreaIndex = currentAreaIndex - 1;
@@ -102,7 +103,7 @@ export function SelfCheckQuestions() {
       if (isLastQuestion) {
         // 모든 질문 완료 - 결과 페이지로 이동
         localStorage.setItem('selfCheckResponses', JSON.stringify(newResponses));
-        navigate('/self-check/result');
+        navigate(ROUTE_PATHS.SELF_CHECK_RESULT);
       } else if (isLastQuestionInArea) {
         // 다음 영역의 첫 번째 질문으로 이동
         setCurrentAreaIndex(prev => prev + 1);

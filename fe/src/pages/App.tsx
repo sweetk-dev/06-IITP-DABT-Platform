@@ -215,6 +215,46 @@ export function getNavigationRoutes(path: string): { previous: string | null; ne
   return { previous, next };
 }
 
+// 특정 라우트 키로 경로 가져오기 (동적 라우트 파라미터 포함)
+export function getRoutePathByKey(key: keyof typeof ROUTE_PATHS, params?: Record<string, string>): string {
+  return getRoutePath(ROUTE_PATHS[key], params);
+}
+
+// 검색 결과 페이지 경로 생성
+export function getDataSearchPath(options?: {
+  q?: string;
+  type?: 'theme' | 'data_type';
+  category?: string;
+  theme?: string;
+}): string {
+  const params = new URLSearchParams();
+  if (options?.q) params.set('q', options.q);
+  if (options?.type) params.set('type', options.type);
+  if (options?.category) params.set('category', options.category);
+  if (options?.theme) params.set('theme', options.theme);
+  
+  const queryString = params.toString();
+  return queryString ? `${ROUTE_PATHS.DATA_SEARCH}?${queryString}` : ROUTE_PATHS.DATA_SEARCH;
+}
+
+// 데이터 목록 페이지 경로 생성
+export function getDataListPath(options?: {
+  theme?: string;
+  type?: string;
+}): string {
+  const params = new URLSearchParams();
+  if (options?.theme) params.set('theme', options.theme);
+  if (options?.type) params.set('type', options.type);
+  
+  const queryString = params.toString();
+  return queryString ? `${ROUTE_PATHS.DATA_LIST}?${queryString}` : ROUTE_PATHS.DATA_LIST;
+}
+
+// 데이터 상세 페이지 경로 생성
+export function getDataDetailPath(id: string): string {
+  return getRoutePathByKey('DATA_DETAIL', { id });
+}
+
 // 데이터 리셋 조건 확인
 export function shouldResetData(fromPath: string, toPath: string): boolean {
   const fromRoute = ROUTE_CONFIGS.find(route => route.path === fromPath);

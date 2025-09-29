@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { getDataListPath } from './App';
 import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
@@ -30,12 +31,12 @@ export function DataSearch() {
 
   // 자립 테마 클릭 핸들러
   const handleThemeClick = (theme: ThemeCode) => {
-    navigate(`/data-list?theme=${theme}`);
+    navigate(getDataListPath({ theme }));
   };
 
   // 데이터 유형 클릭 핸들러
   const handleTypeClick = (type: DataTypeCode) => {
-    navigate(`/data-list?type=${type}`);
+    navigate(getDataListPath({ type }));
   };
 
   return (

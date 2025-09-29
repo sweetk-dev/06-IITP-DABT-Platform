@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ROUTE_PATHS } from './App';
 import { Layout } from '../components/layout/Layout';
 
 export function Info() {
@@ -419,7 +420,7 @@ export function Info() {
             간단한 자가 진단으로 자립 수준을 확인하고, 맞춤 정보를
             바로 만나보세요.
           </div>
-          <Link to="/self-check/start" style={{ textDecoration: 'none' }}>
+          <Link to={ROUTE_PATHS.SELF_CHECK_START} style={{ textDecoration: 'none' }}>
             <button id="info-diagnosis-info-button" style={{
               minWidth: '320px',
               padding: '22px 36px',

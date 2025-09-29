@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { ROUTE_PATHS } from '../App';
 import { SelfCheckLayout, SelfCheckContainer } from '../../components/self-check';
 import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '../../../../packages/common/src/types';
 
@@ -29,7 +30,7 @@ export function SelfCheckStart() {
         }
       >
         {/* Start Button */}
-        <Link to="/self-check/identity" style={{ textDecoration: 'none' }}>
+        <Link to={ROUTE_PATHS.SELF_CHECK_IDENTITY} style={{ textDecoration: 'none' }}>
           <button style={{
             width: '600px',
             minWidth: '400px',

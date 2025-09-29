@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { ROUTE_PATHS, getDataDetailPath } from './App';
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
@@ -40,7 +41,7 @@ export function DataDetail() {
           gap: '16px', 
           marginBottom: '16px' 
         }}>
-          <Link to="/data" style={{ textDecoration: 'none' }}>
+          <Link to={ROUTE_PATHS.DATA_LIST} style={{ textDecoration: 'none' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -372,7 +373,7 @@ export function DataDetail() {
                 { id: '3', title: '서울시 지하철역 엘리베이터 위치정보', tags: ['이동권', '접근성'] },
                 { id: '4', title: '장애인 고용 현황 통계', tags: ['고용', '통계'] }
               ].map((item) => (
-                <Link key={item.id} to={`/data/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link key={item.id} to={getDataDetailPath(item.id)} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div style={{
                     padding: '12px',
                     background: '#f8f9fa',

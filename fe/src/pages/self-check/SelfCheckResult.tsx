@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ROUTE_PATHS, getDataSearchPath } from '../App';
 import { Layout } from '../../components/layout/Layout';
 import { SelfThemaCard, CardContent, CardTitle, CardSubtitle, CardIcon } from '../../components/ui/SelfThemaCard';
 import { SELF_CHECK_CONSTANTS } from '@iitp-dabt-platform/common';
@@ -16,19 +17,19 @@ export function SelfCheckResult() {
       category: '신체적 자립을 위한',
       title: '활동보조사(주/야간) 지원 사업 신청',
       description: '일상생활 지원을 위한 활동보조사 서비스',
-      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[0]}` // phys
+      link: getDataSearchPath({ category: SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[0] }) // phys
     },
     {
       category: '경제적 자립을 위한',
       title: '장애 수당 신청',
       description: '경제적 지원을 위한 장애 수당 신청',
-      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1]}` // econ
+      link: getDataSearchPath({ category: SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1] }) // econ
     },
     {
       category: '경제적 자립을 위한',
       title: '나에게 맞는 일자리 정보',
       description: '개인 맞춤형 취업 정보 제공',
-      link: `/data-search?category=${SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1]}` // econ
+      link: getDataSearchPath({ category: SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER[1] }) // econ
     }
   ];
 
@@ -287,7 +288,7 @@ export function SelfCheckResult() {
           gap: '24px',
           marginTop: '40px'
         }}>
-          <Link to="/self-check/start" style={{ textDecoration: 'none' }}>
+          <Link to={ROUTE_PATHS.SELF_CHECK_START} style={{ textDecoration: 'none' }}>
             <button style={{
               width: '280px',
               height: '77px',
@@ -310,7 +311,7 @@ export function SelfCheckResult() {
               자가 진단 다시하기
             </button>
           </Link>
-          <Link to="/data-search" style={{ textDecoration: 'none' }}>
+          <Link to={ROUTE_PATHS.SELF_CHECK_MORE} style={{ textDecoration: 'none' }}>
             <button style={{
               width: '280px',
               height: '77px',

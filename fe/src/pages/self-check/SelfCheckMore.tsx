@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ROUTE_PATHS } from '../App';
 import { Layout } from '../../components/layout/Layout';
 import { Sidebar } from '../../components/ui/Sidebar';
 import { FilterSection } from '../../components/ui/FilterSection';
@@ -174,7 +175,7 @@ export function SelfCheckMore() {
                 description: '장애인의 자립생활을 위한 경제적 지원 제도 안내'
               }
             ].map((item) => (
-              <Link key={item.id} to={`/self-check/service/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link key={item.id} to={ROUTE_PATHS.DATA_SEARCH} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <SelfThemaCard 
                   variant="default"
                 >

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getDataSearchPath } from '../../pages/App';
 
 interface HeaderSearchProps {
   idPrefix: string;
@@ -12,7 +13,7 @@ export function HeaderSearch({ idPrefix }: HeaderSearchProps) {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/data-search?q=${encodeURIComponent(searchTerm.trim())}`);
+      navigate(getDataSearchPath({ q: searchTerm.trim() }));
     }
   };
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATHS } from '../App';
 import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
 import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, AREA_NAMES, type IdentityQuestionType, type IdentityResponse } from '../../../../packages/common/src/types';
@@ -32,7 +33,7 @@ export function SelfCheckIdentity() {
   // 이전 버튼 처리
   const handlePrevious = () => {
     if (isFirstQuestion) {
-      navigate('/self-check/start');
+      navigate(ROUTE_PATHS.SELF_CHECK_START);
     } else {
       setCurrentQuestionIndex(prev => prev - 1);
     }
@@ -43,7 +44,7 @@ export function SelfCheckIdentity() {
     if (isLastQuestion) {
       // 모든 질문이 완료되었으므로 자가진단 질문으로 이동
       localStorage.setItem('selfCheckUserInfo', JSON.stringify(userResponses));
-      navigate('/self-check/questions');
+      navigate(ROUTE_PATHS.SELF_CHECK_QUESTIONS);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
     }
@@ -51,7 +52,7 @@ export function SelfCheckIdentity() {
 
   // 종료 처리
   const handleExit = () => {
-    navigate('/');
+    navigate(ROUTE_PATHS.HOME);
   };
 
   return (

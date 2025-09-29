@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
+import { ROUTE_PATHS } from '../../pages/App';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { getBreadcrumbItems } from '../../pages/App';
 import { MobileNavigation } from '../ui/MobileNavigation';
@@ -54,7 +55,7 @@ export function Layout({
               height: '118px'
             }}>
               <Link 
-                to="/"
+                to={ROUTE_PATHS.HOME}
                 id={`${idPrefix}-header-title`} 
                 style={{
                   color: 'black',

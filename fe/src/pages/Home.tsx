@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { getDataListPath, getDataSearchPath, ROUTE_PATHS } from './App';
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
@@ -10,19 +11,19 @@ export function Home() {
   const [modalContent, setModalContent] = useState({ title: '', description: '' });
 
   const handleThemeClick = (theme: string) => {
-    navigate(`/data-list?theme=${theme}`);
+    navigate(getDataListPath({ theme }));
   };
 
   const handleDataTypeClick = (type: string) => {
-    navigate(`/data-list?type=${type}`);
+    navigate(getDataListPath({ type }));
   };
 
   const handleViewAllThemes = () => {
-    navigate('/data-search?type=theme');
+    navigate(getDataSearchPath({ type: 'theme' }));
   };
 
   const handleViewAllDataTypes = () => {
-    navigate('/data-search?type=data_type');
+    navigate(getDataSearchPath({ type: 'data_type' }));
   };
 
 
@@ -42,7 +43,7 @@ export function Home() {
   };
 
   const handleSearch = () => {
-    navigate('/data-search');
+    navigate(ROUTE_PATHS.DATA_SEARCH);
   };
 
   return (
@@ -63,7 +64,7 @@ export function Home() {
             </div>
 
             <Link 
-              to="/info"
+              to={ROUTE_PATHS.INFO}
               id="home-about-detail-btn"
               className="home-about-link"
             >
@@ -315,7 +316,7 @@ export function Home() {
               간단한 자가 진단으로 자립 수준을 확인하고, 맞춤
               정보를 바로 만나보세요.
             </div>
-            <Link to="/self-check/start">
+            <Link to={ROUTE_PATHS.SELF_CHECK_START}>
               <div id="home-self-check-btn" className="home-self-check-btn">
                 <div id="home-self-check-btn-text" className="home-self-check-btn-text">
                   자가 진단 바로가기
