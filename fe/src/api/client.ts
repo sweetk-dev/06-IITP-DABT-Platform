@@ -1,12 +1,14 @@
-// API 클라이언트 (fetch 래퍼)
+// API 클라이언트 (fetch 래퍼) - common 패키지의 모든 API 타입 활용
 import { apiErrorHandler, ApiError } from './errorHandler';
 import { 
   API_MAPPING, 
+  API_URLS,
   type ExtractReqType, 
   type ExtractResType,
   type ExtractBodyType,
   type ExtractParamsType,
-  type ExtractQueryType
+  type ExtractQueryType,
+  type ApiMappingKey
 } from '../../../packages/common/src/types';
 
 // ============================================================================
@@ -14,6 +16,7 @@ import {
 // ============================================================================
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
 
 // ============================================================================
 // API 클라이언트 클래스
@@ -28,8 +31,9 @@ export class ApiClient {
 
   /**
    * 타입 안전한 API 호출 (body, params, query 구분)
+   * common 패키지의 API_MAPPING을 완전히 활용
    */
-  async call<T extends keyof typeof API_MAPPING>(
+  async call<T extends ApiMappingKey>(
     url: T,
     request?: {
       body?: ExtractBodyType<T>;
@@ -92,7 +96,7 @@ export class ApiClient {
   /**
    * GET 요청용 API 호출 (params, query 구분)
    */
-  async get<T extends keyof typeof API_MAPPING>(
+  async get<T extends ApiMappingKey>(
     url: T,
     request?: {
       params?: ExtractParamsType<T>;
@@ -105,7 +109,7 @@ export class ApiClient {
   /**
    * POST 요청용 API 호출 (body, params, query 구분)
    */
-  async post<T extends keyof typeof API_MAPPING>(
+  async post<T extends ApiMappingKey>(
     url: T,
     request?: {
       body?: ExtractBodyType<T>;
@@ -119,7 +123,7 @@ export class ApiClient {
   /**
    * PUT 요청용 API 호출 (body, params, query 구분)
    */
-  async put<T extends keyof typeof API_MAPPING>(
+  async put<T extends ApiMappingKey>(
     url: T,
     request?: {
       body?: ExtractBodyType<T>;
@@ -133,7 +137,7 @@ export class ApiClient {
   /**
    * DELETE 요청용 API 호출 (params, query 구분)
    */
-  async delete<T extends keyof typeof API_MAPPING>(
+  async delete<T extends ApiMappingKey>(
     url: T,
     request?: {
       params?: ExtractParamsType<T>;

@@ -19,24 +19,42 @@ import {
 import { 
   SELF_CHECK_MORE_CONSTANTS, 
   type SelfCheckMoreMenuType,
-  getSelfCheckMoreMenuName 
+  getSelfCheckMoreMenuName,
+  SELF_CHECK_POLICIES_DEFAULTS,
+  SELF_CHECK_PROVIDERS_DEFAULTS,
+  SELF_CHECK_FACILITIES_DEFAULTS
 } from '@iitp-dabt-platform/common';
-import { getSelfCheckMoreApiEndpoint } from '../../config/api';
+import { useRecommendations, usePolicies, useProviders, useFacilities } from '../../api/hooks';
 import '../../styles/data-pages.css';
 
 export function SelfCheckMore() {
   const [selectedMenu, setSelectedMenu] = useState<SelfCheckMoreMenuType>('policies'); // 기본값: 자립 지원 정책
+
+  // ============================================================================
+  // API 데이터 조회 (common 패키지의 모든 타입 활용)
+  // ============================================================================
+  
+  // 자가진단 관련 API 호출
+  const recommendationsState = useRecommendations({ themes: 'phy,emo' });
+  const policiesState = usePolicies({ 
+    themes: 'phy,emo', 
+    page: SELF_CHECK_POLICIES_DEFAULTS.PAGE, 
+    pageSize: SELF_CHECK_POLICIES_DEFAULTS.PAGE_SIZE 
+  });
+  const providersState = useProviders({ 
+    page: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE, 
+    pageSize: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE_SIZE 
+  });
+  const facilitiesState = useFacilities({ 
+    page: SELF_CHECK_FACILITIES_DEFAULTS.PAGE, 
+    pageSize: SELF_CHECK_FACILITIES_DEFAULTS.PAGE_SIZE 
+  });
 
   // 메뉴 데이터 정의 - common 패키지의 상수 사용
   const menuItems = SELF_CHECK_MORE_CONSTANTS.ALL_CODES.map((code: SelfCheckMoreMenuType) => ({
     id: code,
     name: getSelfCheckMoreMenuName(code)
   }));
-
-  // TODO: API 연동으로 실제 데이터 가져오기
-  // const policies = await getSelfCheckPolicies();
-  // const providers = await getSelfCheckProviders(); 
-  // const facilities = await getSelfCheckFacilities();
 
   // 임시 데이터 (API 연동 시 제거)
   const mockData = {
@@ -104,14 +122,26 @@ export function SelfCheckMore() {
     ]
   };
 
-  const currentData = mockData[selectedMenu as keyof typeof mockData];
+  // 현재 선택된 메뉴에 따른 API 데이터 상태 결정
+  const getCurrentApiState = () => {
+    switch (selectedMenu) {
+      case 'policies':
+        return policiesState;
+      case 'providers':
+        return providersState;
+      case 'facilities':
+        return facilitiesState;
+      default:
+        return recommendationsState;
+    }
+  };
+
+  const currentApiState = getCurrentApiState();
+  const currentData = currentApiState.data || [];
 
   // 메뉴 클릭 핸들러
   const handleMenuClick = (menuType: SelfCheckMoreMenuType) => {
     setSelectedMenu(menuType);
-    // TODO: 해당 메뉴의 API 호출
-    // const apiEndpoint = getSelfCheckMoreApiEndpoint(menuType);
-    // fetchData(apiEndpoint);
   };
 
   // 카드 클릭 핸들러
@@ -135,8 +165,8 @@ export function SelfCheckMore() {
   };
 
   const getCount = () => {
-    // TODO: API에서 실제 건수 가져오기
-    return currentData.length;
+    return currentApiState.loading ? '...' : 
+           currentApiState.data?.length?.toLocaleString() || '0';
   };
 
   return (
@@ -179,65 +209,85 @@ export function SelfCheckMore() {
             </TableHeader>
 
             <TableBody id="self-check-more-table-body">
-              {currentData.map((item: any, index: number) => (
-                <TableRow 
-                  key={item.id} 
-                  id={`self-check-more-row-${index + 1}`} 
-                  onClick={() => handleCardClick(item)}
-                >
-                  <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
-                    <DataTitle id={`self-check-more-row-${index + 1}-title`}>
-                      {item.title}
-                    </DataTitle>
-                    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
-                      {item.category && (
-                        <MetaItem
-                          label="카테고리"
-                          value={item.category}
-                          labelId={`self-check-more-row-${index + 1}-meta-category-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-category-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
-                        />
-                      )}
-                      {item.organization && (
-                        <MetaItem
-                          label="제공 기관"
-                          value={item.organization}
-                          labelId={`self-check-more-row-${index + 1}-meta-org-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-org-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
-                        />
-                      )}
-                      {item.location && (
-                        <MetaItem
-                          label="위치"
-                          value={item.location}
-                          labelId={`self-check-more-row-${index + 1}-meta-location-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-location-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
-                        />
-                      )}
-                      <MetaItem
-                        label="등록일"
-                        value="2025.01.15"
-                        labelId={`self-check-more-row-${index + 1}-meta-date-label`}
-                        valueId={`self-check-more-row-${index + 1}-meta-date-value`}
-                      />
-                    </DataMeta>
-                  </TableCell>
-                  <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
-                    {item.category && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
-                    )}
-                    {item.organization && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
-                    )}
-                    {item.location && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
-                    )}
+              {currentApiState.loading ? (
+                <TableRow>
+                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center' }}>
+                    로딩 중...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : currentApiState.error ? (
+                <TableRow>
+                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
+                    데이터를 불러오는 중 오류가 발생했습니다.
+                  </TableCell>
+                </TableRow>
+              ) : currentData.length > 0 ? (
+                currentData.map((item: any, index: number) => (
+                  <TableRow 
+                    key={item.id || index} 
+                    id={`self-check-more-row-${index + 1}`} 
+                    onClick={() => handleCardClick(item)}
+                  >
+                    <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
+                      <DataTitle id={`self-check-more-row-${index + 1}-title`}>
+                        {item.title || item.policy_name || item.provider_name || item.facility_name || '제목'}
+                      </DataTitle>
+                      <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
+                        {item.category && (
+                          <MetaItem
+                            label="카테고리"
+                            value={item.category}
+                            labelId={`self-check-more-row-${index + 1}-meta-category-label`}
+                            valueId={`self-check-more-row-${index + 1}-meta-category-value`}
+                            separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+                          />
+                        )}
+                        {item.organization && (
+                          <MetaItem
+                            label="제공 기관"
+                            value={item.organization}
+                            labelId={`self-check-more-row-${index + 1}-meta-org-label`}
+                            valueId={`self-check-more-row-${index + 1}-meta-org-value`}
+                            separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+                          />
+                        )}
+                        {item.location && (
+                          <MetaItem
+                            label="위치"
+                            value={item.location}
+                            labelId={`self-check-more-row-${index + 1}-meta-location-label`}
+                            valueId={`self-check-more-row-${index + 1}-meta-location-value`}
+                            separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+                          />
+                        )}
+                        <MetaItem
+                          label="등록일"
+                          value={item.reg_date || '2025.01.15'}
+                          labelId={`self-check-more-row-${index + 1}-meta-date-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-date-value`}
+                        />
+                      </DataMeta>
+                    </TableCell>
+                    <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
+                      {item.category && (
+                        <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
+                      )}
+                      {item.organization && (
+                        <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
+                      )}
+                      {item.location && (
+                        <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center' }}>
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

@@ -384,6 +384,12 @@
   align-items: center;
   gap: 10px;
   display: flex;
+  transition: background-color 0.2s ease;
+}
+
+.home-latest-data-item:hover {
+  background-color: rgba(0, 143.88, 255, 0.05);
+  border-radius: 8px;
 }
 
 .home-latest-data-item-content {

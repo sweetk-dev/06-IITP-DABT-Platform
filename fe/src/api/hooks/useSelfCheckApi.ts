@@ -5,7 +5,11 @@ import {
   SelfCheckRecommendationsReq,
   SelfCheckPoliciesReq,
   SelfCheckProvidersReq,
-  SelfCheckFacilitiesReq
+  SelfCheckFacilitiesReq,
+  SELF_CHECK_RECOMMENDATIONS_DEFAULTS,
+  SELF_CHECK_POLICIES_DEFAULTS,
+  SELF_CHECK_PROVIDERS_DEFAULTS,
+  SELF_CHECK_FACILITIES_DEFAULTS
 } from '../../../../packages/common/src/types';
 
 // ============================================================================
@@ -25,7 +29,7 @@ export interface ApiState<T> {
 /**
  * 추천 정책 리스트 조회 훅
  */
-export function useRecommendations(params: SelfCheckRecommendationsReq, immediate: boolean = true) {
+export function useRecommendations(params: SelfCheckRecommendationsReq = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -36,7 +40,12 @@ export function useRecommendations(params: SelfCheckRecommendationsReq, immediat
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await selfCheckService.getRecommendations(params);
+      // 기본값 적용
+      const queryParams = {
+        limit: SELF_CHECK_RECOMMENDATIONS_DEFAULTS.LIMIT,
+        ...params
+      };
+      const data = await selfCheckService.getRecommendations(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -70,7 +79,13 @@ export function usePolicies(params: SelfCheckPoliciesReq = {}, immediate: boolea
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await selfCheckService.getPolicies(params);
+      // 기본값 적용
+      const queryParams = {
+        page: SELF_CHECK_POLICIES_DEFAULTS.PAGE,
+        pageSize: SELF_CHECK_POLICIES_DEFAULTS.PAGE_SIZE,
+        ...params
+      };
+      const data = await selfCheckService.getPolicies(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -104,7 +119,13 @@ export function useProviders(params: SelfCheckProvidersReq = {}, immediate: bool
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await selfCheckService.getProviders(params);
+      // 기본값 적용
+      const queryParams = {
+        page: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE,
+        pageSize: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE_SIZE,
+        ...params
+      };
+      const data = await selfCheckService.getProviders(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -138,7 +159,13 @@ export function useFacilities(params: SelfCheckFacilitiesReq = {}, immediate: bo
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await selfCheckService.getFacilities(params);
+      // 기본값 적용
+      const queryParams = {
+        page: SELF_CHECK_FACILITIES_DEFAULTS.PAGE,
+        pageSize: SELF_CHECK_FACILITIES_DEFAULTS.PAGE_SIZE,
+        ...params
+      };
+      const data = await selfCheckService.getFacilities(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 

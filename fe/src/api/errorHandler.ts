@@ -1,5 +1,5 @@
-// API 에러 처리 및 알림 관리
-import { ErrorCode } from '../../../packages/common/src/types/errorCodes.js';
+// API 에러 처리 및 알림 관리 - common 패키지의 ErrorCode 완전 활용
+import { ErrorCode, ErrorMetaMap } from '../../../packages/common/src/types';
 
 // ============================================================================
 // 에러 타입 정의
@@ -111,35 +111,30 @@ export class ApiErrorHandler {
   // ============================================================================
 
   private getErrorTitle(code: ErrorCode): string {
-    const titleMap: Record<ErrorCode, string> = {
-      [ErrorCode.UNKNOWN_ERROR]: '오류 발생',
-      [ErrorCode.VALIDATION_ERROR]: '입력 오류',
-      [ErrorCode.DATABASE_ERROR]: '데이터베이스 오류',
-      [ErrorCode.NETWORK_ERROR]: '네트워크 오류',
-      [ErrorCode.INVALID_REQUEST]: '잘못된 요청',
-      [ErrorCode.MISSING_REQUIRED_FIELD]: '필수 정보 누락',
-      [ErrorCode.INVALID_PARAMETER]: '잘못된 파라미터',
-      [ErrorCode.REQUEST_TIMEOUT]: '요청 시간 초과',
-      [ErrorCode.SYS_INTERNAL_SERVER_ERROR]: '서버 오류',
-      [ErrorCode.SYS_SERVICE_UNAVAILABLE]: '서비스 이용 불가',
-      [ErrorCode.SYS_MAINTENANCE_MODE]: '시스템 점검 중'
-    };
-    return titleMap[code] || '오류 발생';
+    // common 패키지의 ErrorMetaMap 활용
+    const errorMeta = ErrorMetaMap[code];
+    if (errorMeta) {
+      return errorMeta.statusCode >= 500 ? '서버 오류' : 
+             errorMeta.statusCode >= 400 ? '요청 오류' : '오류 발생';
+    }
+    return '오류 발생';
   }
 
   private getErrorMessage(error: ApiError): string {
     if (error.details?.message) {
       return error.details.message;
     }
-    return error.message;
+    // common 패키지의 ErrorMetaMap에서 기본 메시지 가져오기
+    const errorMeta = ErrorMetaMap[error.code];
+    return errorMeta?.message || error.message;
   }
 
   private getErrorType(code: ErrorCode): 'error' | 'warning' | 'info' {
-    if (code >= ErrorCode.SYS_INTERNAL_SERVER_ERROR) {
-      return 'error';
-    }
-    if (code >= ErrorCode.INVALID_REQUEST) {
-      return 'warning';
+    // common 패키지의 ErrorMetaMap 활용
+    const errorMeta = ErrorMetaMap[code];
+    if (errorMeta) {
+      if (errorMeta.statusCode >= 500) return 'error';
+      if (errorMeta.statusCode >= 400) return 'warning';
     }
     return 'error';
   }
@@ -158,16 +153,10 @@ export class ApiErrorHandler {
   }
 
   private getDefaultErrorMessage(status: number): string {
-    switch (status) {
-      case 400: return '잘못된 요청입니다.';
-      case 401: return '인증이 필요합니다.';
-      case 403: return '접근 권한이 없습니다.';
-      case 404: return '요청한 리소스를 찾을 수 없습니다.';
-      case 408: return '요청 시간이 초과되었습니다.';
-      case 500: return '서버 내부 오류가 발생했습니다.';
-      case 503: return '서비스가 일시적으로 이용 불가능합니다.';
-      default: return '알 수 없는 오류가 발생했습니다.';
-    }
+    // common 패키지의 ErrorMetaMap에서 기본 메시지 가져오기
+    const errorCode = this.getErrorCodeFromStatus(status);
+    const errorMeta = ErrorMetaMap[errorCode];
+    return errorMeta?.message || '알 수 없는 오류가 발생했습니다.';
   }
 }
 

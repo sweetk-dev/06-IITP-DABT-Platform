@@ -2,20 +2,28 @@
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼의 프론트엔드 애플리케이션입니다.
 
+## 🎯 핵심 특징
+
+- **완전한 모듈화**: `@iitp-dabt-platform/common` 패키지의 모든 API 타입, 상수, 에러 코드 완전 활용
+- **타입 안전성**: TypeScript를 통한 컴파일 타임 타입 체크
+- **일관된 API 처리**: 단일 API 클라이언트로 모든 API 호출 통합
+- **하드코딩 제거**: 모든 상수와 타입을 common 패키지에서 가져옴
+- **중복 코드 제거**: 재사용 가능한 서비스와 훅으로 코드 중복 최소화
+
 ## 📁 프로젝트 구조
 
 ```
 fe/src/
-├── api/                          # API 관련 모든 기능
+├── api/                          # API 관련 모든 기능 (common 패키지 완전 활용)
 │   ├── index.ts                  # API 모듈 진입점
-│   ├── client.ts                 # API 클라이언트 (fetch 래퍼)
-│   ├── errorHandler.ts           # 공통 에러 처리
-│   ├── services/                 # API 서비스 레이어
+│   ├── client.ts                 # API 클라이언트 (fetch 래퍼, API_MAPPING 활용)
+│   ├── errorHandler.ts           # 공통 에러 처리 (ErrorCode, ErrorMetaMap 활용)
+│   ├── services/                 # API 서비스 레이어 (API_URLS, REQ/RES DTO 활용)
 │   │   ├── index.ts
 │   │   ├── dataService.ts        # 데이터 API 서비스
 │   │   ├── selfCheckService.ts   # 자가진단 API 서비스
 │   │   └── commonService.ts      # 공통 API 서비스
-│   └── hooks/                    # API 관련 훅들
+│   └── hooks/                    # API 관련 훅들 (common 타입 활용)
 │       ├── index.ts
 │       ├── useDataApi.ts         # 데이터 API 훅들
 │       ├── useSelfCheckApi.ts    # 자가진단 API 훅들
@@ -47,8 +55,7 @@ fe/src/
 │   └── data-pages.css            # 데이터 페이지 스타일
 ├── types/                        # 타입 정의
 │   └── common.ts                 # 공통 타입
-├── config/                       # 설정 파일
-│   └── api.ts                    # API 설정 (레거시)
+├── config/                       # 설정 파일 (통합됨)
 └── examples/                     # 사용 예시
     └── ApiUsageExample.tsx       # API 사용 예시
 ```
@@ -78,19 +85,29 @@ npm run preview
 
 ## 🔧 API 사용법
 
+### 🎯 완전한 모듈화된 API 구조
+
+모든 API 호출은 `@iitp-dabt-platform/common` 패키지의 타입과 상수를 완전히 활용합니다:
+
+- **API_URLS**: 모든 API 엔드포인트
+- **API_MAPPING**: 요청/응답 타입 매핑
+- **REQ/RES DTO**: 모든 API 요청/응답 타입
+- **ErrorCode, ErrorMetaMap**: 에러 처리
+- **Constants**: 모든 상수 (THEME_CONSTANTS, DATA_TYPE_CONSTANTS 등)
+
 ### 1. 훅을 사용한 API 호출 (권장)
 
 ```typescript
 import { useLatestData, useThemeCounts, useDataSearch } from '../api/hooks';
 
 function MyComponent() {
-  // 최신 데이터 조회
+  // 최신 데이터 조회 (common 패키지의 DataLatestQuery 타입 사용)
   const { data: latestData, loading, error } = useLatestData({ limit: 6 });
   
-  // 테마별 건수 조회
+  // 테마별 건수 조회 (common 패키지의 DataThemeCountsRes 타입 사용)
   const { data: themeCounts } = useThemeCounts();
   
-  // 데이터 검색
+  // 데이터 검색 (common 패키지의 DataSearchQuery 타입 사용)
   const { data: searchResults, execute: search } = useDataSearch({
     q: '장애인',
     themes: 'phy,emo',
@@ -121,11 +138,11 @@ import { dataService, selfCheckService } from '../api/services';
 
 async function handleApiCall() {
   try {
-    // 데이터 서비스 사용
+    // 데이터 서비스 사용 (common 패키지의 API_URLS와 타입 활용)
     const latestData = await dataService.getLatestData({ limit: 10 });
     const themeCounts = await dataService.getThemeCounts();
     
-    // 자가진단 서비스 사용
+    // 자가진단 서비스 사용 (common 패키지의 타입 활용)
     const policies = await selfCheckService.getPolicies({
       themes: 'phy,emo',
       page: 1,
@@ -134,13 +151,33 @@ async function handleApiCall() {
     
     console.log('API 결과:', { latestData, themeCounts, policies });
   } catch (error) {
-    // 에러는 자동으로 ErrorAlert로 표시됨
+    // 에러는 자동으로 ErrorAlert로 표시됨 (common 패키지의 ErrorCode 활용)
     console.error('API 호출 실패:', error);
   }
 }
 ```
 
-### 3. 자가진단 API 사용
+### 3. API 클라이언트 직접 사용 (고급)
+
+```typescript
+import { apiClient } from '../api/client';
+import { API_URLS } from '../../../packages/common/src/types';
+
+async function directApiCall() {
+  try {
+    // API 클라이언트 직접 사용 (API_MAPPING을 통한 완전한 타입 안전성)
+    const data = await apiClient.get(`GET ${API_URLS.DATA.SUMMARY.LATEST}`, {
+      query: { limit: 6 }
+    });
+    
+    console.log('API 결과:', data);
+  } catch (error) {
+    console.error('API 호출 실패:', error);
+  }
+}
+```
+
+### 4. 자가진단 API 사용
 
 ```typescript
 import { useRecommendations, usePolicies } from '../api/hooks';
@@ -175,23 +212,32 @@ function SelfCheckComponent() {
 
 ## 🎯 주요 기능
 
-### 1. 타입 안전한 API 호출
+### 1. 완전한 모듈화
 
-- `mapping.ts`를 통한 API URL과 타입 자동 연결
+- `@iitp-dabt-platform/common` 패키지의 모든 타입과 상수 활용
+- 하드코딩 완전 제거
+- 중복 코드 제거로 유지보수성 향상
+
+### 2. 타입 안전한 API 호출
+
+- `API_MAPPING`을 통한 API URL과 타입 자동 연결
 - 컴파일 타임에 API 호출 오류 방지
 - IDE에서 자동완성 지원
+- `body`, `params`, `query` 구분으로 명확한 요청 구조
 
-### 2. 자동 에러 처리
+### 3. 통합된 에러 처리
 
+- `ErrorCode`와 `ErrorMetaMap`을 활용한 일관된 에러 처리
 - 모든 API 에러가 자동으로 `ErrorAlert`로 표시
 - 사용자가 확인 버튼을 눌러야 사라짐
 - 에러 타입별로 다른 스타일 적용
 
-### 3. 일관된 API 구조
+### 4. 일관된 API 구조
 
 - 모든 API가 동일한 패턴으로 처리
 - 훅과 서비스를 통한 코드 재사용
 - 명확한 책임 분리
+- 단일 API 클라이언트로 통합
 
 ## 📋 사용 가능한 API
 

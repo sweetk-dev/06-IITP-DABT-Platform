@@ -3,11 +3,22 @@ import { ROUTE_PATHS, getDataDetailPath } from './App';
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
+import { useDataDetail, useDataPreview } from '../api/hooks';
 
 export function DataDetail() {
   const { id } = useParams<{ id: string }>();
   const [isOpenApiModalOpen, setIsOpenApiModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+
+  // ============================================================================
+  // API 데이터 조회 (common 패키지의 모든 타입 활용)
+  // ============================================================================
+  
+  // 데이터 상세 정보 조회
+  const dataDetailState = useDataDetail(id ? parseInt(id) : 0);
+  
+  // 데이터 미리보기 조회
+  const dataPreviewState = useDataPreview(id ? parseInt(id) : 0);
 
   const handleOpenApiClick = () => {
     setIsOpenApiModalOpen(true);
@@ -67,7 +78,9 @@ export function DataDetail() {
           marginBottom: '8px',
           color: 'black'
         }}>
-          장애인 생활체육 실행 유형
+          {dataDetailState.loading ? '로딩 중...' : 
+           dataDetailState.error ? '데이터를 불러올 수 없습니다' :
+           dataDetailState.data?.title || dataDetailState.data?.data_name || '데이터 제목'}
         </h1>
         
         <div style={{ 
@@ -84,7 +97,7 @@ export function DataDetail() {
             fontSize: '14px',
             fontWeight: 600
           }}>
-            기초
+            {dataDetailState.data?.data_type || '기초'}
           </div>
           <div style={{
             padding: '4px 12px',

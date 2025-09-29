@@ -4,7 +4,8 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode } from '../../../packages/common/src/types';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '../../../packages/common/src/types';
+import { useDataSearch } from '../api/hooks';
 
 import '../styles/data-pages.css';
 
@@ -12,6 +13,17 @@ export function DataSearch() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const searchTerm = searchParams.get('q') || '';
+
+  // ============================================================================
+  // API 데이터 조회 (common 패키지의 모든 타입 활용)
+  // ============================================================================
+  
+  // 데이터 검색
+  const searchState = useDataSearch({
+    q: searchTerm,
+    page: DATA_SEARCH_DEFAULTS.PAGE,
+    pageSize: DATA_SEARCH_DEFAULTS.PAGE_SIZE
+  });
 
   // 검색어 강조 함수
   const highlightSearchTerm = (text: string, term: string) => {
@@ -92,7 +104,10 @@ export function DataSearch() {
               )}
             </div>
             <div id="data-search-data-count" className="data-count">
-              총 <span id="data-search-count-number" className="count-number">4</span>건
+              총 <span id="data-search-count-number" className="count-number">
+                {searchState.loading ? '...' : 
+                 searchState.data?.totalCount?.toLocaleString() || '0'}
+              </span>건
             </div>
           </div>
 
@@ -104,118 +119,64 @@ export function DataSearch() {
             </div>
 
             <div id="data-search-table-body" className="data-table-body">
-              <div id="data-search-row-1" className="data-row">
-                <div id="data-search-row-1-info" className="data-info">
-                  <div id="data-search-row-1-title" className="data-title">
-                    {highlightSearchTerm('장애인 의료 이용 현황', searchTerm)}
-                  </div>
-                  <div id="data-search-row-1-meta" className="data-meta">
-                    <div id="data-search-row-1-meta-format" className="meta-item">
-                      <span id="data-search-row-1-meta-format-label" className="meta-label">제공 포맷</span>
-                      <span id="data-search-row-1-meta-format-value" className="meta-value">csv</span>
-                    </div>
-                    <div id="data-search-row-1-meta-separator-1" className="meta-separator"></div>
-                    <div id="data-search-row-1-meta-org" className="meta-item">
-                      <span id="data-search-row-1-meta-org-label" className="meta-label">제공 기관</span>
-                      <span id="data-search-row-1-meta-org-value" className="meta-value">한국장애인고용공단</span>
-                    </div>
-                    <div id="data-search-row-1-meta-separator-2" className="meta-separator"></div>
-                    <div id="data-search-row-1-meta-date" className="meta-item">
-                      <span id="data-search-row-1-meta-date-label" className="meta-label">최종 수정일</span>
-                      <span id="data-search-row-1-meta-date-value" className="meta-value">2025.05.12</span>
-                    </div>
-                  </div>
+              {searchState.loading ? (
+                <div style={{ padding: '40px', textAlign: 'center' }}>로딩 중...</div>
+              ) : searchState.error ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
+                  검색 중 오류가 발생했습니다.
                 </div>
-                <div id="data-search-row-1-tags" className="data-tags">
-                  <span id="data-search-row-1-tag-1" className="tag">일상지원</span>
-                  <span id="data-search-row-1-tag-2" className="tag">방문돌봄</span>
-                  <span id="data-search-row-1-tag-3" className="tag">장애인</span>
-                </div>
-              </div>
-
-              <div id="data-search-row-2" className="data-row">
-                <div id="data-search-row-2-info" className="data-info">
-                  <div id="data-search-row-2-title" className="data-title">
-                    {highlightSearchTerm('공공기관 장애인 고용 현황', searchTerm)}
-                  </div>
-                  <div id="data-search-row-2-meta" className="data-meta">
-                    <div id="data-search-row-2-meta-format" className="meta-item">
-                      <span id="data-search-row-2-meta-format-label" className="meta-label">제공 포맷</span>
-                      <span id="data-search-row-2-meta-format-value" className="meta-value">xlsx</span>
+              ) : searchState.data && searchState.data.items && searchState.data.items.length > 0 ? (
+                searchState.data.items.map((item: any, index: number) => (
+                  <div key={item.id || index} id={`data-search-row-${index + 1}`} className="data-row">
+                    <div id={`data-search-row-${index + 1}-info`} className="data-info">
+                      <div id={`data-search-row-${index + 1}-title`} className="data-title">
+                        {highlightSearchTerm(item.title || item.data_name || '데이터 제목', searchTerm)}
+                      </div>
+                      <div id={`data-search-row-${index + 1}-meta`} className="data-meta">
+                        <div id={`data-search-row-${index + 1}-meta-format`} className="meta-item">
+                          <span id={`data-search-row-${index + 1}-meta-format-label`} className="meta-label">제공 포맷</span>
+                          <span id={`data-search-row-${index + 1}-meta-format-value`} className="meta-value">
+                            {item.format || 'csv'}
+                          </span>
+                        </div>
+                        <div id={`data-search-row-${index + 1}-meta-separator-1`} className="meta-separator"></div>
+                        <div id={`data-search-row-${index + 1}-meta-org`} className="meta-item">
+                          <span id={`data-search-row-${index + 1}-meta-org-label`} className="meta-label">제공 기관</span>
+                          <span id={`data-search-row-${index + 1}-meta-org-value`} className="meta-value">
+                            {item.src_org_name || '제공 기관'}
+                          </span>
+                        </div>
+                        <div id={`data-search-row-${index + 1}-meta-separator-2`} className="meta-separator"></div>
+                        <div id={`data-search-row-${index + 1}-meta-date`} className="meta-item">
+                          <span id={`data-search-row-${index + 1}-meta-date-label`} className="meta-label">최종 수정일</span>
+                          <span id={`data-search-row-${index + 1}-meta-date-value`} className="meta-value">
+                            {item.sys_data_reg_dt || '2025.05.12'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div id="data-search-row-2-meta-separator-1" className="meta-separator"></div>
-                    <div id="data-search-row-2-meta-org" className="meta-item">
-                      <span id="data-search-row-2-meta-org-label" className="meta-label">제공 기관</span>
-                      <span id="data-search-row-2-meta-org-value" className="meta-value">고용노동부</span>
-                    </div>
-                    <div id="data-search-row-2-meta-separator-2" className="meta-separator"></div>
-                    <div id="data-search-row-2-meta-date" className="meta-item">
-                      <span id="data-search-row-2-meta-date-label" className="meta-label">최종 수정일</span>
-                      <span id="data-search-row-2-meta-date-value" className="meta-value">2025.04.28</span>
-                    </div>
-                  </div>
-                </div>
-                <div id="data-search-row-2-tags" className="data-tags">
-                  <span id="data-search-row-2-tag-1" className="tag">고용</span>
-                  <span id="data-search-row-2-tag-2" className="tag">공공기관</span>
-                </div>
-              </div>
-
-              <div id="data-search-row-3" className="data-row">
-                <div id="data-search-row-3-info" className="data-info">
-                  <div id="data-search-row-3-title" className="data-title">
-                    {highlightSearchTerm('민간기업 장애인 고용 현황', searchTerm)}
-                  </div>
-                  <div id="data-search-row-3-meta" className="data-meta">
-                    <div id="data-search-row-3-meta-format" className="meta-item">
-                      <span id="data-search-row-3-meta-format-label" className="meta-label">제공 포맷</span>
-                      <span id="data-search-row-3-meta-format-value" className="meta-value">json</span>
-                    </div>
-                    <div id="data-search-row-3-meta-separator-1" className="meta-separator"></div>
-                    <div id="data-search-row-3-meta-org" className="meta-item">
-                      <span id="data-search-row-3-meta-org-label" className="meta-label">제공 기관</span>
-                      <span id="data-search-row-3-meta-org-value" className="meta-value">한국장애인고용공단</span>
-                    </div>
-                    <div id="data-search-row-3-meta-separator-2" className="meta-separator"></div>
-                    <div id="data-search-row-3-meta-date" className="meta-item">
-                      <span id="data-search-row-3-meta-date-label" className="meta-label">최종 수정일</span>
-                      <span id="data-search-row-3-meta-date-value" className="meta-value">2025.04.15</span>
+                    <div id={`data-search-row-${index + 1}-tags`} className="data-tags">
+                      {item.tags && item.tags.length > 0 ? (
+                        item.tags.map((tag: string, tagIndex: number) => (
+                          <span key={tagIndex} id={`data-search-row-${index + 1}-tag-${tagIndex + 1}`} className="tag">
+                            {tag}
+                          </span>
+                        ))
+                      ) : (
+                        <>
+                          <span id={`data-search-row-${index + 1}-tag-1`} className="tag">일상지원</span>
+                          <span id={`data-search-row-${index + 1}-tag-2`} className="tag">방문돌봄</span>
+                          <span id={`data-search-row-${index + 1}-tag-3`} className="tag">장애인</span>
+                        </>
+                      )}
                     </div>
                   </div>
+                ))
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center' }}>
+                  {searchTerm ? `'${searchTerm}'에 대한 검색 결과가 없습니다.` : '데이터가 없습니다.'}
                 </div>
-                <div id="data-search-row-3-tags" className="data-tags">
-                  <span id="data-search-row-3-tag-1" className="tag">고용</span>
-                  <span id="data-search-row-3-tag-2" className="tag">민간기업</span>
-                </div>
-              </div>
-
-              <div id="data-search-row-4" className="data-row">
-                <div id="data-search-row-4-info" className="data-info">
-                  <div id="data-search-row-4-title" className="data-title">
-                    {highlightSearchTerm('장애유형 및 산업 장애인 근로자 고용현황', searchTerm)}
-                  </div>
-                  <div id="data-search-row-4-meta" className="data-meta">
-                    <div id="data-search-row-4-meta-format" className="meta-item">
-                      <span id="data-search-row-4-meta-format-label" className="meta-label">제공 포맷</span>
-                      <span id="data-search-row-4-meta-format-value" className="meta-value">csv</span>
-                    </div>
-                    <div id="data-search-row-4-meta-separator-1" className="meta-separator"></div>
-                    <div id="data-search-row-4-meta-org" className="meta-item">
-                      <span id="data-search-row-4-meta-org-label" className="meta-label">제공 기관</span>
-                      <span id="data-search-row-4-meta-org-value" className="meta-value">통계청</span>
-                    </div>
-                    <div id="data-search-row-4-meta-separator-2" className="meta-separator"></div>
-                    <div id="data-search-row-4-meta-date" className="meta-item">
-                      <span id="data-search-row-4-meta-date-label" className="meta-label">최종 수정일</span>
-                      <span id="data-search-row-4-meta-date-value" className="meta-value">2025.03.30</span>
-                    </div>
-                  </div>
-                </div>
-                <div id="data-search-row-4-tags" className="data-tags">
-                  <span id="data-search-row-4-tag-1" className="tag">고용</span>
-                  <span id="data-search-row-4-tag-2" className="tag">통계</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

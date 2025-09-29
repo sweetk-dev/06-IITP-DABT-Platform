@@ -2,10 +2,14 @@
 import { useState, useEffect } from 'react';
 import { dataService } from '../services';
 import { 
-  DataLatestReq, 
-  DataSearchReq,
-  DataThemeItemsReq,
-  DataTypeItemsReq
+  DataLatestQuery, 
+  DataSearchQuery,
+  DataThemeItemsQuery,
+  DataTypeItemsQuery,
+  DATA_LATEST_DEFAULTS,
+  DATA_SEARCH_DEFAULTS,
+  DATA_THEME_ITEMS_DEFAULTS,
+  DATA_TYPE_ITEMS_DEFAULTS
 } from '../../../../packages/common/src/types';
 
 // ============================================================================
@@ -25,7 +29,7 @@ export interface ApiState<T> {
 /**
  * 최신 데이터 리스트 조회 훅
  */
-export function useLatestData(params: DataLatestReq = {}, immediate: boolean = true) {
+export function useLatestData(params: DataLatestQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -36,7 +40,12 @@ export function useLatestData(params: DataLatestReq = {}, immediate: boolean = t
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await dataService.getLatestData(params);
+      // 기본값 적용
+      const queryParams = {
+        limit: DATA_LATEST_DEFAULTS.LIMIT,
+        ...params
+      };
+      const data = await dataService.getLatestData(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -127,7 +136,7 @@ export function useTypeCounts(immediate: boolean = true) {
 /**
  * 데이터 검색 훅
  */
-export function useDataSearch(params: DataSearchReq, immediate: boolean = true) {
+export function useDataSearch(params: DataSearchQuery, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -138,7 +147,14 @@ export function useDataSearch(params: DataSearchReq, immediate: boolean = true) 
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await dataService.searchData(params);
+      // 기본값 적용
+      const queryParams = {
+        page: DATA_SEARCH_DEFAULTS.PAGE,
+        pageSize: DATA_SEARCH_DEFAULTS.PAGE_SIZE,
+        sort: DATA_SEARCH_DEFAULTS.SORT,
+        ...params
+      };
+      const data = await dataService.searchData(queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -229,7 +245,7 @@ export function useTypes(immediate: boolean = true) {
 /**
  * 자립 테마별 리스트 조회 훅
  */
-export function useThemeItems(theme: string, params: DataThemeItemsReq = {}, immediate: boolean = true) {
+export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -240,7 +256,14 @@ export function useThemeItems(theme: string, params: DataThemeItemsReq = {}, imm
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await dataService.getThemeItems(theme, params);
+      // 기본값 적용
+      const queryParams = {
+        page: DATA_THEME_ITEMS_DEFAULTS.PAGE,
+        pageSize: DATA_THEME_ITEMS_DEFAULTS.PAGE_SIZE,
+        sort: DATA_THEME_ITEMS_DEFAULTS.SORT,
+        ...params
+      };
+      const data = await dataService.getThemeItems(theme, queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 
@@ -263,7 +286,7 @@ export function useThemeItems(theme: string, params: DataThemeItemsReq = {}, imm
 /**
  * 데이터 유형별 리스트 조회 훅
  */
-export function useTypeItems(type: string, params: DataTypeItemsReq = {}, immediate: boolean = true) {
+export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -274,7 +297,14 @@ export function useTypeItems(type: string, params: DataTypeItemsReq = {}, immedi
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await dataService.getTypeItems(type, params);
+      // 기본값 적용
+      const queryParams = {
+        page: DATA_TYPE_ITEMS_DEFAULTS.PAGE,
+        pageSize: DATA_TYPE_ITEMS_DEFAULTS.PAGE_SIZE,
+        sort: DATA_TYPE_ITEMS_DEFAULTS.SORT,
+        ...params
+      };
+      const data = await dataService.getTypeItems(type, queryParams);
       setState({ data, loading: false, error: null });
     } catch (error) {
       setState(prev => ({ 

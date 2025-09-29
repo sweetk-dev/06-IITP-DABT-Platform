@@ -1,14 +1,28 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { getDataListPath, getDataSearchPath, ROUTE_PATHS } from './App';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode } from '../../../packages/common/src/types';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '../../../packages/common/src/types';
+import { useLatestData, useThemeCounts, useTypeCounts } from '../api/hooks';
 
 export function Home() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', description: '' });
+  
+  // ============================================================================
+  // API 데이터 조회 (common 패키지의 모든 타입 활용)
+  // ============================================================================
+  
+  // 최신 데이터 조회
+  const latestDataState = useLatestData({ limit: DATA_LATEST_DEFAULTS.LIMIT });
+  
+  // 테마별 데이터 건수 조회
+  const themeCountsState = useThemeCounts();
+  
+  // 데이터 유형별 데이터 건수 조회
+  const typeCountsState = useTypeCounts();
 
   const handleThemeClick = (theme: string) => {
     navigate(getDataListPath({ theme }));
@@ -44,6 +58,10 @@ export function Home() {
 
   const handleSearch = () => {
     navigate(ROUTE_PATHS.DATA_SEARCH);
+  };
+
+  const handleDataItemClick = (id: number) => {
+    navigate(`/data/${id}`);
   };
 
   return (
@@ -94,27 +112,36 @@ export function Home() {
               최신 데이터
             </div>
             <div id="home-latest-data-list" className="home-latest-data-list">
-              {[
-                { category: '기초', title: '장애유형 및 산업별 장애인 근로자 고용현황' },
-                { category: '이동권', title: '서울시 지하철역 엘리베이터 위치정보' },
-                { category: '고용', title: '23패널 코드북 및 조사표' },
-                { category: '기초', title: '운동 시 가장 도움이 되는 지원 사항' },
-                { category: '기초', title: '장애인 생활체육 실행 유형' },
-                { category: '고용', title: '한국장애인고용공단 신규고용장려금 지역별 지급 현황' }
-              ].map((item, index) => (
-                <div key={index} id={`home-latest-data-item-${index + 1}`} className="home-latest-data-item">
-                  <div id={`home-latest-data-item-${index + 1}-content`} className="home-latest-data-item-content">
-                    <div id={`home-latest-data-item-${index + 1}-category`} className="home-latest-data-category">
-                      <div id={`home-latest-data-item-${index + 1}-category-text`} className="home-latest-data-category-text">
-                        {item.category}
+              {latestDataState.loading ? (
+                <div style={{ padding: '20px', textAlign: 'center' }}>로딩 중...</div>
+              ) : latestDataState.error ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-danger)' }}>
+                  데이터를 불러오는 중 오류가 발생했습니다.
+                </div>
+              ) : latestDataState.data && latestDataState.data.length > 0 ? (
+                latestDataState.data.map((item: DataLatestItem, index: number) => (
+                  <div 
+                    key={item.id} 
+                    id={`home-latest-data-item-${index + 1}`} 
+                    className="home-latest-data-item"
+                    onClick={() => handleDataItemClick(item.id)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div id={`home-latest-data-item-${index + 1}-content`} className="home-latest-data-item-content">
+                      <div id={`home-latest-data-item-${index + 1}-category`} className="home-latest-data-category">
+                        <div id={`home-latest-data-item-${index + 1}-category-text`} className="home-latest-data-category-text">
+                          {DATA_TYPE_CONSTANTS.DATA_TYPES[item.data_type as DataTypeCode]?.name || item.data_type}
+                        </div>
+                      </div>
+                      <div id={`home-latest-data-item-${index + 1}-title`} className="home-latest-data-title-text">
+                        {item.title}
                       </div>
                     </div>
-                    <div id={`home-latest-data-item-${index + 1}-title`} className="home-latest-data-title-text">
-                      {item.title}
-                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div style={{ padding: '20px', textAlign: 'center' }}>데이터가 없습니다.</div>
+              )}
             </div>
           </div>
         </div>
@@ -162,31 +189,29 @@ export function Home() {
                   background: '#ffeef2',
                   outline: '#ffdde5',
                   image: '/medal2.png',
-                  count: '181',
                   imageStyle: { right: 0, bottom: '-20px', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 emo: {
                   background: '#fffdee',
                   outline: '#fff6b4',
                   image: '/lightbulb.png',
-                  count: '2,311',
                   imageStyle: { right: 0, bottom: '-25px', transform: 'rotate(-8deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 econ: {
                   background: '#eefff2',
                   outline: '#d9f5df',
                   image: '/money.png',
-                  count: '31',
                   imageStyle: { right: 0, bottom: '-40px', transform: 'rotate(-19deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 soc: {
                   background: '#eef8ff',
                   outline: '#d0ecff',
                   image: '/chat.png',
-                  count: '75',
                   imageStyle: { right: 0, bottom: 0, filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 }
               };
+              
+              // 공통 유틸리티 함수 사용
               
               const style = themeStyles[themeCode];
               
@@ -206,7 +231,8 @@ export function Home() {
                   </div>
                   <div id={`home-theme-card-${themeCode}-count`} className="home-theme-card-count">
                     <div id={`home-theme-card-${themeCode}-count-number`} className="home-theme-card-count-number">
-                      {style.count}
+                      {themeCountsState.loading ? '...' : 
+                       themeCountsState.data?.[themeCode as keyof DataThemeCountsRes]?.toLocaleString() || '0'}
                     </div>
                     <div id={`home-theme-card-${themeCode}-count-unit`} className="home-theme-card-count-unit">
                       건
@@ -268,7 +294,8 @@ export function Home() {
           <div className="home-data-type-grid">
             {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode: DataTypeCode, index: number) => {
               const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
-              const counts: { [key in DataTypeCode]: number } = { basic: 2790, poi: 312, emp: 56 };
+              
+              // 공통 유틸리티 함수 사용
               
               return (
                 <div 
@@ -284,9 +311,10 @@ export function Home() {
                       </div>
                       <div id={`home-data-type-card-${dataTypeCode}-count`} className="card-stats">
                         <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-1`} className="stat-item">
-                          <div id={`home-data-type-card-${dataTypeCode}-count-number`} className="stat-number">
-                            {counts[dataTypeCode].toLocaleString()}
-                          </div>
+                        <div id={`home-data-type-card-${dataTypeCode}-count-number`} className="stat-number">
+                          {typeCountsState.loading ? '...' : 
+                           typeCountsState.data?.[dataTypeCode as keyof DataTypeCountsRes]?.toLocaleString() || '0'}
+                        </div>
                         </div>
                         <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-2`} className="stat-item">
                           <div id={`home-data-type-card-${dataTypeCode}-count-unit`} className="stat-unit">
