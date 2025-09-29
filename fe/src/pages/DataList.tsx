@@ -51,13 +51,11 @@ export function DataList() {
           <FilterSection idPrefix="data-list-theme" title="자립 테마별">
             {THEME_CONSTANTS.ALL_CODES.map((themeCode) => {
               const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
-              const counts = { phy: 181, emo: 142, econ: 98, soc: 75 };
               return (
                 <FilterOption
                   key={themeCode}
                   id={`data-list-theme-${themeCode}`}
                   name={themeInfo.name}
-                  count={counts[themeCode]}
                   isActive={activeValue === themeCode && activeFilter === 'theme'}
                   onClick={() => window.location.href = `/data-list?theme=${themeCode}`}
                 />
@@ -68,13 +66,11 @@ export function DataList() {
           <FilterSection idPrefix="data-list-type" title="데이터 유형별">
             {DATA_TYPE_CONSTANTS.ALL_CODES.map((dataTypeCode) => {
               const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataTypeCode];
-              const counts = { basic: 2790, poi: 312, emp: 56 };
               return (
                 <FilterOption
                   key={dataTypeCode}
                   id={`data-list-type-${dataTypeCode}`}
                   name={dataTypeInfo.name}
-                  count={counts[dataTypeCode]}
                   isActive={activeValue === dataTypeCode && activeFilter === 'type'}
                   onClick={() => window.location.href = `/data-list?type=${dataTypeCode}`}
                 />

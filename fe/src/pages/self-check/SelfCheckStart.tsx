@@ -31,7 +31,7 @@ export function SelfCheckStart() {
       >
         {/* Start Button */}
         <Link to={ROUTE_PATHS.SELF_CHECK_IDENTITY} style={{ textDecoration: 'none' }}>
-          <button style={{
+          <button id="self-check-start-button" style={{
             width: '600px',
             minWidth: '400px',
             padding: '32px 48px',

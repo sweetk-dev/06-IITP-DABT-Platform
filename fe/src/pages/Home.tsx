@@ -68,12 +68,13 @@ export function Home() {
               id="home-about-detail-btn"
               className="home-about-link"
             >
-              <div className="home-about-link-text">
+              <div id="home-about-link-text" className="home-about-link-text">
                 자세히 보기
               </div>
-              <div className="icon-container">
-                <div className="icon-container-inner" />
+              <div id="home-about-link-icon-container" className="icon-container">
+                <div id="home-about-link-icon-inner" className="icon-container-inner" />
                 <div 
+                  id="home-about-link-icon-image"
                   className="icon-container-image"
                   style={{ backgroundImage: 'url(/right_arrow.svg)' }}
                 />
@@ -81,17 +82,18 @@ export function Home() {
             </Link>
 
             <div 
+              id="home-about-bg-image"
               className="home-about-bg-image"
               style={{ background: 'url(/main_top.png) 50% / cover no-repeat' }}
             />
           </div>
 
           {/* Latest Data Section */}
-          <div className="home-latest-data-section">
-            <div className="home-latest-data-title">
+          <div id="home-latest-data-section" className="home-latest-data-section">
+            <div id="home-latest-data-title" className="home-latest-data-title">
               최신 데이터
             </div>
-            <div className="home-latest-data-list">
+            <div id="home-latest-data-list" className="home-latest-data-list">
               {[
                 { category: '기초', title: '장애유형 및 산업별 장애인 근로자 고용현황' },
                 { category: '이동권', title: '서울시 지하철역 엘리베이터 위치정보' },
@@ -100,14 +102,14 @@ export function Home() {
                 { category: '기초', title: '장애인 생활체육 실행 유형' },
                 { category: '고용', title: '한국장애인고용공단 신규고용장려금 지역별 지급 현황' }
               ].map((item, index) => (
-                <div key={index} className="home-latest-data-item">
-                  <div className="home-latest-data-item-content">
-                    <div className="home-latest-data-category">
-                      <div className="home-latest-data-category-text">
+                <div key={index} id={`home-latest-data-item-${index + 1}`} className="home-latest-data-item">
+                  <div id={`home-latest-data-item-${index + 1}-content`} className="home-latest-data-item-content">
+                    <div id={`home-latest-data-item-${index + 1}-category`} className="home-latest-data-category">
+                      <div id={`home-latest-data-item-${index + 1}-category-text`} className="home-latest-data-category-text">
                         {item.category}
                       </div>
                     </div>
-                    <div className="home-latest-data-title-text">
+                    <div id={`home-latest-data-item-${index + 1}-title`} className="home-latest-data-title-text">
                       {item.title}
                     </div>
                   </div>
@@ -120,13 +122,14 @@ export function Home() {
         {/* Theme Section */}
         <div id="home-theme-section" className="home-section">
           <div className="home-section-header">
-            <div style={{ width: '633px', justifyContent: 'flex-start', alignItems: 'center', gap: '8px', display: 'flex' }}>
+            <div id="home-theme-header-left" style={{ width: '633px', justifyContent: 'flex-start', alignItems: 'center', gap: '8px', display: 'flex' }}>
               <div id="home-theme-title" className="home-section-title">
                 자립 테마별
               </div>
-              <div className="icon-container">
-                <div className="icon-container-inner" />
+              <div id="home-theme-title-icon-container" className="icon-container">
+                <div id="home-theme-title-icon-inner" className="icon-container-inner" />
                 <div 
+                  id="home-theme-title-icon-image"
                   className="icon-container-image"
                   style={{ backgroundImage: 'url(/question.svg)' }}
                 />

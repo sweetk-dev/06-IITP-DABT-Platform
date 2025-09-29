@@ -1,227 +1,247 @@
-import { Link } from 'react-router-dom';
-import { ROUTE_PATHS } from '../App';
+import { useState } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import { Sidebar } from '../../components/ui/Sidebar';
 import { FilterSection } from '../../components/ui/FilterSection';
 import { FilterOption } from '../../components/ui/FilterOption';
-import { Icon } from '../../components/ui/Icon';
-import { Button } from '../../components/ui/Button';
-import { SelfThemaCard } from '../../components/ui/SelfThemaCard';
-import { Tag } from '../../components/ui/Tag';
-import { SELF_REL_TYPE_CONSTANTS, type SelfRelTypeCode } from '../../../../packages/common/src/types';
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableRow, 
+  TableCell, 
+  TableColumn,
+  DataTitle,
+  DataMeta,
+  MetaItem,
+  DataTags,
+  Tag
+} from '../../components/ui/Table';
+import { 
+  SELF_CHECK_MORE_CONSTANTS, 
+  type SelfCheckMoreMenuType,
+  getSelfCheckMoreMenuName 
+} from '@iitp-dabt-platform/common';
+import { getSelfCheckMoreApiEndpoint } from '../../config/api';
+import '../../styles/data-pages.css';
 
 export function SelfCheckMore() {
+  const [selectedMenu, setSelectedMenu] = useState<SelfCheckMoreMenuType>('policies'); // 기본값: 자립 지원 정책
+
+  // 메뉴 데이터 정의 - common 패키지의 상수 사용
+  const menuItems = SELF_CHECK_MORE_CONSTANTS.ALL_CODES.map((code: SelfCheckMoreMenuType) => ({
+    id: code,
+    name: getSelfCheckMoreMenuName(code)
+  }));
+
+  // TODO: API 연동으로 실제 데이터 가져오기
+  // const policies = await getSelfCheckPolicies();
+  // const providers = await getSelfCheckProviders(); 
+  // const facilities = await getSelfCheckFacilities();
+
+  // 임시 데이터 (API 연동 시 제거)
+  const mockData = {
+    policies: [
+      {
+        id: '1',
+        title: '장애인연금',
+        category: '생활 안정 지원',
+        organization: '보건복지부',
+        description: '장애로 인한 생활의 어려움을 해소하기 위한 기초생활보장제도',
+        link: 'https://example.com/policy/1'
+      },
+      {
+        id: '2', 
+        title: '장애수당',
+        category: '생활 안정 지원',
+        organization: '보건복지부',
+        description: '장애인에게 지급되는 월정액 수당',
+        link: 'https://example.com/policy/2'
+      },
+      {
+        id: '3',
+        title: '장애인 자립생활 지원',
+        category: '자립생활 지원',
+        organization: '보건복지부',
+        description: '장애인의 자립생활을 위한 종합적인 지원 서비스',
+        link: 'https://example.com/policy/3'
+      }
+    ],
+    providers: [
+      {
+        id: '1',
+        title: '장애인자립생활지원센터',
+        organization: '보건복지부',
+        address: '서울특별시 중구 세종대로 110',
+        phone: '02-1234-5678',
+        description: '장애인의 자립생활을 위한 종합적인 지원 서비스'
+      },
+      {
+        id: '2',
+        title: '한국장애인고용공단',
+        organization: '고용노동부',
+        address: '서울특별시 영등포구 여의대로 92',
+        phone: '02-2345-6789',
+        description: '장애인 고용촉진 및 직업재활 지원'
+      }
+    ],
+    facilities: [
+      {
+        id: '1',
+        title: '무장애 화장실',
+        location: '서울시청',
+        address: '서울특별시 중구 세종대로 110',
+        hours: '24시간 이용가능',
+        description: '휠체어 이용자를 위한 무장애 화장실'
+      },
+      {
+        id: '2',
+        title: '장애인 전용 주차장',
+        location: '강남구청',
+        address: '서울특별시 강남구 테헤란로 521',
+        hours: '평일 09:00-18:00',
+        description: '장애인 전용 주차공간 제공'
+      }
+    ]
+  };
+
+  const currentData = mockData[selectedMenu as keyof typeof mockData];
+
+  // 메뉴 클릭 핸들러
+  const handleMenuClick = (menuType: SelfCheckMoreMenuType) => {
+    setSelectedMenu(menuType);
+    // TODO: 해당 메뉴의 API 호출
+    // const apiEndpoint = getSelfCheckMoreApiEndpoint(menuType);
+    // fetchData(apiEndpoint);
+  };
+
+  // 카드 클릭 핸들러
+  const handleCardClick = (item: any) => {
+    if (item.link) {
+      // 링크가 있으면 새창으로 열기
+      window.open(item.link, '_blank', 'noopener,noreferrer');
+    } else {
+      // 링크가 없으면 상세 정보 표시
+      alert(`${item.title} 상세 정보는 준비 중입니다.`);
+    }
+  };
+
+  // 메뉴별 제목과 설명 가져오기
+  const getTitle = () => {
+    return getSelfCheckMoreMenuName(selectedMenu);
+  };
+
+  const getDescription = () => {
+    return SELF_CHECK_MORE_CONSTANTS.MENU_TYPES[selectedMenu].description;
+  };
+
+  const getCount = () => {
+    // TODO: API에서 실제 건수 가져오기
+    return currentData.length;
+  };
+
   return (
     <Layout idPrefix="self-check-more">
-      {/* Header Section - Figma Design */}
-      <section id="self-check-more-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <img src="/question.svg" alt="자가진단 아이콘" style={{ width: '32px', height: '32px' }} />
-          <h1 id="self-check-more-title" style={{
-            fontSize: '32px',
-            fontWeight: 700,
-            lineHeight: '38px',
-            margin: 0,
-            color: 'var(--color-text-primary)',
-            fontFamily: 'var(--font-family-primary)'
-          }}>
-            자가진단 결과 더보기
-          </h1>
-        </div>
-        <p id="self-check-more-desc" style={{
-          fontSize: '16px',
-          fontFamily: 'var(--font-family-primary)',
-          color: 'var(--color-text-secondary)',
-          marginBottom: '32px'
-        }}>
-          자립 수준별 맞춤 정보 및 서비스
-        </p>
-      </section>
-
-      {/* Main Content - Figma Design */}
-      <section id="self-check-more-content" style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '280px 1fr', 
-        gap: '40px', 
-        marginTop: '32px' 
-      }}>
-        {/* Sidebar Filters - 공통 컴포넌트 사용 */}
+      <div id="self-check-more-container" className="data-list-container">
+        {/* Sidebar */}
         <Sidebar idPrefix="self-check-more" title="필터">
-          {/* Independence Level Filter */}
-          <FilterSection idPrefix="self-check-more-levels" title="자립 수준">
-            {[
-              { name: '초급', count: 45, icon: <Icon name="star-line" size="s" color="var(--color-primary)" /> },
-              { name: '중급', count: 78, icon: <Icon name="star-fill" size="s" color="var(--color-primary)" /> },
-              { name: '고급', count: 32, icon: <Icon name="star-fill" size="s" color="var(--color-primary)" /> }
-            ].map((level, idx) => (
+          <FilterSection idPrefix="self-check-more-menu" title="자립 지원 정보">
+            {menuItems.map((menu: { id: SelfCheckMoreMenuType; name: string }) => (
               <FilterOption
-                key={level.name}
-                id={`self-check-more-filter-level-${idx+1}`}
-                name={level.name}
-                count={level.count}
-                icon={level.icon}
-              />
-            ))}
-          </FilterSection>
-
-          {/* Self Rel Type Filter */}
-          <FilterSection idPrefix="self-check-more-types" title="자립 유형">
-            {SELF_REL_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== 'basic').map((typeCode) => {
-              const typeInfo = SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[typeCode];
-              const counts = { phys: 45, emo: 32, econ: 28, soc: 21 };
-              return (
-                <FilterOption
-                  key={typeCode}
-                  id={`self-check-more-filter-type-${typeCode}`}
-                  name={typeInfo.name}
-                  count={counts[typeCode]}
-                />
-              );
-            })}
-          </FilterSection>
-
-          {/* Service Type Filter */}
-          <FilterSection idPrefix="self-check-more-services" title="서비스 유형" marginBottom={false}>
-            {[
-              { name: '정보 제공', count: 89, icon: <Icon name="information-line" size="s" color="var(--color-primary)" /> },
-              { name: '교육 프로그램', count: 56, icon: <Icon name="book-open-line" size="s" color="var(--color-primary)" /> },
-              { name: '상담 서비스', count: 23, icon: <Icon name="customer-service-line" size="s" color="var(--color-primary)" /> }
-            ].map((service, idx) => (
-              <FilterOption
-                key={service.name}
-                id={`self-check-more-filter-service-${idx+1}`}
-                name={service.name}
-                count={service.count}
-                icon={service.icon}
+                key={menu.id}
+                id={`self-check-more-menu-${menu.id}`}
+                name={menu.name}
+                isActive={selectedMenu === menu.id}
+                onClick={() => handleMenuClick(menu.id)}
               />
             ))}
           </FilterSection>
         </Sidebar>
 
-        {/* Main Content Area */}
-        <div id="self-check-more-main">
-          {/* Search Bar */}
-          <div id="self-check-more-search" style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            marginBottom: '24px',
-            gap: '12px'
-          }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <Icon 
-                name="search-line" 
-                size="m" 
-                style={{ 
-                  position: 'absolute', 
-                  left: '16px', 
-                  top: '50%', 
-                  transform: 'translateY(-50%)',
-                  color: 'var(--color-text-secondary)'
-                }} 
-              />
-              <input 
-                id="self-check-more-search-input" 
-                placeholder="서비스명으로 검색" 
-                style={{ 
-                  width: '100%',
-                  padding: '12px 16px 12px 48px', 
-                  borderRadius: '12px', 
-                  border: '1px solid var(--color-border-secondary)',
-                  fontSize: '16px',
-                  background: 'var(--color-bg-primary)',
-                  color: 'var(--color-text-primary)'
-                }} 
-              />
+        {/* Main Content */}
+        <div id="self-check-more-main-content" className="main-content">
+          <div id="self-check-more-page-header" className="page-header">
+            <div id="self-check-more-page-title" className="page-title-large">{getTitle()}</div>
+            <div id="self-check-more-page-description" className="page-description">
+              {getDescription()}
             </div>
-            <Button id="self-check-more-search-btn" variant="primary" size="m">
-              검색
-            </Button>
+            <div id="self-check-more-data-count" className="data-count">
+              총 <span id="self-check-more-count-number" className="count-number">{getCount()}</span> 건
+            </div>
           </div>
 
-          {/* Service List */}
-          <div id="self-check-more-cards" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { 
-                id: '1', 
-                title: '장애인 자립생활 지원센터', 
-                tags: ['초급', '정보제공'],
-                organization: '보건복지부',
-                date: '2025.01.15',
-                description: '장애인의 자립생활을 위한 종합적인 지원 서비스 안내'
-              },
-              { 
-                id: '2', 
-                title: '직업재활훈련 프로그램', 
-                tags: ['중급', '교육프로그램'],
-                organization: '한국장애인고용공단',
-                date: '2025.01.14',
-                description: '장애인의 직업적 자립을 위한 맞춤형 훈련 프로그램'
-              },
-              { 
-                id: '3', 
-                title: '심리상담 서비스', 
-                tags: ['고급', '상담서비스'],
-                organization: '한국장애인개발원',
-                date: '2025.01.13',
-                description: '장애인의 정서적 자립을 위한 전문 심리상담 서비스'
-              },
-              { 
-                id: '4', 
-                title: '자립준비금 지원', 
-                tags: ['초급', '정보제공'],
-                organization: '보건복지부',
-                date: '2025.01.12',
-                description: '장애인의 자립생활을 위한 경제적 지원 제도 안내'
-              }
-            ].map((item) => (
-              <Link key={item.id} to={ROUTE_PATHS.DATA_SEARCH} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <SelfThemaCard 
-                  variant="default"
+          {/* Content List Table */}
+          <Table id="self-check-more-table">
+            <TableHeader id="self-check-more-table-header">
+              <TableColumn id="self-check-more-table-column-title" variant="title">
+                {selectedMenu === 'policies' ? '정책명' : selectedMenu === 'providers' ? '기관명' : '시설명'}
+              </TableColumn>
+              <TableColumn id="self-check-more-table-column-tags" variant="tags">태그</TableColumn>
+            </TableHeader>
+
+            <TableBody id="self-check-more-table-body">
+              {currentData.map((item: any, index: number) => (
+                <TableRow 
+                  key={item.id} 
+                  id={`self-check-more-row-${index + 1}`} 
+                  onClick={() => handleCardClick(item)}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ 
-                        fontSize: '18px', 
-                        fontWeight: 600, 
-                        marginBottom: '8px',
-                        color: 'var(--color-text-primary)'
-                      }}>
-                        {item.title}
-                      </h3>
-                      <p style={{ 
-                        fontSize: '14px', 
-                        color: 'var(--color-text-secondary)',
-                        marginBottom: '12px',
-                        lineHeight: '1.4'
-                      }}>
-                        {item.description}
-                      </p>
-                    </div>
-                    <Icon name="arrow-right-s-line" size="m" color="var(--color-text-secondary)" />
-                  </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {item.tags.map((tag, idx) => (
-                        <Tag key={idx} variant="primary" size="s">{tag}</Tag>
-                      ))}
-                    </div>
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: 'var(--color-text-secondary)',
-                      textAlign: 'right'
-                    }}>
-                      <div>{item.organization}</div>
-                      <div>최종수정: {item.date}</div>
-                    </div>
-                  </div>
-                </SelfThemaCard>
-              </Link>
-            ))}
-          </div>
+                  <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
+                    <DataTitle id={`self-check-more-row-${index + 1}-title`}>
+                      {item.title}
+                    </DataTitle>
+                    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
+                      {item.category && (
+                        <MetaItem
+                          label="카테고리"
+                          value={item.category}
+                          labelId={`self-check-more-row-${index + 1}-meta-category-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-category-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+                        />
+                      )}
+                      {item.organization && (
+                        <MetaItem
+                          label="제공 기관"
+                          value={item.organization}
+                          labelId={`self-check-more-row-${index + 1}-meta-org-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-org-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+                        />
+                      )}
+                      {item.location && (
+                        <MetaItem
+                          label="위치"
+                          value={item.location}
+                          labelId={`self-check-more-row-${index + 1}-meta-location-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-location-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+                        />
+                      )}
+                      <MetaItem
+                        label="등록일"
+                        value="2025.01.15"
+                        labelId={`self-check-more-row-${index + 1}-meta-date-label`}
+                        valueId={`self-check-more-row-${index + 1}-meta-date-value`}
+                      />
+                    </DataMeta>
+                  </TableCell>
+                  <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
+                    {item.category && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
+                    )}
+                    {item.organization && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
+                    )}
+                    {item.location && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-      </section>
+      </div>
     </Layout>
   );
 }
