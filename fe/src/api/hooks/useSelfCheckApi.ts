@@ -10,7 +10,7 @@ import {
   SELF_CHECK_POLICIES_DEFAULTS,
   SELF_CHECK_PROVIDERS_DEFAULTS,
   SELF_CHECK_FACILITIES_DEFAULTS
-} from '../../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // ============================================================================
 // API 호출 상태 타입

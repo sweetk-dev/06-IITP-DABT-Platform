@@ -3,7 +3,7 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '../../../packages/common/src/types';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useThemeItems, useTypeItems, useThemeCounts, useTypeCounts } from '../api/hooks';
 import '../styles/data-pages.css';
 

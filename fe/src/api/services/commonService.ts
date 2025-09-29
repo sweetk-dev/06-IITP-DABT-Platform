@@ -3,7 +3,7 @@ import { apiClient } from '../client';
 import { 
   CommonHealthRes,
   CommonVersionRes
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 export class CommonService {
   /**

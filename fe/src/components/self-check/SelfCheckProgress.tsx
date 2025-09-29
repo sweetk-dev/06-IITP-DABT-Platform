@@ -1,5 +1,5 @@
 import React from 'react';
-import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '../../../../packages/common/src/types';
+import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '@iitp-dabt-platform/common';
 
 interface SelfCheckProgressProps {
   currentStep: number;

@@ -9,7 +9,7 @@ import {
   SelfCheckProvidersRes,
   SelfCheckFacilitiesQuery,
   SelfCheckFacilitiesRes
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 export class SelfCheckService {
   /**

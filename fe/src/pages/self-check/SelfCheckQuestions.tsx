@@ -9,7 +9,7 @@ import {
   AREA_NAMES, 
   type SelfCheckAreaType,
   type SelfCheckResponse 
-} from '../../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 export function SelfCheckQuestions() {
   const navigate = useNavigate();

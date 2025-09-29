@@ -9,7 +9,7 @@ import {
   type ExtractParamsType,
   type ExtractQueryType,
   type ApiMappingKey
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // ============================================================================
 // API 클라이언트 설정

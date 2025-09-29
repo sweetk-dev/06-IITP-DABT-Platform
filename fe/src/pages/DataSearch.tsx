@@ -4,7 +4,7 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '../../../packages/common/src/types';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useDataSearch } from '../api/hooks';
 
 import '../styles/data-pages.css';

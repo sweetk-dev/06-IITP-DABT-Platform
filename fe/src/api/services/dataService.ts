@@ -17,7 +17,7 @@ import {
   DataDetailRes,
   DataPreviewQuery,
   DataPreviewRes
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 export class DataService {
   /**

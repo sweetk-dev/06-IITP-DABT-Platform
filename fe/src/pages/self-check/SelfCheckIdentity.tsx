@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
 import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
-import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, AREA_NAMES, type IdentityQuestionType, type IdentityResponse } from '../../../../packages/common/src/types';
+import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, AREA_NAMES, type IdentityQuestionType, type IdentityResponse } from '@iitp-dabt-platform/common';
 
 export function SelfCheckIdentity() {
   const navigate = useNavigate();

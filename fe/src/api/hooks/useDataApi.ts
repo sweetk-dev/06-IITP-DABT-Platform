@@ -10,7 +10,7 @@ import {
   DATA_SEARCH_DEFAULTS,
   DATA_THEME_ITEMS_DEFAULTS,
   DATA_TYPE_ITEMS_DEFAULTS
-} from '../../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // ============================================================================
 // API 호출 상태 타입

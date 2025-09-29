@@ -161,7 +161,7 @@ async function handleApiCall() {
 
 ```typescript
 import { apiClient } from '../api/client';
-import { API_URLS } from '../../../packages/common/src/types';
+import { API_URLS } from '@iitp-dabt-platform/common';
 
 async function directApiCall() {
   try {

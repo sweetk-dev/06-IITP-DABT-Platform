@@ -1,5 +1,5 @@
 // API 에러 처리 및 알림 관리 - common 패키지의 ErrorCode 완전 활용
-import { ErrorCode, ErrorMetaMap } from '../../../packages/common/src/types';
+import { ErrorCode, ErrorMetaMap } from '@iitp-dabt-platform/common';
 
 // ============================================================================
 // 에러 타입 정의

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
 import { SelfCheckLayout, SelfCheckContainer } from '../../components/self-check';
-import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '../../../../packages/common/src/types';
+import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '@iitp-dabt-platform/common';
 
 export function SelfCheckStart() {
   // Constants에서 계산된 값들

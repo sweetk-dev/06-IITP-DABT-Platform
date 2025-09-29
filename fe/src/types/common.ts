@@ -2,7 +2,7 @@
 import { 
   ApiResponse,
   PaginationReq
-} from '../../../packages/common/src/types';
+} from '@iitp-dabt-platform/common';
 
 // Re-export common types for convenience
 export type {

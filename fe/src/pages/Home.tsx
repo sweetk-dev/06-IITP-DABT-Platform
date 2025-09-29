@@ -3,7 +3,7 @@ import { getDataListPath, getDataSearchPath, ROUTE_PATHS } from './App';
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '../../../packages/common/src/types';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useLatestData, useThemeCounts, useTypeCounts } from '../api/hooks';
 
 export function Home() {

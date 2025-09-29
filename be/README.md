@@ -209,7 +209,7 @@ GET /api/v1/selfcheck/policies?gender=남성&disLevel=경증&ageCond=adult&theme
 | `DB_NAME` | 데이터베이스 이름 | `iitp_dabt_platform` |
 | `DB_USER` | 데이터베이스 사용자 | `postgres` |
 | `DB_PASSWORD` | 데이터베이스 비밀번호 | - |
-| `CORS_ORIGINS` | CORS 허용 오리진 | `http://localhost:3000` |
+| `CORS_ORIGINS` | CORS 허용 오리진 | `http://localhost:33000` |
 | `OPEN_API_SERVER_URL` | OpenAPI 서버 URL | - |
 | `LOG_LEVEL` | 로그 레벨 | `info` |
 
