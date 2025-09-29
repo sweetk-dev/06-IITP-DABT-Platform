@@ -11,7 +11,7 @@ export * from './errorCodes.js';
 // 자가진단 관련 타입 및 함수
 // ============================================================================
 
-export * from './selfcheck.js';
+export * from './selfcheck-logic.js';
 
 // ============================================================================
 // API 관련 타입
@@ -19,3 +19,6 @@ export * from './selfcheck.js';
 
 export * from './api/api.js';
 export * from './api/common.js';
+export * from './api/data.js';
+export * from './api/selfcheck.js';
+export * from './api/mapping.js';
