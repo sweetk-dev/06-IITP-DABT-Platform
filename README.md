@@ -6,17 +6,25 @@ IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and
 
 장애인 자립 생활 지원을 위한 빅데이터 플랫폼으로, 데이터 탐색, 자가진단, 정책 추천 등의 기능을 제공합니다.
 
+## 🎯 핵심 특징
+
+- **완전한 모듈화**: `@iitp-dabt-platform/common` 패키지를 통한 FE/BE 공통 타입 및 상수 관리
+- **하드코딩 제거**: 모든 상수와 타입을 중앙에서 관리
+- **타입 안전성**: TypeScript를 통한 컴파일 타임 타입 체크
+- **일관된 API 처리**: 단일 API 클라이언트로 모든 API 호출 통합
+- **중복 코드 제거**: 재사용 가능한 서비스와 훅으로 코드 중복 최소화
+
 ## 🏗️ 프로젝트 구조
 
 ```
 06-IITP-DABT-Platform/
 ├── fe/                           # 프론트엔드 (React + TypeScript)
 │   ├── src/
-│   │   ├── api/                  # API 관련 모든 기능
-│   │   │   ├── client.ts         # API 클라이언트
-│   │   │   ├── errorHandler.ts   # 에러 처리
-│   │   │   ├── services/         # API 서비스 레이어
-│   │   │   └── hooks/            # API 훅들
+│   │   ├── api/                  # API 관련 모든 기능 (common 패키지 완전 활용)
+│   │   │   ├── client.ts         # API 클라이언트 (API_MAPPING 활용)
+│   │   │   ├── errorHandler.ts   # 에러 처리 (ErrorCode, ErrorMetaMap 활용)
+│   │   │   ├── services/         # API 서비스 레이어 (API_URLS, REQ/RES DTO 활용)
+│   │   │   └── hooks/            # API 훅들 (common 타입 활용)
 │   │   ├── components/           # React 컴포넌트
 │   │   ├── pages/                # 페이지 컴포넌트
 │   │   ├── hooks/                # 커스텀 훅
@@ -27,18 +35,18 @@ IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and
 │   │   └── index.ts              # 서버 진입점
 │   └── package.json
 ├── packages/                     # 공통 패키지
-│   └── common/                   # 공통 타입 및 상수
+│   └── common/                   # 공통 타입 및 상수 (FE/BE 완전 공유)
 │       ├── src/
 │       │   ├── types/            # 타입 정의
-│       │   │   ├── constants.ts  # 상수 정의
-│       │   │   ├── errorCodes.ts # 에러 코드
+│       │   │   ├── constants.ts  # 상수 정의 (THEME_CONSTANTS, DATA_TYPE_CONSTANTS 등)
+│       │   │   ├── errorCodes.ts # 에러 코드 (ErrorCode, ErrorMetaMap)
 │       │   │   ├── selfcheck-logic.ts # 자가진단 로직
 │       │   │   └── api/          # API 타입 정의
-│       │   │       ├── api.ts    # 기본 API URL
+│       │   │       ├── api.ts    # 기본 API URL (API_URLS)
 │       │   │       ├── common.ts # 공통 API 타입
-│       │   │       ├── data.ts   # 데이터 API 타입
+│       │   │       ├── data.ts   # 데이터 API 타입 (REQ/RES DTO)
 │       │   │       ├── selfcheck.ts # 자가진단 API 타입
-│       │   │       └── mapping.ts # API 매핑 테이블
+│       │   │       └── mapping.ts # API 매핑 테이블 (body, params, query 구분)
 │       │   └── index.ts          # 패키지 진입점
 │       └── README.md             # 공통 패키지 문서
 ├── 01.references/                # 참고 자료

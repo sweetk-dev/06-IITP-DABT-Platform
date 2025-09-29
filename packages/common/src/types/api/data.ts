@@ -22,9 +22,6 @@ export interface DataLatestItem {
   id: number;
   title: string;
   data_type: DataTypeCode;
-  sys_tbl_id: string;
-  src_org_name: string;
-  sys_data_reg_dt: string;
 }
 
 export type DataLatestRes = DataLatestItem[];
