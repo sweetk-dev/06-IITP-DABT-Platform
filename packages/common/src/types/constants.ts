@@ -158,7 +158,11 @@ export type GenderCode = 'male' | 'female';
 export type AgeCondCode = 'minor' | 'adult' | 'all';
 export type DisLevelCode = 'mild' | 'severe';
 
-export const USER_INFO_CONSTANTS = {
+// ============================================================================
+// 성별 관련 상수
+// ============================================================================
+
+export const GENDER_CONSTANTS = {
   // 성별 코드와 정보
   GENDER: {
     male: {
@@ -171,6 +175,15 @@ export const USER_INFO_CONSTANTS = {
     }
   },
   
+  // ALL_CODES 배열
+  ALL_CODES: ['male', 'female'] as const
+} as const;
+
+// ============================================================================
+// 연령 조건 관련 상수
+// ============================================================================
+
+export const AGE_COND_CONSTANTS = {
   // 연령 조건 코드와 정보
   AGE_COND: {
     minor: {
@@ -187,6 +200,15 @@ export const USER_INFO_CONSTANTS = {
     }
   },
   
+  // ALL_CODES 배열
+  ALL_CODES: ['minor', 'adult', 'all'] as const
+} as const;
+
+// ============================================================================
+// 장애정도 관련 상수
+// ============================================================================
+
+export const DIS_LEVEL_CONSTANTS = {
   // 장애정도 코드와 정보
   DIS_LEVEL: {
     mild: {
@@ -197,8 +219,12 @@ export const USER_INFO_CONSTANTS = {
       code: 'severe',
       name: '중증'
     }
-  }
+  },
+  
+  // ALL_CODES 배열
+  ALL_CODES: ['mild', 'severe'] as const
 } as const;
+
 
 // ============================================================================
 // 자립 지원 정보 메뉴 타입 관련 상수
