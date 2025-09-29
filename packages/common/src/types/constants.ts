@@ -299,21 +299,21 @@ export function getSelfCheckMoreMenuName(code: SelfCheckMoreMenuType): string {
  * 성별 코드로 한글명 가져오기
  */
 export function getGenderName(code: GenderCode): string {
-  return USER_INFO_CONSTANTS.GENDER[code].name;
+  return GENDER_CONSTANTS.GENDER[code].name;
 }
 
 /**
  * 연령 조건 코드로 한글명 가져오기
  */
 export function getAgeCondName(code: AgeCondCode): string {
-  return USER_INFO_CONSTANTS.AGE_COND[code].name;
+  return AGE_COND_CONSTANTS.AGE_COND[code].name;
 }
 
 /**
  * 장애정도 코드로 한글명 가져오기
  */
 export function getDisLevelName(code: DisLevelCode): string {
-  return USER_INFO_CONSTANTS.DIS_LEVEL[code].name;
+  return DIS_LEVEL_CONSTANTS.DIS_LEVEL[code].name;
 }
 
 /**
