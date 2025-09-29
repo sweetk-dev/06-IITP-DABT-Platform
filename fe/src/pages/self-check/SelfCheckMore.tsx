@@ -5,7 +5,7 @@ import { FilterSection } from '../../components/ui/FilterSection';
 import { FilterOption } from '../../components/ui/FilterOption';
 import { Icon } from '../../components/ui/Icon';
 import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { SelfThemaCard } from '../../components/ui/SelfThemaCard';
 import { Tag } from '../../components/ui/Tag';
 import { SELF_REL_TYPE_CONSTANTS, type SelfRelTypeCode } from '../../../../packages/common/src/types';
 
@@ -175,11 +175,8 @@ export function SelfCheckMore() {
               }
             ].map((item) => (
               <Link key={item.id} to={`/self-check/service/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Card 
-                  id={`self-check-more-item-${item.id}`}
-                  variant="elevated"
-                  padding="l"
-                  hover={true}
+                <SelfThemaCard 
+                  variant="default"
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                     <div style={{ flex: 1 }}>
@@ -218,7 +215,7 @@ export function SelfCheckMore() {
                       <div>최종수정: {item.date}</div>
                     </div>
                   </div>
-                </Card>
+                </SelfThemaCard>
               </Link>
             ))}
           </div>

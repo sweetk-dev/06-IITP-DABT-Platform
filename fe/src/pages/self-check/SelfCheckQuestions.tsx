@@ -159,7 +159,7 @@ export function SelfCheckQuestions() {
       />
 
       {/* Main Container */}
-      <SelfCheckContainer>
+      <SelfCheckContainer title="">
         {/* Category Title */}
         <div style={{
           textAlign: 'center',
