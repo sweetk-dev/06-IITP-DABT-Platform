@@ -253,8 +253,9 @@ export function useTypes(immediate: boolean = true) {
 
 /**
  * 자립 테마별 리스트 조회 훅
+ * theme이 없으면 모든 테마의 데이터를 조회
  */
-export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, immediate: boolean = true) {
+export function useThemeItems(theme?: string | null | undefined, params: DataThemeItemsQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -273,7 +274,12 @@ export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, i
         sort: DATA_THEME_ITEMS_DEFAULTS.SORT,
         ...params
       };
-      const data = await dataService.getThemeItems(theme, queryParams);
+      
+      // theme이 없으면 전체 테마 아이템 조회
+      const data = theme 
+        ? await dataService.getThemeItems(theme, queryParams)
+        : await dataService.getAllThemeItems(queryParams);
+      
       setState({ data, loading: false, error: null });
       setHasExecuted(true);
     } catch (error) {
@@ -287,7 +293,14 @@ export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, i
   };
 
   useEffect(() => {
-    if (immediate && !hasExecuted) {
+    // theme이 undefined가 아닐 때 리셋 (파라미터 변경 시 재실행 가능하게)
+    if (theme !== undefined) {
+      setHasExecuted(false);
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    if (immediate && !hasExecuted && theme !== undefined) {
       execute();
     }
   }, [immediate, theme, hasExecuted]);
@@ -297,8 +310,9 @@ export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, i
 
 /**
  * 데이터 유형별 리스트 조회 훅
+ * type이 없으면 모든 유형의 데이터를 조회
  */
-export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, immediate: boolean = true) {
+export function useTypeItems(type?: string | null | undefined, params: DataTypeItemsQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -317,7 +331,12 @@ export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, imme
         sort: DATA_TYPE_ITEMS_DEFAULTS.SORT,
         ...params
       };
-      const data = await dataService.getTypeItems(type, queryParams);
+      
+      // type이 없으면 전체 유형 아이템 조회
+      const data = type
+        ? await dataService.getTypeItems(type, queryParams)
+        : await dataService.getAllTypeItems(queryParams);
+      
       setState({ data, loading: false, error: null });
       setHasExecuted(true);
     } catch (error) {
@@ -331,7 +350,14 @@ export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, imme
   };
 
   useEffect(() => {
-    if (immediate && !hasExecuted) {
+    // type이 undefined가 아닐 때 리셋 (파라미터 변경 시 재실행 가능하게)
+    if (type !== undefined) {
+      setHasExecuted(false);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    if (immediate && !hasExecuted && type !== undefined) {
       execute();
     }
   }, [immediate, type, hasExecuted]);

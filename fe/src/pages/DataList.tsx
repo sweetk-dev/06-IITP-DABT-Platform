@@ -1,57 +1,57 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
-import { 
-  Table, 
-  TableHeader, 
-  TableBodyWithState,
-  TableRow, 
-  TableCell, 
-  TableColumn,
-  DataTitle,
-  DataMeta,
-  MetaItem,
-  DataTags,
-  Tag
-} from '../components/ui/Table';
+import { Table, TableHeader, TableBodyWithState, TableColumn, DataItemRow } from '../components/ui/Table';
 import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '@iitp-dabt-platform/common';
-import { useThemeItems, useTypeItems, useThemeCounts, useTypeCounts } from '../api/hooks';
+import { useThemeItems, useTypeItems } from '../api/hooks';
 import '../styles/data-pages.css';
 
 export function DataList() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const theme = searchParams.get('theme');
   const type = searchParams.get('type');
+  const category = searchParams.get('category'); // 'theme' 또는 'type' 전체보기
   
   // 필터 상태 결정
-  const activeFilter = theme ? 'theme' : type ? 'type' : 'theme';
-  const activeValue = theme || type || 'phy';
+  const hasFilter = Boolean(theme || type);
+  const activeFilter = theme ? 'theme' : type ? 'type' : (category || 'theme');
+  const activeValue = theme || type || null;
 
   // ============================================================================
   // API 데이터 조회 (common 패키지의 모든 타입 활용)
   // ============================================================================
   
-  // 테마별 데이터 조회
-  const themeItemsState = useThemeItems(activeValue, { 
-    page: DATA_THEME_ITEMS_DEFAULTS.PAGE, 
-    pageSize: DATA_THEME_ITEMS_DEFAULTS.PAGE_SIZE 
-  });
+  // 테마별 데이터 조회 (theme 없으면 전체)
+  const themeItemsState = useThemeItems(
+    activeFilter === 'theme' ? (theme || null) : undefined, 
+    { 
+      page: DATA_THEME_ITEMS_DEFAULTS.PAGE, 
+      pageSize: DATA_THEME_ITEMS_DEFAULTS.PAGE_SIZE 
+    }
+  );
   
-  // 데이터 유형별 데이터 조회
-  const typeItemsState = useTypeItems(activeValue, { 
-    page: DATA_TYPE_ITEMS_DEFAULTS.PAGE, 
-    pageSize: DATA_TYPE_ITEMS_DEFAULTS.PAGE_SIZE 
-  });
+  // 데이터 유형별 데이터 조회 (type 없으면 전체)
+  const typeItemsState = useTypeItems(
+    activeFilter === 'type' ? (type || null) : undefined,
+    { 
+      page: DATA_TYPE_ITEMS_DEFAULTS.PAGE, 
+      pageSize: DATA_TYPE_ITEMS_DEFAULTS.PAGE_SIZE 
+    }
+  );
   
-  // 테마별 건수 조회
-  const themeCountsState = useThemeCounts();
-  
-  // 데이터 유형별 건수 조회
-  const typeCountsState = useTypeCounts();
-
   const getTitle = () => {
+    if (!hasFilter && !category) {
+      return '전체 데이터';
+    }
+    if (category === 'theme' && !theme) {
+      return '자립 테마 데이터';
+    }
+    if (category === 'type' && !type) {
+      return '데이터 유형별 데이터';
+    }
     if (activeFilter === 'theme') {
       return getThemeName(activeValue as ThemeCode) || '신체적 자립';
     } else {
@@ -60,6 +60,15 @@ export function DataList() {
   };
 
   const getDescription = () => {
+    if (!hasFilter && !category) {
+      return '모든 자립 테마 및 데이터 유형의 데이터를 확인할 수 있습니다.';
+    }
+    if (category === 'theme' && !theme) {
+      return '자립 테마 데이터를 확인할 수 있습니다.';
+    }
+    if (category === 'type' && !type) {
+      return '데이터 유형별 데이터를 확인할 수 있습니다.';
+    }
     if (activeFilter === 'theme') {
       const themeInfo = THEME_CONSTANTS.THEMES[activeValue as ThemeCode];
       return themeInfo?.description || THEME_CONSTANTS.THEMES.phy.description;
@@ -70,11 +79,10 @@ export function DataList() {
   };
 
   const getCount = () => {
-    if (activeFilter === 'theme') {
-      return themeCountsState.data?.[activeValue as keyof typeof themeCountsState.data]?.toLocaleString() || '0';
-    } else {
-      return typeCountsState.data?.[activeValue as keyof typeof typeCountsState.data]?.toLocaleString() || '0';
-    }
+    // 모든 경우에 API 응답의 meta.totalItems 사용
+    const currentState = activeFilter === 'theme' ? themeItemsState : typeItemsState;
+    const totalItems = currentState.data?.meta?.totalItems || currentState.data?.meta?.total || 0;
+    return totalItems > 0 ? totalItems.toLocaleString() : '0';
   };
 
   // 현재 데이터 상태 결정
@@ -93,8 +101,8 @@ export function DataList() {
                   key={themeCode}
                   id={`data-list-theme-${themeCode}`}
                   name={themeInfo.name}
-                  isActive={activeValue === themeCode && activeFilter === 'theme'}
-                  onClick={() => window.location.href = `/data-list?theme=${themeCode}`}
+                  isActive={hasFilter && activeValue === themeCode && activeFilter === 'theme'}
+                  onClick={() => navigate(`/data-list?theme=${themeCode}`)}
                 />
               );
             })}
@@ -108,8 +116,8 @@ export function DataList() {
                   key={dataTypeCode}
                   id={`data-list-type-${dataTypeCode}`}
                   name={dataTypeInfo.name}
-                  isActive={activeValue === dataTypeCode && activeFilter === 'type'}
-                  onClick={() => window.location.href = `/data-list?type=${dataTypeCode}`}
+                  isActive={hasFilter && activeValue === dataTypeCode && activeFilter === 'type'}
+                  onClick={() => navigate(`/data-list?type=${dataTypeCode}`)}
                 />
               );
             })}
@@ -137,57 +145,18 @@ export function DataList() {
 
             <TableBodyWithState
               id="data-list-table-body"
-              data={currentDataState.data || []}
+              data={currentDataState.data?.items || []}
               loading={currentDataState.loading}
               error={currentDataState.error}
               emptyMessage="데이터가 없습니다."
               renderRow={(item: any, index: number) => (
-                <TableRow key={item.id || index} id={`data-list-row-${index + 1}`}>
-                  <TableCell variant="info" id={`data-list-row-${index + 1}-info`}>
-                    <DataTitle id={`data-list-row-${index + 1}-title`}>
-                      {item.title || item.data_name || '데이터 제목'}
-                    </DataTitle>
-                    <DataMeta id={`data-list-row-${index + 1}-meta`}>
-                      <MetaItem
-                        label="제공 포맷"
-                        value={item.format || 'csv'}
-                        labelId={`data-list-row-${index + 1}-meta-format-label`}
-                        valueId={`data-list-row-${index + 1}-meta-format-value`}
-                        separatorId={`data-list-row-${index + 1}-meta-separator-1`}
-                      />
-                      <MetaItem
-                        label="제공 기관"
-                        value={item.src_org_name || '제공 기관'}
-                        labelId={`data-list-row-${index + 1}-meta-org-label`}
-                        valueId={`data-list-row-${index + 1}-meta-org-value`}
-                        separatorId={`data-list-row-${index + 1}-meta-separator-2`}
-                      />
-                      <MetaItem
-                        label="등록일"
-                        value={item.sys_data_reg_dt || '2023.01.07'}
-                        labelId={`data-list-row-${index + 1}-meta-date-label`}
-                        valueId={`data-list-row-${index + 1}-meta-date-value`}
-                      />
-                    </DataMeta>
-                  </TableCell>
-                  <TableCell variant="tags" id={`data-list-row-${index + 1}-tags`}>
-                    <DataTags>
-                      {item.tags && item.tags.length > 0 ? (
-                        item.tags.map((tag: string, tagIndex: number) => (
-                          <Tag key={tagIndex} id={`data-list-row-${index + 1}-tag-${tagIndex + 1}`}>
-                            {tag}
-                          </Tag>
-                        ))
-                      ) : (
-                        <>
-                          <Tag id={`data-list-row-${index + 1}-tag-1`}>일상지원</Tag>
-                          <Tag id={`data-list-row-${index + 1}-tag-2`}>방문돌봄</Tag>
-                          <Tag id={`data-list-row-${index + 1}-tag-3`}>장애인</Tag>
-                        </>
-                      )}
-                    </DataTags>
-                  </TableCell>
-                </TableRow>
+                <DataItemRow 
+                  item={item}
+                  index={index}
+                  idPrefix="data-list"
+                  showModifiedDate={false}
+                  onRowClick={() => navigate(`/data/${item.id}`)}
+                />
               )}
             />
           </Table>

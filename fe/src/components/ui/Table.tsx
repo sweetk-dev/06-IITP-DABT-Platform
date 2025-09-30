@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import { ReactNode, Fragment } from 'react';
+import { parseKeywords } from '@iitp-dabt-platform/common';
 
 interface TableProps {
   children: ReactNode;
@@ -261,8 +262,86 @@ export function TableBodyWithState<T>({
       ) : data.length === 0 ? (
         <TableEmptyRow message={emptyMessage} />
       ) : (
-        data.map((item, index) => renderRow(item, index))
+        data.map((item: any, index) => (
+          <Fragment key={item?.id || index}>
+            {renderRow(item, index)}
+          </Fragment>
+        ))
       )}
     </TableBody>
+  );
+}
+
+// ============================================================================
+// 복합 컴포넌트 - 재사용을 위한 고수준 컴포넌트
+// ============================================================================
+
+interface DataItemRowProps {
+  item: any;
+  index: number;
+  idPrefix: string;
+  onTitleRender?: (title: string) => ReactNode; // 제목 커스터마이징 (검색어 강조 등)
+  showModifiedDate?: boolean; // true면 "최종 수정일", false면 "등록일"
+  onRowClick?: () => void; // 행 클릭 핸들러
+}
+
+/**
+ * 데이터 아이템 테이블 행 공통 컴포넌트
+ * DataList, DataSearch 등에서 사용
+ */
+export function DataItemRow({ 
+  item, 
+  index, 
+  idPrefix,
+  onTitleRender,
+  showModifiedDate = false,
+  onRowClick
+}: DataItemRowProps) {
+  const keywords = parseKeywords(item.data_keywords);
+  const title = item.title || item.data_name || '데이터 제목';
+
+  return (
+    <TableRow id={`${idPrefix}-row-${index + 1}`} onClick={onRowClick}>
+      <TableCell variant="info" id={`${idPrefix}-row-${index + 1}-info`}>
+        <DataTitle id={`${idPrefix}-row-${index + 1}-title`}>
+          {onTitleRender ? onTitleRender(title) : title}
+        </DataTitle>
+        <DataMeta id={`${idPrefix}-row-${index + 1}-meta`}>
+          <MetaItem
+            label="제공 포맷"
+            value={item.format || 'csv'}
+            labelId={`${idPrefix}-row-${index + 1}-meta-format-label`}
+            valueId={`${idPrefix}-row-${index + 1}-meta-format-value`}
+            separatorId={`${idPrefix}-row-${index + 1}-meta-separator-1`}
+          />
+          <MetaItem
+            label="제공 기관"
+            value={item.src_org_name || '제공 기관'}
+            labelId={`${idPrefix}-row-${index + 1}-meta-org-label`}
+            valueId={`${idPrefix}-row-${index + 1}-meta-org-value`}
+            separatorId={`${idPrefix}-row-${index + 1}-meta-separator-2`}
+          />
+          <MetaItem
+            label={showModifiedDate ? "최종 수정일" : "등록일"}
+            value={item.sys_data_reg_dt || '2023.01.07'}
+            labelId={`${idPrefix}-row-${index + 1}-meta-date-label`}
+            valueId={`${idPrefix}-row-${index + 1}-meta-date-value`}
+          />
+        </DataMeta>
+      </TableCell>
+      <TableCell variant="tags" id={`${idPrefix}-row-${index + 1}-tags`}>
+        <DataTags>
+          {keywords.length > 0 ? (
+            keywords.map((keyword: string, tagIndex: number) => (
+              <Tag key={tagIndex} id={`${idPrefix}-row-${index + 1}-tag-${tagIndex + 1}`}>
+                {keyword}
+              </Tag>
+            ))
+          ) : (
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>-</span>
+          )}
+        </DataTags>
+      </TableCell>
+    </TableRow>
   );
 }

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ROUTE_PATHS } from '../../pages/App';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { getBreadcrumbItems } from '../../pages/App';
@@ -23,11 +23,18 @@ export function Layout({
 }: LayoutProps) {
   const location = useLocation();
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  
+  // path params와 query params 병합
+  const allParams = {
+    ...params,
+    ...Object.fromEntries(searchParams.entries())
+  } as Record<string, string>;
   
   // 홈 페이지는 브레드크럼 숨김, showBreadcrumb prop도 고려
   const shouldShowBreadcrumb = showBreadcrumb && location.pathname !== '/';
-  const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, params as Record<string, string>) : [];
+  const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, allParams) : [];
 
 
   return (

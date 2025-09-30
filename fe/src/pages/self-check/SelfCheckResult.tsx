@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
 import { Layout } from '../../components/layout/Layout';
 import { SelfThemaCard, CardContent, CardTitle, CardSubtitle, CardIcon } from '../../components/ui/SelfThemaCard';
 import { SELF_CHECK_CONSTANTS } from '@iitp-dabt-platform/common';
 
 export function SelfCheckResult() {
+  const navigate = useNavigate();
   const scores = {
     physical: 45,
     emotional: 32,
@@ -58,7 +59,7 @@ export function SelfCheckResult() {
       window.open(recommendation.url, '_blank', 'noopener,noreferrer');
     } else {
       // URL이 없으면 SelfCheckMore 페이지로 이동
-      window.location.href = ROUTE_PATHS.SELF_CHECK_MORE;
+      navigate(ROUTE_PATHS.SELF_CHECK_MORE);
     }
   };
 

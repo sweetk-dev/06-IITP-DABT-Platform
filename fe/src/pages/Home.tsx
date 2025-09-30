@@ -33,11 +33,13 @@ export function Home() {
   };
 
   const handleViewAllThemes = () => {
-    navigate(getDataSearchPath({ type: 'theme' }));
+    // 자립 테마별 전체보기 → DataList로 이동 (테마 전체)
+    navigate(`${ROUTE_PATHS.DATA_LIST}?category=theme`);
   };
 
   const handleViewAllDataTypes = () => {
-    navigate(getDataSearchPath({ type: 'data_type' }));
+    // 데이터 유형별 전체보기 → DataList로 이동 (유형 전체)
+    navigate(`${ROUTE_PATHS.DATA_LIST}?category=type`);
   };
 
 
@@ -130,7 +132,7 @@ export function Home() {
                     <div id={`home-latest-data-item-${index + 1}-content`} className="home-latest-data-item-content">
                       <div id={`home-latest-data-item-${index + 1}-category`} className="home-latest-data-category">
                         <div id={`home-latest-data-item-${index + 1}-category-text`} className="home-latest-data-category-text">
-                          {DATA_TYPE_CONSTANTS.DATA_TYPES[item.data_type as DataTypeCode]?.name || item.data_type}
+                          {DATA_TYPE_CONSTANTS.DATA_TYPES[item.data_type as DataTypeCode]?.shortName || item.data_type}
                         </div>
                       </div>
                       <div id={`home-latest-data-item-${index + 1}-title`} className="home-latest-data-title-text">

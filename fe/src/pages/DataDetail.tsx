@@ -7,7 +7,7 @@ import { Tag } from '../components/ui/Tag';
 import { Button } from '../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableColumn } from '../components/ui/Table';
 import { useDataDetail, useDataPreview } from '../api/hooks';
-import { DATA_TYPE_CONSTANTS, THEME_CONSTANTS, type DataTypeCode, type ThemeCode } from '@iitp-dabt-platform/common';
+import { DATA_TYPE_CONSTANTS, THEME_CONSTANTS, type DataTypeCode, type ThemeCode, parseKeywords } from '@iitp-dabt-platform/common';
 
 export function DataDetail() {
   const { id } = useParams<{ id: string }>();
@@ -27,10 +27,8 @@ export function DataDetail() {
 
   const detailData = dataDetailState.data;
 
-  // 키워드를 배열로 변환 (콤마 구분)
-  const keywords = detailData?.data_keywords 
-    ? detailData.data_keywords.split(',').map((k: string) => k.trim()).filter(Boolean)
-    : [];
+  // 키워드를 배열로 변환 (common 패키지의 parseKeywords 사용)
+  const keywords = parseKeywords(detailData?.data_keywords);
 
   // 날짜 포맷 변환 (YYYY-MM-DD → YYYY.MM.DD)
   const formatDate = (dateString?: string) => {

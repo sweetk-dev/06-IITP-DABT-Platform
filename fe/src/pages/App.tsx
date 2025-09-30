@@ -4,6 +4,7 @@ import { Spinner } from '../components/ui/Spinner';
 import { ErrorAlert } from '../components/ui/ErrorAlert';
 import { useRouteChange } from '../hooks/useRouteChange';
 import { useErrorHandler } from '../hooks/useErrorHandler';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode } from '@iitp-dabt-platform/common';
 
 // Lazy load pages for better performance - 중앙 집중식 관리
 const LAZY_COMPONENTS = {
@@ -165,7 +166,7 @@ export function getBreadcrumbItems(pathname: string, params?: Record<string, str
   }
 
   // 브레드크럼 아이템 생성
-  return breadcrumbPath.map((route, index) => {
+  const items = breadcrumbPath.map((route, index) => {
     const isLast = index === breadcrumbPath.length - 1;
     let href = route.path;
     
@@ -182,6 +183,29 @@ export function getBreadcrumbItems(pathname: string, params?: Record<string, str
       active: isLast
     };
   });
+
+  // DataList의 경우 theme/type 파라미터에 따라 추가 항목 표시
+  if (pathname === ROUTE_PATHS.DATA_LIST && params) {
+    const { theme, type } = params;
+    if (theme || type) {
+      const themeName = theme ? THEME_CONSTANTS.THEMES[theme as ThemeCode]?.name : null;
+      const typeName = type ? DATA_TYPE_CONSTANTS.DATA_TYPES[type as DataTypeCode]?.name : null;
+      
+      items.push({
+        label: themeName || typeName || '',
+        href: undefined,
+        active: true
+      });
+      
+      // 마지막 항목 (데이터 목록)의 active를 false로 변경
+      if (items.length > 1) {
+        items[items.length - 2].active = false;
+        items[items.length - 2].href = ROUTE_PATHS.DATA_LIST;
+      }
+    }
+  }
+
+  return items;
 }
 
 // 라우트 경로 가져오기

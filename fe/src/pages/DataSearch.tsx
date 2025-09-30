@@ -4,19 +4,7 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
-import { 
-  Table, 
-  TableHeader, 
-  TableBodyWithState,
-  TableRow, 
-  TableCell, 
-  TableColumn,
-  DataTitle,
-  DataMeta,
-  MetaItem,
-  DataTags,
-  Tag
-} from '../components/ui/Table';
+import { Table, TableHeader, TableBodyWithState, TableColumn, DataItemRow } from '../components/ui/Table';
 import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useDataSearch } from '../api/hooks';
 
@@ -140,52 +128,14 @@ export function DataSearch() {
               loadingMessage="로딩 중..."
               errorMessage="검색 중 오류가 발생했습니다."
               renderRow={(item: any, index: number) => (
-                <TableRow key={item.id || index} id={`data-search-row-${index + 1}`}>
-                  <TableCell variant="info" id={`data-search-row-${index + 1}-info`}>
-                    <DataTitle id={`data-search-row-${index + 1}-title`}>
-                      {highlightSearchTerm(item.title || item.data_name || '데이터 제목', searchTerm)}
-                    </DataTitle>
-                    <DataMeta id={`data-search-row-${index + 1}-meta`}>
-                      <MetaItem
-                        label="제공 포맷"
-                        value={item.format || 'csv'}
-                        labelId={`data-search-row-${index + 1}-meta-format-label`}
-                        valueId={`data-search-row-${index + 1}-meta-format-value`}
-                        separatorId={`data-search-row-${index + 1}-meta-separator-1`}
-                      />
-                      <MetaItem
-                        label="제공 기관"
-                        value={item.src_org_name || '제공 기관'}
-                        labelId={`data-search-row-${index + 1}-meta-org-label`}
-                        valueId={`data-search-row-${index + 1}-meta-org-value`}
-                        separatorId={`data-search-row-${index + 1}-meta-separator-2`}
-                      />
-                      <MetaItem
-                        label="최종 수정일"
-                        value={item.sys_data_reg_dt || '2025.05.12'}
-                        labelId={`data-search-row-${index + 1}-meta-date-label`}
-                        valueId={`data-search-row-${index + 1}-meta-date-value`}
-                      />
-                    </DataMeta>
-                  </TableCell>
-                  <TableCell variant="tags" id={`data-search-row-${index + 1}-tags`}>
-                    <DataTags>
-                      {item.tags && item.tags.length > 0 ? (
-                        item.tags.map((tag: string, tagIndex: number) => (
-                          <Tag key={tagIndex} id={`data-search-row-${index + 1}-tag-${tagIndex + 1}`}>
-                            {tag}
-                          </Tag>
-                        ))
-                      ) : (
-                        <>
-                          <Tag id={`data-search-row-${index + 1}-tag-1`}>일상지원</Tag>
-                          <Tag id={`data-search-row-${index + 1}-tag-2`}>방문돌봄</Tag>
-                          <Tag id={`data-search-row-${index + 1}-tag-3`}>장애인</Tag>
-                        </>
-                      )}
-                    </DataTags>
-                  </TableCell>
-                </TableRow>
+                <DataItemRow 
+                  item={item}
+                  index={index}
+                  idPrefix="data-search"
+                  onTitleRender={(title) => highlightSearchTerm(title, searchTerm)}
+                  showModifiedDate={true}
+                  onRowClick={() => navigate(`/data/${item.id}`)}
+                />
               )}
             />
           </Table>

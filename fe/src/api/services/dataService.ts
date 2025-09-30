@@ -49,56 +49,59 @@ export class DataService {
   }
 
   /**
-   * 자립 테마 리스트 전체 조회
+   * 자립 테마 메타데이터 전체 조회
    */
   async getThemes(): Promise<DataThemesRes> {
     return apiClient.get(`GET ${FULL_API_URLS.DATA.THEMES}`);
   }
 
   /**
-   * 데이터 유형 리스트 전체 조회
+   * 전체 테마 아이템 조회 (테마 지정 없음)
    */
-  async getTypes(): Promise<DataTypesRes> {
-    return apiClient.get(`GET ${FULL_API_URLS.DATA.TYPES}`);
+  async getAllThemeItems(query: DataThemeItemsQuery = {}): Promise<DataThemeItemsRes> {
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.THEMES_ITEMS_ALL}`, { query });
   }
 
   /**
    * 자립 테마별 리스트 조회
    */
   async getThemeItems(theme: string, query: DataThemeItemsQuery = {}): Promise<DataThemeItemsRes> {
-    return apiClient.get(`GET /api/v1/data/themes/{theme}/items`, {
-      params: { theme },
-      query
-    });
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.THEME_ITEMS(theme)}`, { query });
+  }
+
+  /**
+   * 데이터 유형 메타데이터 전체 조회
+   */
+  async getTypes(): Promise<DataTypesRes> {
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.TYPES}`);
+  }
+
+  /**
+   * 전체 유형 아이템 조회 (유형 지정 없음)
+   */
+  async getAllTypeItems(query: DataTypeItemsQuery = {}): Promise<DataTypeItemsRes> {
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.TYPES_ITEMS_ALL}`, { query });
   }
 
   /**
    * 데이터 유형별 리스트 조회
    */
   async getTypeItems(type: string, query: DataTypeItemsQuery = {}): Promise<DataTypeItemsRes> {
-    return apiClient.get(`GET /api/v1/data/types/{type}/items`, {
-      params: { type },
-      query
-    });
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.TYPE_ITEMS(type)}`, { query });
   }
 
   /**
    * 데이터 상세 정보 조회
    */
   async getDataDetail(id: number): Promise<DataDetailRes> {
-    return apiClient.get(`GET /api/v1/data/{id}`, {
-      params: { id }
-    });
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.DETAIL(id)}`);
   }
 
   /**
    * 데이터 미리보기 조회
    */
   async getDataPreview(id: number, query: DataPreviewQuery = {}): Promise<DataPreviewRes> {
-    return apiClient.get(`GET /api/v1/data/{id}/preview`, {
-      params: { id },
-      query
-    });
+    return apiClient.get(`GET ${FULL_API_URLS.DATA.PREVIEW(id)}`, { query });
   }
 }
 
