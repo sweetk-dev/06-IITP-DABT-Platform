@@ -76,7 +76,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         ],
       });
 
-      const counts = {
+      const counts: DataThemeCountsRes = {
         phy: 0,
         emo: 0,
         econ: 0,
@@ -84,13 +84,13 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       };
 
       results.forEach((item: any) => {
-        const theme = item.self_rel_type;
+        const themeCode = item.self_rel_type as ThemeCode;
         const count = parseInt(item.dataValues.count);
         
-        if (theme === 'physical') counts.phy = count;
-        else if (theme === 'emotional') counts.emo = count;
-        else if (theme === 'economic') counts.econ = count;
-        else if (theme === 'social') counts.soc = count;
+        // DB에 저장된 값이 이미 ThemeCode 형식 (phy, emo, econ, soc)
+        if (THEME_CONSTANTS.ALL_CODES.includes(themeCode)) {
+          counts[themeCode] = count;
+        }
       });
 
       return counts;
@@ -117,19 +117,20 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         ],
       });
 
-      const counts = {
+      const counts: DataTypeCountsRes = {
         basic: 0,
         poi: 0,
         emp: 0,
       };
 
       results.forEach((item: any) => {
-        const type = item.data_type;
+        const dataType = item.data_type as DataTypeCode;
         const count = parseInt(item.dataValues.count);
         
-        if (type === 'basic') counts.basic = count;
-        else if (type === 'poi') counts.poi = count;
-        else if (type === 'emp') counts.emp = count;
+        // 유효한 데이터 타입인지 확인
+        if (DATA_TYPE_CONSTANTS.ALL_CODES.includes(dataType)) {
+          counts[dataType] = count;
+        }
       });
 
       return counts;
@@ -225,21 +226,14 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       });
 
       return results.map((item: any) => {
-        const theme = item.self_rel_type;
+        const themeCode = item.self_rel_type as ThemeCode;
         const count = parseInt(item.dataValues.total_count);
-        
-        let id: ThemeCode = 'phy';
-        let name = '';
-        
-        if (theme === 'physical') { id = 'phy'; name = '신체적 자립'; }
-        else if (theme === 'emotional') { id = 'emo'; name = '정서적 자립'; }
-        else if (theme === 'economic') { id = 'econ'; name = '경제적 자립'; }
-        else if (theme === 'social') { id = 'soc'; name = '사회적 자립'; }
+        const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
         
         return {
-          id,
-          name,
-          description: THEME_CONSTANTS.THEMES[id]?.description || '',
+          id: themeCode,
+          name: themeInfo.name,
+          description: themeInfo.description,
           total_count: count,
         };
       });
@@ -259,17 +253,18 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
     try {
       logger.debug('데이터 Repository - 테마별 아이템 조회', { theme, options });
       
-      let selfRelType = '';
-      if (theme === 'phy') selfRelType = 'physical';
-      else if (theme === 'emo') selfRelType = 'emotional';
-      else if (theme === 'econ') selfRelType = 'economic';
-      else if (theme === 'soc') selfRelType = 'social';
+      // DB에 이미 ThemeCode 형식으로 저장되어 있음
+      const themeCode = theme as ThemeCode;
+      
+      if (!THEME_CONSTANTS.ALL_CODES.includes(themeCode)) {
+        throw new Error(`유효하지 않은 테마 코드: ${theme}`);
+      }
 
       const { data, totalItems } = await this.findWithPagination({
         where: {
           status: 'A',
           del_yn: 'N',
-          self_rel_type: selfRelType,
+          self_rel_type: themeCode,
         },
         page: options.page,
         pageSize: options.pageSize,
@@ -325,20 +320,14 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       });
 
       return results.map((item: any) => {
-        const type = item.data_type;
+        const dataType = item.data_type as DataTypeCode;
         const count = parseInt(item.dataValues.total_count);
-        
-        let id: DataTypeCode = 'basic';
-        let name = '';
-        
-        if (type === 'basic') { id = 'basic'; name = '기초 데이터'; }
-        else if (type === 'poi') { id = 'poi'; name = '이동권 데이터'; }
-        else if (type === 'emp') { id = 'emp'; name = '일자리 데이터'; }
+        const typeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[dataType];
         
         return {
-          id,
-          name,
-          description: `${name} 관련 자료`,
+          id: dataType,
+          name: typeInfo.name,
+          description: typeInfo.description,
           total_count: count,
         };
       });
