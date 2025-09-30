@@ -83,7 +83,11 @@ export function TableCell({ children, className = '', style = {}, variant = 'inf
   const variantClass = variant === 'info' ? 'data-info' : 'data-tags';
   
   return (
-    <div id={id} className={`${variantClass} ${className}`} style={style}>
+    <div 
+      id={id} 
+      className={`${variantClass} ${className}`} 
+      style={style}
+    >
       {children}
     </div>
   );
@@ -186,5 +190,79 @@ export function Tag({ children, className = '', style = {}, id }: TagProps) {
     <div id={id} className={`tag ${className}`} style={style}>
       {children}
     </div>
+  );
+}
+
+// ============================================================================
+// 상태 표시 전용 컴포넌트
+// ============================================================================
+
+interface TableEmptyRowProps {
+  message: string;
+  variant?: 'normal' | 'error' | 'warning';
+  id?: string;
+}
+
+export function TableEmptyRow({ message, variant = 'normal', id }: TableEmptyRowProps) {
+  const colorMap = {
+    normal: 'inherit',
+    error: 'var(--color-danger)',
+    warning: 'var(--color-warning)'
+  };
+  
+  return (
+    <div 
+      id={id}
+      className="data-row data-row-empty" 
+      style={{ 
+        padding: '40px', 
+        textAlign: 'center',
+        color: colorMap[variant],
+        justifyContent: 'center',
+        cursor: 'default'
+      }}
+    >
+      {message}
+    </div>
+  );
+}
+
+// ============================================================================
+// 조건부 렌더링 헬퍼 컴포넌트
+// ============================================================================
+
+interface TableBodyWithStateProps<T> {
+  data: T[];
+  loading: boolean;
+  error: string | null;
+  emptyMessage?: string;
+  loadingMessage?: string;
+  errorMessage?: string;
+  renderRow: (item: T, index: number) => ReactNode;
+  id?: string;
+}
+
+export function TableBodyWithState<T>({ 
+  data, 
+  loading, 
+  error,
+  emptyMessage = '데이터가 없습니다.',
+  loadingMessage = '로딩 중...',
+  errorMessage = '데이터를 불러오는 중 오류가 발생했습니다.',
+  renderRow,
+  id
+}: TableBodyWithStateProps<T>) {
+  return (
+    <TableBody id={id}>
+      {loading ? (
+        <TableEmptyRow message={loadingMessage} />
+      ) : error ? (
+        <TableEmptyRow message={errorMessage || error} variant="error" />
+      ) : data.length === 0 ? (
+        <TableEmptyRow message={emptyMessage} />
+      ) : (
+        data.map((item, index) => renderRow(item, index))
+      )}
+    </TableBody>
   );
 }

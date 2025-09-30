@@ -1,16 +1,7 @@
 // 공통 API 훅들
 import { useState, useEffect } from 'react';
 import { commonService } from '../services';
-
-// ============================================================================
-// API 호출 상태 타입
-// ============================================================================
-
-export interface ApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-}
+import { ApiState } from '../types';
 
 // ============================================================================
 // 공통 API 훅들
@@ -25,6 +16,7 @@ export function useHealth(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -32,20 +24,22 @@ export function useHealth(immediate: boolean = true) {
     try {
       const data = await commonService.getHealth();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true); // 에러 발생 시에도 실행 완료로 표시
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -59,6 +53,7 @@ export function useVersion(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -66,20 +61,22 @@ export function useVersion(immediate: boolean = true) {
     try {
       const data = await commonService.getVersion();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true); // 에러 발생 시에도 실행 완료로 표시
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }

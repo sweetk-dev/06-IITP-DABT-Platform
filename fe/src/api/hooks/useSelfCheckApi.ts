@@ -1,6 +1,7 @@
 // 자가진단 API 훅들
 import { useState, useEffect } from 'react';
 import { selfCheckService } from '../services';
+import { ApiState } from '../types';
 import { 
   SelfCheckRecommendationsReq,
   SelfCheckPoliciesReq,
@@ -11,16 +12,6 @@ import {
   SELF_CHECK_PROVIDERS_DEFAULTS,
   SELF_CHECK_FACILITIES_DEFAULTS
 } from '@iitp-dabt-platform/common';
-
-// ============================================================================
-// API 호출 상태 타입
-// ============================================================================
-
-export interface ApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-}
 
 // ============================================================================
 // 자가진단 API 훅들
@@ -35,6 +26,7 @@ export function useRecommendations(params: SelfCheckRecommendationsReq = {}, imm
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -47,20 +39,22 @@ export function useRecommendations(params: SelfCheckRecommendationsReq = {}, imm
       };
       const data = await selfCheckService.getRecommendations(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -74,6 +68,7 @@ export function usePolicies(params: SelfCheckPoliciesReq = {}, immediate: boolea
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -87,20 +82,22 @@ export function usePolicies(params: SelfCheckPoliciesReq = {}, immediate: boolea
       };
       const data = await selfCheckService.getPolicies(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -114,6 +111,7 @@ export function useProviders(params: SelfCheckProvidersReq = {}, immediate: bool
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -127,20 +125,22 @@ export function useProviders(params: SelfCheckProvidersReq = {}, immediate: bool
       };
       const data = await selfCheckService.getProviders(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -154,6 +154,7 @@ export function useFacilities(params: SelfCheckFacilitiesReq = {}, immediate: bo
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -167,20 +168,22 @@ export function useFacilities(params: SelfCheckFacilitiesReq = {}, immediate: bo
       };
       const data = await selfCheckService.getFacilities(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }

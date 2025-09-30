@@ -66,7 +66,7 @@ export class DataService {
    * 자립 테마별 리스트 조회
    */
   async getThemeItems(theme: string, query: DataThemeItemsQuery = {}): Promise<DataThemeItemsRes> {
-    return apiClient.get(`GET ${API_URLS.DATA.THEME_ITEMS(theme)}`, {
+    return apiClient.get(`GET /api/v1/data/themes/{theme}/items`, {
       params: { theme },
       query
     });
@@ -76,7 +76,7 @@ export class DataService {
    * 데이터 유형별 리스트 조회
    */
   async getTypeItems(type: string, query: DataTypeItemsQuery = {}): Promise<DataTypeItemsRes> {
-    return apiClient.get(`GET ${API_URLS.DATA.TYPE_ITEMS(type)}`, {
+    return apiClient.get(`GET /api/v1/data/types/{type}/items`, {
       params: { type },
       query
     });
@@ -86,7 +86,7 @@ export class DataService {
    * 데이터 상세 정보 조회
    */
   async getDataDetail(id: number): Promise<DataDetailRes> {
-    return apiClient.get(`GET ${API_URLS.DATA.DETAIL(id)}`, {
+    return apiClient.get(`GET /api/v1/data/{id}`, {
       params: { id }
     });
   }
@@ -95,7 +95,7 @@ export class DataService {
    * 데이터 미리보기 조회
    */
   async getDataPreview(id: number, query: DataPreviewQuery = {}): Promise<DataPreviewRes> {
-    return apiClient.get(`GET ${API_URLS.DATA.PREVIEW(id)}`, {
+    return apiClient.get(`GET /api/v1/data/{id}/preview`, {
       params: { id },
       query
     });

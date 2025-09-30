@@ -2,3 +2,4 @@
 export * from './useDataApi';
 export * from './useSelfCheckApi';
 export * from './useCommonApi';
+export * from '../types';

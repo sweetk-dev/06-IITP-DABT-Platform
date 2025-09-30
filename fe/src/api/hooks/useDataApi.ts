@@ -1,6 +1,7 @@
 // 데이터 API 훅들
 import { useState, useEffect } from 'react';
 import { dataService } from '../services';
+import { ApiState } from '../types';
 import { 
   DataLatestQuery, 
   DataSearchQuery,
@@ -11,16 +12,6 @@ import {
   DATA_THEME_ITEMS_DEFAULTS,
   DATA_TYPE_ITEMS_DEFAULTS
 } from '@iitp-dabt-platform/common';
-
-// ============================================================================
-// API 호출 상태 타입
-// ============================================================================
-
-export interface ApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-}
 
 // ============================================================================
 // 데이터 API 훅들
@@ -35,6 +26,7 @@ export function useLatestData(params: DataLatestQuery = {}, immediate: boolean =
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -47,20 +39,22 @@ export function useLatestData(params: DataLatestQuery = {}, immediate: boolean =
       };
       const data = await dataService.getLatestData(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -74,6 +68,7 @@ export function useThemeCounts(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -81,20 +76,22 @@ export function useThemeCounts(immediate: boolean = true) {
     try {
       const data = await dataService.getThemeCounts();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -108,6 +105,7 @@ export function useTypeCounts(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -115,20 +113,22 @@ export function useTypeCounts(immediate: boolean = true) {
     try {
       const data = await dataService.getTypeCounts();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -142,6 +142,7 @@ export function useDataSearch(params: DataSearchQuery, immediate: boolean = true
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -156,20 +157,22 @@ export function useDataSearch(params: DataSearchQuery, immediate: boolean = true
       };
       const data = await dataService.searchData(queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -183,6 +186,7 @@ export function useThemes(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -190,20 +194,22 @@ export function useThemes(immediate: boolean = true) {
     try {
       const data = await dataService.getThemes();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -217,6 +223,7 @@ export function useTypes(immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -224,20 +231,22 @@ export function useTypes(immediate: boolean = true) {
     try {
       const data = await dataService.getTypes();
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate]);
+  }, [immediate, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -251,6 +260,7 @@ export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, i
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -265,20 +275,22 @@ export function useThemeItems(theme: string, params: DataThemeItemsQuery = {}, i
       };
       const data = await dataService.getThemeItems(theme, queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate, theme]);
+  }, [immediate, theme, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -292,6 +304,7 @@ export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, imme
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -306,20 +319,22 @@ export function useTypeItems(type: string, params: DataTypeItemsQuery = {}, imme
       };
       const data = await dataService.getTypeItems(type, queryParams);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate) {
+    if (immediate && !hasExecuted) {
       execute();
     }
-  }, [immediate, type]);
+  }, [immediate, type, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -333,6 +348,7 @@ export function useDataDetail(id: number, immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -340,20 +356,22 @@ export function useDataDetail(id: number, immediate: boolean = true) {
     try {
       const data = await dataService.getDataDetail(id);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate && id) {
+    if (immediate && id && !hasExecuted) {
       execute();
     }
-  }, [immediate, id]);
+  }, [immediate, id, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
@@ -367,6 +385,7 @@ export function useDataPreview(id: number, immediate: boolean = true) {
     loading: false,
     error: null,
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   const execute = async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -374,20 +393,22 @@ export function useDataPreview(id: number, immediate: boolean = true) {
     try {
       const data = await dataService.getDataPreview(id);
       setState({ data, loading: false, error: null });
+      setHasExecuted(true);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }));
+      setHasExecuted(true);
     }
   };
 
   useEffect(() => {
-    if (immediate && id) {
+    if (immediate && id && !hasExecuted) {
       execute();
     }
-  }, [immediate, id]);
+  }, [immediate, id, hasExecuted]);
 
   return { ...state, execute, refetch: execute };
 }
