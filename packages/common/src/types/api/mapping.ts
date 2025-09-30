@@ -153,8 +153,19 @@ export const API_MAPPING = {
     description: '데이터 유형 리스트 전체 조회',
     fullUrl: FULL_API_URLS.DATA.TYPES
   },
-  // 동적 경로는 별도 처리 필요
-  [`GET /api/v1/data/themes/{theme}/items`]: {
+  // 전체 테마 아이템 조회
+  [`GET ${API_URLS.DATA.THEMES_ITEMS_ALL}`]: {
+    req: {
+      body: 'void',
+      params: 'void',
+      query: 'DataThemeItemsQuery'
+    } as ApiRequest,
+    res: {} as DataThemeItemsRes,
+    description: '전체 테마 데이터 아이템 조회',
+    fullUrl: FULL_API_URLS.DATA.THEMES_ITEMS_ALL
+  },
+  // 특정 테마 아이템 조회
+  [`GET ${API_URLS.DATA.THEME_ITEMS('{theme}')}`]: {
     req: {
       body: 'void',
       params: 'DataThemeItemsParams',
@@ -163,7 +174,19 @@ export const API_MAPPING = {
     res: {} as DataThemeItemsRes,
     description: '자립 테마별 리스트 조회'
   },
-  [`GET /api/v1/data/types/{type}/items`]: {
+  // 전체 유형 아이템 조회
+  [`GET ${API_URLS.DATA.TYPES_ITEMS_ALL}`]: {
+    req: {
+      body: 'void',
+      params: 'void',
+      query: 'DataTypeItemsQuery'
+    } as ApiRequest,
+    res: {} as DataTypeItemsRes,
+    description: '전체 유형 데이터 아이템 조회',
+    fullUrl: FULL_API_URLS.DATA.TYPES_ITEMS_ALL
+  },
+  // 특정 유형 아이템 조회
+  [`GET ${API_URLS.DATA.TYPE_ITEMS('{type}')}`]: {
     req: {
       body: 'void',
       params: 'DataTypeItemsParams',
@@ -172,7 +195,7 @@ export const API_MAPPING = {
     res: {} as DataTypeItemsRes,
     description: '데이터 유형별 리스트 조회'
   },
-  [`GET /api/v1/data/{id}`]: {
+  [`GET ${API_URLS.DATA.DETAIL('{id}' as any)}`]: {
     req: {
       body: 'void',
       params: 'DataDetailParams',
@@ -181,7 +204,7 @@ export const API_MAPPING = {
     res: {} as DataDetailRes,
     description: '데이터 테이블 상세 정보 조회'
   },
-  [`GET /api/v1/data/{id}/preview`]: {
+  [`GET ${API_URLS.DATA.PREVIEW('{id}' as any)}`]: {
     req: {
       body: 'void',
       params: 'DataPreviewParams',

@@ -84,6 +84,7 @@ export interface DataSearchItem {
   data_type: DataTypeCode;
   self_rel_type?: SelfRelTypeCode;
   category?: string;
+  data_keywords?: string; // 콤마 구분 문자열, 최대 3개 (예: '키워드1,키워드2,키워드3')
   sys_tbl_id: string;
   src_org_name: string;
   src_latest_chn_dt: string;
@@ -191,7 +192,7 @@ export interface DataDetailRes {
   category?: string;
   sys_tbl_id: string;
   data_desc?: string;
-  data_keywords?: string;
+  data_keywords?: string; // 콤마 구분 문자열, 최대 3개 (예: '키워드1,키워드2,키워드3')
   data_format?: string;
   data_usage_scope?: string;
   src_org_name: string;

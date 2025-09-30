@@ -1,6 +1,29 @@
 // API 및 FE 화면에서 사용하는 공통 상수 정의
 
 // ============================================================================
+// 키워드 관련 상수
+// ============================================================================
+
+export const KEYWORDS_CONSTANTS = {
+  MAX_COUNT: 3,
+  SEPARATOR: ','
+} as const;
+
+/**
+ * 키워드 문자열을 배열로 변환 (최대 개수 제한)
+ * @param keywords - 콤마 구분 키워드 문자열
+ * @param maxCount - 최대 키워드 개수 (기본값: 3)
+ * @returns 키워드 배열
+ */
+export function parseKeywords(keywords?: string, maxCount: number = KEYWORDS_CONSTANTS.MAX_COUNT): string[] {
+  if (!keywords) return [];
+  return keywords.split(KEYWORDS_CONSTANTS.SEPARATOR)
+    .map(k => k.trim())
+    .filter(Boolean)
+    .slice(0, maxCount);
+}
+
+// ============================================================================
 // 페이지네이션 관련 상수
 // ============================================================================
 
