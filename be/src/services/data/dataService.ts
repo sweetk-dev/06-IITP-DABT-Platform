@@ -161,25 +161,42 @@ export async function searchData(query: DataSearchQuery): Promise<DataSearchRes>
   }
 }
 
-// 테마 리스트 조회 서비스
+// 테마 메타데이터 조회 서비스
 export async function getThemes(): Promise<DataThemesRes> {
   try {
-    logger.debug('테마 리스트 조회 서비스 실행');
+    logger.debug('테마 메타데이터 조회 서비스 실행');
     
     const startTime = Date.now();
     
-    // 테마 리스트 조회
+    // 테마 메타데이터 조회
     const result = await dataRepository.getThemes();
     
     const duration = Date.now() - startTime;
-    logger.info('테마 리스트 조회 서비스 완료', { 
+    logger.info('테마 메타데이터 조회 서비스 완료', { 
       count: result.length, 
       duration: `${duration}ms` 
     });
     
     return result;
   } catch (error) {
-    logger.error('테마 리스트 조회 서비스 오류', { error });
+    logger.error('테마 메타데이터 조회 서비스 오류', { error });
+    throw error;
+  }
+}
+
+// 전체 테마 아이템 조회 서비스 (테마 지정 없음)
+export async function getAllThemeItems(query: DataThemeItemsQuery = {}): Promise<DataThemeItemsRes> {
+  try {
+    logger.debug('전체 테마 아이템 조회 서비스 실행', { query });
+    
+    // 모든 테마를 검색 조건으로 사용
+    const { THEME_CONSTANTS } = await import('@iitp-dabt-platform/common');
+    return searchData({
+      themes: THEME_CONSTANTS.ALL_CODES.join(','),
+      ...query
+    });
+  } catch (error) {
+    logger.error('전체 테마 아이템 조회 서비스 오류', { error });
     throw error;
   }
 }
@@ -231,25 +248,42 @@ export async function getThemeItems(theme: string, query: DataThemeItemsQuery = 
   }
 }
 
-// 데이터 유형 리스트 조회 서비스
+// 데이터 유형 메타데이터 조회 서비스
 export async function getTypes(): Promise<DataTypesRes> {
   try {
-    logger.debug('데이터 유형 리스트 조회 서비스 실행');
+    logger.debug('데이터 유형 메타데이터 조회 서비스 실행');
     
     const startTime = Date.now();
     
-    // 데이터 유형 리스트 조회
+    // 데이터 유형 메타데이터 조회
     const result = await dataRepository.getTypes();
     
     const duration = Date.now() - startTime;
-    logger.info('데이터 유형 리스트 조회 서비스 완료', { 
+    logger.info('데이터 유형 메타데이터 조회 서비스 완료', { 
       count: result.length, 
       duration: `${duration}ms` 
     });
     
     return result;
   } catch (error) {
-    logger.error('데이터 유형 리스트 조회 서비스 오류', { error });
+    logger.error('데이터 유형 메타데이터 조회 서비스 오류', { error });
+    throw error;
+  }
+}
+
+// 전체 유형 아이템 조회 서비스 (유형 지정 없음)
+export async function getAllTypeItems(query: DataTypeItemsQuery = {}): Promise<DataTypeItemsRes> {
+  try {
+    logger.debug('전체 유형 아이템 조회 서비스 실행', { query });
+    
+    // 모든 유형을 검색 조건으로 사용
+    const { DATA_TYPE_CONSTANTS } = await import('@iitp-dabt-platform/common');
+    return searchData({
+      types: DATA_TYPE_CONSTANTS.ALL_CODES.join(','),
+      ...query
+    });
+  } catch (error) {
+    logger.error('전체 유형 아이템 조회 서비스 오류', { error });
     throw error;
   }
 }
@@ -354,8 +388,10 @@ export const dataService = {
   getTypeCounts,
   searchData,
   getThemes,
+  getAllThemeItems,
   getThemeItems,
   getTypes,
+  getAllTypeItems,
   getTypeItems,
   getDataDetail,
   getDataPreview,

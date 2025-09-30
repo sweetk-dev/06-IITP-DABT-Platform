@@ -68,12 +68,25 @@ router.get(
 
 /**
  * @route GET /api/v1/data/themes
- * @desc 자립 테마 리스트 전체 조회
+ * @desc 자립 테마 메타데이터 전체 조회
  * @access Public
  */
 router.get(
   API_URLS.DATA.THEMES,
   asyncHandler(dataController.getThemes)
+);
+
+/**
+ * @route GET /api/v1/data/themes/items
+ * @desc 전체 테마 데이터 아이템 조회 (테마 지정 없음)
+ * @access Public
+ */
+router.get(
+  API_URLS.DATA.THEMES_ITEMS_ALL,
+  validateRequest({
+    query: commonSchemas.paginationQuery,
+  }),
+  asyncHandler(dataController.getAllThemeItems)
 );
 
 /**
@@ -97,12 +110,25 @@ router.get(
 
 /**
  * @route GET /api/v1/data/types
- * @desc 데이터 유형 리스트 전체 조회
+ * @desc 데이터 유형 메타데이터 전체 조회
  * @access Public
  */
 router.get(
   API_URLS.DATA.TYPES,
   asyncHandler(dataController.getTypes)
+);
+
+/**
+ * @route GET /api/v1/data/types/items
+ * @desc 전체 유형 데이터 아이템 조회 (유형 지정 없음)
+ * @access Public
+ */
+router.get(
+  API_URLS.DATA.TYPES_ITEMS_ALL,
+  validateRequest({
+    query: commonSchemas.paginationQuery,
+  }),
+  asyncHandler(dataController.getAllTypeItems)
 );
 
 /**

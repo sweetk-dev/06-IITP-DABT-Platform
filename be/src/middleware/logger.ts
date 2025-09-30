@@ -7,10 +7,16 @@ import { env } from '../config/env';
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();
   
+  // Access 로그 - 콘솔에 명확하게 출력
+  const requestLog = `[ACCESS] ${req.method} ${req.originalUrl} - IP: ${req.ip || 'unknown'}`;
+  console.log(`\x1b[36m${requestLog}\x1b[0m`); // cyan color
+  
   // 요청 시작 로그
   logger.info('API 요청 시작', {
     method: req.method,
     url: req.originalUrl,
+    query: req.query,
+    body: req.method !== 'GET' ? req.body : undefined,
     userAgent: req.get('User-Agent'),
     ip: req.ip,
     timestamp: new Date().toISOString(),
@@ -19,6 +25,15 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
   // 응답 완료 시 로그
   res.on('finish', () => {
     const responseTime = Date.now() - startTime;
+    
+    // Access 완료 로그 - 콘솔에 명확하게 출력 (색상으로 상태 구분)
+    const statusColor = res.statusCode >= 500 ? '\x1b[31m' : // red for 5xx
+                       res.statusCode >= 400 ? '\x1b[33m' : // yellow for 4xx
+                       res.statusCode >= 300 ? '\x1b[36m' : // cyan for 3xx
+                       '\x1b[32m'; // green for 2xx
+    
+    const responseLog = `[ACCESS] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${responseTime}ms`;
+    console.log(`${statusColor}${responseLog}\x1b[0m`);
     
     // 응답 완료 로그
     logger.info('API 요청 완료', {

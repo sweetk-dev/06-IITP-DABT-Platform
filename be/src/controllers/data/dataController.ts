@@ -88,18 +88,47 @@ export async function searchData(req: Request, res: Response): Promise<void> {
   }
 }
 
-// 테마 리스트 조회 컨트롤러
+// 테마 메타데이터 조회 컨트롤러
 export async function getThemes(req: Request, res: Response): Promise<void> {
   try {
-    logger.debug('테마 리스트 조회 요청 처리 시작');
+    logger.debug('테마 메타데이터 조회 요청 처리 시작');
     
     const result = await dataService.getThemes();
     
     createSuccessResponse(res, result, 200);
     
-    logger.debug('테마 리스트 조회 요청 처리 완료', { result });
+    logger.debug('테마 메타데이터 조회 요청 처리 완료', { result });
   } catch (error) {
-    logger.error('테마 리스트 조회 요청 처리 중 오류 발생', { error });
+    logger.error('테마 메타데이터 조회 요청 처리 중 오류 발생', { error });
+    throw error;
+  }
+}
+
+// 전체 테마 아이템 조회 컨트롤러 (테마 지정 없음)
+export async function getAllThemeItems(req: Request, res: Response): Promise<void> {
+  try {
+    const { page, pageSize, sort } = req.query;
+    
+    logger.debug('전체 테마 아이템 조회 요청 처리 시작', { page, pageSize, sort });
+    
+    const result = await dataService.getAllThemeItems({
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+      sort: sort as 'recent' | 'alpha',
+    });
+    
+    createPaginatedResponse(
+      res,
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
+    );
+    
+    logger.debug('전체 테마 아이템 조회 요청 처리 완료', { result });
+  } catch (error) {
+    logger.error('전체 테마 아이템 조회 요청 처리 중 오류 발생', { error });
     throw error;
   }
 }
@@ -135,18 +164,47 @@ export async function getThemeItems(req: Request, res: Response): Promise<void> 
   }
 }
 
-// 데이터 유형 리스트 조회 컨트롤러
+// 데이터 유형 메타데이터 조회 컨트롤러
 export async function getTypes(req: Request, res: Response): Promise<void> {
   try {
-    logger.debug('데이터 유형 리스트 조회 요청 처리 시작');
+    logger.debug('데이터 유형 메타데이터 조회 요청 처리 시작');
     
     const result = await dataService.getTypes();
     
     createSuccessResponse(res, result, 200);
     
-    logger.debug('데이터 유형 리스트 조회 요청 처리 완료', { result });
+    logger.debug('데이터 유형 메타데이터 조회 요청 처리 완료', { result });
   } catch (error) {
-    logger.error('데이터 유형 리스트 조회 요청 처리 중 오류 발생', { error });
+    logger.error('데이터 유형 메타데이터 조회 요청 처리 중 오류 발생', { error });
+    throw error;
+  }
+}
+
+// 전체 유형 아이템 조회 컨트롤러 (유형 지정 없음)
+export async function getAllTypeItems(req: Request, res: Response): Promise<void> {
+  try {
+    const { page, pageSize, sort } = req.query;
+    
+    logger.debug('전체 유형 아이템 조회 요청 처리 시작', { page, pageSize, sort });
+    
+    const result = await dataService.getAllTypeItems({
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+      sort: sort as 'recent' | 'alpha',
+    });
+    
+    createPaginatedResponse(
+      res,
+      result.items,
+      result.page,
+      result.limit,
+      result.total,
+      200
+    );
+    
+    logger.debug('전체 유형 아이템 조회 요청 처리 완료', { result });
+  } catch (error) {
+    logger.error('전체 유형 아이템 조회 요청 처리 중 오류 발생', { error });
     throw error;
   }
 }
@@ -231,8 +289,10 @@ export const dataController = {
   getTypeCounts,
   searchData,
   getThemes,
+  getAllThemeItems,
   getThemeItems,
   getTypes,
+  getAllTypeItems,
   getTypeItems,
   getDataDetail,
   getDataPreview,
