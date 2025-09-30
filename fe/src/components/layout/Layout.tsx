@@ -12,6 +12,7 @@ interface LayoutProps {
   showBreadcrumb?: boolean;
   showHeader?: boolean;
   showFooter?: boolean;
+  customBreadcrumbItems?: Array<{label: string, href?: string, active?: boolean}>; // 커스텀 브레드크럼
 }
 
 export function Layout({ 
@@ -19,7 +20,8 @@ export function Layout({
   children, 
   showBreadcrumb = true,
   showHeader = true,
-  showFooter = true 
+  showFooter = true,
+  customBreadcrumbItems 
 }: LayoutProps) {
   const location = useLocation();
   const params = useParams();
@@ -34,7 +36,9 @@ export function Layout({
   
   // 홈 페이지는 브레드크럼 숨김, showBreadcrumb prop도 고려
   const shouldShowBreadcrumb = showBreadcrumb && location.pathname !== '/';
-  const breadcrumbItems = shouldShowBreadcrumb ? getBreadcrumbItems(location.pathname, allParams) : [];
+  const breadcrumbItems = shouldShowBreadcrumb 
+    ? (customBreadcrumbItems || getBreadcrumbItems(location.pathname, allParams))
+    : [];
 
 
   return (

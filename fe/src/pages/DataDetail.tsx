@@ -30,6 +30,23 @@ export function DataDetail() {
   // 키워드를 배열로 변환 (common 패키지의 parseKeywords 사용)
   const keywords = parseKeywords(detailData?.data_keywords);
 
+  // 커스텀 브레드크럼 생성 (데이터 유형 기반)
+  const customBreadcrumbItems = [
+    { label: '홈', href: ROUTE_PATHS.HOME },
+    { label: '데이터 목록', href: ROUTE_PATHS.DATA_LIST },
+    // 데이터 유형(data_type)을 우선적으로 표시
+    ...(detailData?.data_type ? [
+      { 
+        label: DATA_TYPE_CONSTANTS.DATA_TYPES[detailData.data_type as DataTypeCode]?.name || detailData.data_type,
+        href: `${ROUTE_PATHS.DATA_LIST}?type=${detailData.data_type}`
+      }
+    ] : []),
+    { 
+      label: detailData?.title || '데이터 상세', 
+      active: true 
+    }
+  ];
+
   // 날짜 포맷 변환 (YYYY-MM-DD → YYYY.MM.DD)
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -55,43 +72,7 @@ export function DataDetail() {
   };
 
   return (
-    <Layout idPrefix="data-detail">
-      {/* Breadcrumb */}
-      <div id="data-detail-breadcrumb" className="breadcrumb" style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        marginBottom: '24px',
-        fontSize: '14px',
-        color: 'var(--color-text-secondary)'
-      }}>
-        <span 
-          onClick={() => navigate(ROUTE_PATHS.HOME)}
-          style={{ cursor: 'pointer', color: 'var(--color-text-secondary)' }}
-        >
-          홈
-        </span>
-        <span>{'>'}</span>
-        <span 
-          onClick={handleBackClick}
-          style={{ cursor: 'pointer', color: 'var(--color-text-secondary)' }}
-        >
-          데이터 목록
-        </span>
-        {detailData?.self_rel_type && (
-          <>
-            <span>{'>'}</span>
-            <span style={{ color: 'var(--color-text-secondary)' }}>
-              {THEME_CONSTANTS.THEMES[detailData.self_rel_type as ThemeCode]?.name || detailData.self_rel_type}
-            </span>
-          </>
-        )}
-        <span>{'>'}</span>
-        <span style={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
-          {dataDetailState.loading ? '로딩 중...' : detailData?.title || '데이터 상세'}
-        </span>
-      </div>
-
+    <Layout idPrefix="data-detail" customBreadcrumbItems={customBreadcrumbItems}>
       {/* Data Detail Header */}
       <div id="data-detail-header" className="data-detail-header" style={{
         marginBottom: '32px'

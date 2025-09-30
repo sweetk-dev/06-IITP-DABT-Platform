@@ -186,7 +186,12 @@ export function Modal({
                 width: '100%'
               }}
             >
-              {description}
+              {description.split('\\n').map((line, index, array) => (
+                <span key={index}>
+                  {line}
+                  {index < array.length - 1 && <br />}
+                </span>
+              ))}
             </div>
           </div>
         </div>
