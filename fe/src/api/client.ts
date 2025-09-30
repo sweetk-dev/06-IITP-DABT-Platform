@@ -15,7 +15,8 @@ import {
 // API 클라이언트 설정
 // ============================================================================
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+// FULL_API_URLS를 사용하므로 baseUrl은 빈 문자열
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 
 // ============================================================================
@@ -82,13 +83,20 @@ export class ApiClient {
       
       if (!response.ok) {
         await this.handleHttpError(response);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // 이미 에러 핸들러에서 처리했으므로 silent error throw
+        const handledError = new Error('API_ERROR_HANDLED');
+        (handledError as any).isHandled = true;
+        throw handledError;
       }
       
-      const data = await response.json();
-      return data;
+      const result = await response.json();
+      // BE 응답 형식: { success: true, data: T } 에서 data만 추출
+      return result.data !== undefined ? result.data : result;
     } catch (error) {
-      this.handleError(error);
+      // 이미 처리된 에러가 아닌 경우에만 에러 핸들러 호출
+      if (!(error as any).isHandled) {
+        this.handleError(error);
+      }
       throw error;
     }
   }

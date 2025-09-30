@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Spinner } from '../components/ui/Spinner';
 import { ErrorAlert } from '../components/ui/ErrorAlert';
@@ -280,22 +280,15 @@ export function shouldResetData(fromPath: string, toPath: string): boolean {
 
 // SelfCheck 데이터 리셋
 export function resetSelfCheckData(): void {
-  console.log('🔄 SelfCheck 데이터 리셋 실행');
   localStorage.removeItem('selfCheckUserInfo');
   localStorage.removeItem('selfCheckResponses');
   localStorage.removeItem('selfCheckResults');
-  console.log('✅ SelfCheck 데이터 리셋 완료');
 }
 
 // 라우트 변경 시 데이터 리셋 처리
 export function handleRouteChange(fromPath: string, toPath: string): void {
-  console.log(`🔄 라우트 변경: ${fromPath} → ${toPath}`);
-  
   if (shouldResetData(fromPath, toPath)) {
-    console.log('✅ 데이터 리셋 조건 만족 - 리셋 실행');
     resetSelfCheckData();
-  } else {
-    console.log('❌ 데이터 리셋 조건 불만족 - 리셋 건너뜀');
   }
 }
 
@@ -319,6 +312,21 @@ export function App() {
   
   // 에러 처리
   const { error, clearError } = useErrorHandler();
+
+  // 전역 에러 핸들러: 이미 처리된 API 에러는 console에 출력하지 않음
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason?.isHandled || event.reason?.message === 'API_ERROR_HANDLED') {
+        event.preventDefault(); // console 출력 방지
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
 
   return (
     <>

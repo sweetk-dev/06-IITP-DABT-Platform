@@ -76,16 +76,19 @@ export const DATA_TYPE_CONSTANTS = {
     basic: {
       code: 'basic',
       name: '기초 데이터',
+      shortName: '기초',
       description: '장애인과 관련된 기본 통계 및 기초 자료'
     },
     poi: {
       code: 'poi',
       name: '이동권 데이터', 
+      shortName: '이동권',
       description: '교통·보행 등 장애인 이동 및 접근성과 관련된 자료'
     },
     emp: {
       code: 'emp',
-      name: '일자리 데이터',
+      name: '고용 데이터',
+      shortName: '고용',
       description: '고용 현황, 취업 지원, 직업 활동과 관련된 자료'
     }
   },

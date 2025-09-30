@@ -1,7 +1,7 @@
 // 공통 API 서비스 - common 패키지의 모든 API 타입 활용
 import { apiClient } from '../client';
 import { 
-  API_URLS,
+  FULL_API_URLS,
   CommonHealthRes,
   CommonVersionRes
 } from '@iitp-dabt-platform/common';
@@ -11,14 +11,14 @@ export class CommonService {
    * 헬스 체크
    */
   async getHealth(): Promise<CommonHealthRes> {
-    return apiClient.get(`GET ${API_URLS.COMMON.HEALTH_CHECK}`);
+    return apiClient.get(`GET ${FULL_API_URLS.COMMON.HEALTH_CHECK}`);
   }
 
   /**
    * 버전 정보 조회
    */
   async getVersion(): Promise<CommonVersionRes> {
-    return apiClient.get(`GET ${API_URLS.COMMON.VERSION}`);
+    return apiClient.get(`GET ${FULL_API_URLS.COMMON.VERSION}`);
   }
 }
 
