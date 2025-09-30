@@ -1,5 +1,5 @@
 // API 매핑 테이블 - 모든 API의 REQ/RES 타입을 명시적으로 연결
-import { API_URLS } from './api.js';
+import { API_URLS, FULL_API_URLS } from './api.js';
 
 /**
  * API 요청 타입 정의
@@ -11,6 +11,16 @@ export interface ApiRequest {
   body?: string;    // 요청 본문 타입
   params?: string;  // 경로 파라미터 타입
   query?: string;   // 쿼리 파라미터 타입
+}
+
+/**
+ * API 매핑 항목 타입 정의
+ */
+export interface ApiMappingItem {
+  req: ApiRequest;
+  res: string;
+  description: string;
+  fullUrl?: string;  // 완전한 URL (FULL_API_URLS에서 가져온 값)
 }
 
 /**
@@ -29,7 +39,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'CommonHealthRes',
-    description: '헬스 체크'
+    description: '헬스 체크',
+    fullUrl: FULL_API_URLS.COMMON.HEALTH_CHECK
   },
   [`GET ${API_URLS.COMMON.VERSION}`]: {
     req: {
@@ -38,7 +49,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'CommonVersionRes',
-    description: '버전 정보 조회'
+    description: '버전 정보 조회',
+    fullUrl: FULL_API_URLS.COMMON.VERSION
   },
 
   // ============================================================================
@@ -51,7 +63,8 @@ export const API_MAPPING = {
       query: 'DataLatestQuery'
     } as ApiRequest,
     res: 'DataLatestRes',
-    description: '최신 데이터 리스트 6개 조회'
+    description: '최신 데이터 리스트 6개 조회',
+    fullUrl: FULL_API_URLS.DATA.LATEST
   },
   [`GET ${API_URLS.DATA.COUNTS.THEMES}`]: {
     req: {
@@ -60,7 +73,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'DataThemeCountsRes',
-    description: '자립테마 데이터 건수 조회'
+    description: '자립테마 데이터 건수 조회',
+    fullUrl: FULL_API_URLS.DATA.THEME_COUNTS
   },
   [`GET ${API_URLS.DATA.COUNTS.TYPES}`]: {
     req: {
@@ -69,7 +83,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'DataTypeCountsRes',
-    description: '데이터 유형별 데이터 건수 조회'
+    description: '데이터 유형별 데이터 건수 조회',
+    fullUrl: FULL_API_URLS.DATA.TYPE_COUNTS
   },
   [`GET ${API_URLS.DATA.SEARCH}`]: {
     req: {
@@ -78,7 +93,8 @@ export const API_MAPPING = {
       query: 'DataSearchQuery'
     } as ApiRequest,
     res: 'DataSearchRes',
-    description: '자립 테마, 데이터 유형별 대상 검색 조회'
+    description: '자립 테마, 데이터 유형별 대상 검색 조회',
+    fullUrl: FULL_API_URLS.DATA.SEARCH
   },
   [`GET ${API_URLS.DATA.THEMES}`]: {
     req: {
@@ -87,7 +103,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'DataThemesRes',
-    description: '자립 테마 리스트 전체 조회'
+    description: '자립 테마 리스트 전체 조회',
+    fullUrl: FULL_API_URLS.DATA.THEMES
   },
   [`GET ${API_URLS.DATA.TYPES}`]: {
     req: {
@@ -96,7 +113,8 @@ export const API_MAPPING = {
       query: 'void'
     } as ApiRequest,
     res: 'DataTypesRes',
-    description: '데이터 유형 리스트 전체 조회'
+    description: '데이터 유형 리스트 전체 조회',
+    fullUrl: FULL_API_URLS.DATA.TYPES
   },
   // 동적 경로는 별도 처리 필요
   [`GET /api/v1/data/themes/{theme}/items`]: {
@@ -146,7 +164,8 @@ export const API_MAPPING = {
       query: 'SelfCheckRecommendationsQuery'
     } as ApiRequest,
     res: 'SelfCheckRecommendationsRes',
-    description: '추천 정책 리스트 조회'
+    description: '추천 정책 리스트 조회',
+    fullUrl: FULL_API_URLS.SELF_CHK.RECOMMENDATIONS
   },
   [`GET ${API_URLS.SELF_CHK.POLICIES}`]: {
     req: {
@@ -155,7 +174,8 @@ export const API_MAPPING = {
       query: 'SelfCheckPoliciesQuery'
     } as ApiRequest,
     res: 'SelfCheckPoliciesRes',
-    description: '자립 지원 정책 리스트 조회'
+    description: '자립 지원 정책 리스트 조회',
+    fullUrl: FULL_API_URLS.SELF_CHK.POLICIES
   },
   [`GET ${API_URLS.SELF_CHK.PROVIDERS}`]: {
     req: {
@@ -164,7 +184,8 @@ export const API_MAPPING = {
       query: 'SelfCheckProvidersQuery'
     } as ApiRequest,
     res: 'SelfCheckProvidersRes',
-    description: '자립 지원 기관 리스트 조회'
+    description: '자립 지원 기관 리스트 조회',
+    fullUrl: FULL_API_URLS.SELF_CHK.PROVIDERS
   },
   [`GET ${API_URLS.SELF_CHK.FACILITIES}`]: {
     req: {
@@ -173,7 +194,8 @@ export const API_MAPPING = {
       query: 'SelfCheckFacilitiesQuery'
     } as ApiRequest,
     res: 'SelfCheckFacilitiesRes',
-    description: '자립 지원 시설 리스트 조회'
+    description: '자립 지원 시설 리스트 조회',
+    fullUrl: FULL_API_URLS.SELF_CHK.FACILITIES
   },
 } as const;
 
