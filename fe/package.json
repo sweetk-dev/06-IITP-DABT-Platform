@@ -21,9 +21,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run clean && tsc -b && vite build",
+    "dev:clean": "npm run clean:cache && vite",
+    "build": "npm run clean && npm run clean:cache && tsc -b && vite build",
+    "build:clean": "npm run clean && npm run clean:cache && tsc -b && vite build",
     "preview": "vite preview",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "clean:cache": "rimraf node_modules/.vite"
   }
 }
 
