@@ -3,6 +3,19 @@ import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
+import { 
+  Table, 
+  TableHeader, 
+  TableBodyWithState,
+  TableRow, 
+  TableCell, 
+  TableColumn,
+  DataTitle,
+  DataMeta,
+  MetaItem,
+  DataTags,
+  Tag
+} from '../components/ui/Table';
 import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useThemeItems, useTypeItems, useThemeCounts, useTypeCounts } from '../api/hooks';
 import '../styles/data-pages.css';
@@ -116,71 +129,68 @@ export function DataList() {
           </div>
 
           {/* Data List Table */}
-          <div id="data-list-table" className="data-table">
-            <div id="data-list-table-header" className="data-table-header">
-              <div id="data-list-table-column-title" className="table-column-title">데이터명</div>
-              <div id="data-list-table-column-tags" className="table-column-tags">태그</div>
-            </div>
+          <Table id="data-list-table">
+            <TableHeader id="data-list-table-header">
+              <TableColumn id="data-list-table-column-title" variant="title">데이터명</TableColumn>
+              <TableColumn id="data-list-table-column-tags" variant="tags">태그</TableColumn>
+            </TableHeader>
 
-            <div id="data-list-table-body" className="data-table-body">
-              {currentDataState.loading ? (
-                <div style={{ padding: '40px', textAlign: 'center' }}>로딩 중...</div>
-              ) : currentDataState.error ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
-                  데이터를 불러오는 중 오류가 발생했습니다.
-                </div>
-              ) : currentDataState.data && currentDataState.data.length > 0 ? (
-                currentDataState.data.map((item: any, index: number) => (
-                  <div key={item.id || index} id={`data-list-row-${index + 1}`} className="data-row">
-                    <div id={`data-list-row-${index + 1}-info`} className="data-info">
-                      <div id={`data-list-row-${index + 1}-title`} className="data-title">
-                        {item.title || item.data_name || '데이터 제목'}
-                      </div>
-                      <div id={`data-list-row-${index + 1}-meta`} className="data-meta">
-                        <div id={`data-list-row-${index + 1}-meta-format`} className="meta-item">
-                          <span id={`data-list-row-${index + 1}-meta-format-label`} className="meta-label">제공 포맷</span>
-                          <span id={`data-list-row-${index + 1}-meta-format-value`} className="meta-value">
-                            {item.format || 'csv'}
-                          </span>
-                        </div>
-                        <div id={`data-list-row-${index + 1}-meta-separator-1`} className="meta-separator"></div>
-                        <div id={`data-list-row-${index + 1}-meta-org`} className="meta-item">
-                          <span id={`data-list-row-${index + 1}-meta-org-label`} className="meta-label">제공 기관</span>
-                          <span id={`data-list-row-${index + 1}-meta-org-value`} className="meta-value">
-                            {item.src_org_name || '제공 기관'}
-                          </span>
-                        </div>
-                        <div id={`data-list-row-${index + 1}-meta-separator-2`} className="meta-separator"></div>
-                        <div id={`data-list-row-${index + 1}-meta-date`} className="meta-item">
-                          <span id={`data-list-row-${index + 1}-meta-date-label`} className="meta-label">등록일</span>
-                          <span id={`data-list-row-${index + 1}-meta-date-value`} className="meta-value">
-                            {item.sys_data_reg_dt || '2023.01.07'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div id={`data-list-row-${index + 1}-tags`} className="data-tags">
+            <TableBodyWithState
+              id="data-list-table-body"
+              data={currentDataState.data || []}
+              loading={currentDataState.loading}
+              error={currentDataState.error}
+              emptyMessage="데이터가 없습니다."
+              renderRow={(item: any, index: number) => (
+                <TableRow key={item.id || index} id={`data-list-row-${index + 1}`}>
+                  <TableCell variant="info" id={`data-list-row-${index + 1}-info`}>
+                    <DataTitle id={`data-list-row-${index + 1}-title`}>
+                      {item.title || item.data_name || '데이터 제목'}
+                    </DataTitle>
+                    <DataMeta id={`data-list-row-${index + 1}-meta`}>
+                      <MetaItem
+                        label="제공 포맷"
+                        value={item.format || 'csv'}
+                        labelId={`data-list-row-${index + 1}-meta-format-label`}
+                        valueId={`data-list-row-${index + 1}-meta-format-value`}
+                        separatorId={`data-list-row-${index + 1}-meta-separator-1`}
+                      />
+                      <MetaItem
+                        label="제공 기관"
+                        value={item.src_org_name || '제공 기관'}
+                        labelId={`data-list-row-${index + 1}-meta-org-label`}
+                        valueId={`data-list-row-${index + 1}-meta-org-value`}
+                        separatorId={`data-list-row-${index + 1}-meta-separator-2`}
+                      />
+                      <MetaItem
+                        label="등록일"
+                        value={item.sys_data_reg_dt || '2023.01.07'}
+                        labelId={`data-list-row-${index + 1}-meta-date-label`}
+                        valueId={`data-list-row-${index + 1}-meta-date-value`}
+                      />
+                    </DataMeta>
+                  </TableCell>
+                  <TableCell variant="tags" id={`data-list-row-${index + 1}-tags`}>
+                    <DataTags>
                       {item.tags && item.tags.length > 0 ? (
                         item.tags.map((tag: string, tagIndex: number) => (
-                          <div key={tagIndex} id={`data-list-row-${index + 1}-tag-${tagIndex + 1}`} className="tag">
+                          <Tag key={tagIndex} id={`data-list-row-${index + 1}-tag-${tagIndex + 1}`}>
                             {tag}
-                          </div>
+                          </Tag>
                         ))
                       ) : (
                         <>
-                          <div id={`data-list-row-${index + 1}-tag-1`} className="tag">일상지원</div>
-                          <div id={`data-list-row-${index + 1}-tag-2`} className="tag">방문돌봄</div>
-                          <div id={`data-list-row-${index + 1}-tag-3`} className="tag">장애인</div>
+                          <Tag id={`data-list-row-${index + 1}-tag-1`}>일상지원</Tag>
+                          <Tag id={`data-list-row-${index + 1}-tag-2`}>방문돌봄</Tag>
+                          <Tag id={`data-list-row-${index + 1}-tag-3`}>장애인</Tag>
                         </>
                       )}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div style={{ padding: '40px', textAlign: 'center' }}>데이터가 없습니다.</div>
+                    </DataTags>
+                  </TableCell>
+                </TableRow>
               )}
-            </div>
-          </div>
+            />
+          </Table>
         </div>
       </div>
     </Layout>

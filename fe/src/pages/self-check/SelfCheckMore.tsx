@@ -6,7 +6,7 @@ import { FilterOption } from '../../components/ui/FilterOption';
 import { 
   Table, 
   TableHeader, 
-  TableBody, 
+  TableBodyWithState,
   TableRow, 
   TableCell, 
   TableColumn,
@@ -208,87 +208,74 @@ export function SelfCheckMore() {
               <TableColumn id="self-check-more-table-column-tags" variant="tags">태그</TableColumn>
             </TableHeader>
 
-            <TableBody id="self-check-more-table-body">
-              {currentApiState.loading ? (
-                <TableRow>
-                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center' }}>
-                    로딩 중...
-                  </TableCell>
-                </TableRow>
-              ) : currentApiState.error ? (
-                <TableRow>
-                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
-                    데이터를 불러오는 중 오류가 발생했습니다.
-                  </TableCell>
-                </TableRow>
-              ) : currentData.length > 0 ? (
-                currentData.map((item: any, index: number) => (
-                  <TableRow 
-                    key={item.id || index} 
-                    id={`self-check-more-row-${index + 1}`} 
-                    onClick={() => handleCardClick(item)}
-                  >
-                    <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
-                      <DataTitle id={`self-check-more-row-${index + 1}-title`}>
-                        {item.title || item.policy_name || item.provider_name || item.facility_name || '제목'}
-                      </DataTitle>
-                      <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
-                        {item.category && (
-                          <MetaItem
-                            label="카테고리"
-                            value={item.category}
-                            labelId={`self-check-more-row-${index + 1}-meta-category-label`}
-                            valueId={`self-check-more-row-${index + 1}-meta-category-value`}
-                            separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
-                          />
-                        )}
-                        {item.organization && (
-                          <MetaItem
-                            label="제공 기관"
-                            value={item.organization}
-                            labelId={`self-check-more-row-${index + 1}-meta-org-label`}
-                            valueId={`self-check-more-row-${index + 1}-meta-org-value`}
-                            separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
-                          />
-                        )}
-                        {item.location && (
-                          <MetaItem
-                            label="위치"
-                            value={item.location}
-                            labelId={`self-check-more-row-${index + 1}-meta-location-label`}
-                            valueId={`self-check-more-row-${index + 1}-meta-location-value`}
-                            separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
-                          />
-                        )}
-                        <MetaItem
-                          label="등록일"
-                          value={item.reg_date || '2025.01.15'}
-                          labelId={`self-check-more-row-${index + 1}-meta-date-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-date-value`}
-                        />
-                      </DataMeta>
-                    </TableCell>
-                    <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
+            <TableBodyWithState
+              id="self-check-more-table-body"
+              data={currentData}
+              loading={currentApiState.loading}
+              error={currentApiState.error}
+              emptyMessage="데이터가 없습니다."
+              loadingMessage="로딩 중..."
+              errorMessage="데이터를 불러오는 중 오류가 발생했습니다."
+              renderRow={(item: any, index: number) => (
+                <TableRow 
+                  key={item.id || index} 
+                  id={`self-check-more-row-${index + 1}`} 
+                  onClick={() => handleCardClick(item)}
+                >
+                  <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
+                    <DataTitle id={`self-check-more-row-${index + 1}-title`}>
+                      {item.title || item.policy_name || item.provider_name || item.facility_name || '제목'}
+                    </DataTitle>
+                    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
                       {item.category && (
-                        <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
+                        <MetaItem
+                          label="카테고리"
+                          value={item.category}
+                          labelId={`self-check-more-row-${index + 1}-meta-category-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-category-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+                        />
                       )}
                       {item.organization && (
-                        <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
+                        <MetaItem
+                          label="제공 기관"
+                          value={item.organization}
+                          labelId={`self-check-more-row-${index + 1}-meta-org-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-org-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+                        />
                       )}
                       {item.location && (
-                        <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
+                        <MetaItem
+                          label="위치"
+                          value={item.location}
+                          labelId={`self-check-more-row-${index + 1}-meta-location-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-location-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+                        />
                       )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell variant="info" colSpan={2} style={{ padding: '40px', textAlign: 'center' }}>
-                    데이터가 없습니다.
+                      <MetaItem
+                        label="등록일"
+                        value={item.reg_date || '2025.01.15'}
+                        labelId={`self-check-more-row-${index + 1}-meta-date-label`}
+                        valueId={`self-check-more-row-${index + 1}-meta-date-value`}
+                      />
+                    </DataMeta>
+                  </TableCell>
+                  <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
+                    {item.category && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
+                    )}
+                    {item.organization && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
+                    )}
+                    {item.location && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
+                    )}
                   </TableCell>
                 </TableRow>
               )}
-            </TableBody>
+            />
           </Table>
         </div>
       </div>
