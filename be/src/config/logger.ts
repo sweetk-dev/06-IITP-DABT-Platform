@@ -1,37 +1,27 @@
 // 로거 설정 - 완벽한 모듈화
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 import { env } from './env';
 
-// 로그 포맷 정의
-const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
-  winston.format.errors({ stack: true }),
-  winston.format.json(),
-  winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    return JSON.stringify({
-      timestamp,
-      level,
-      message,
-      ...meta,
-    });
-  })
-);
-
-// 파일 로그 포맷 (읽기 쉬운 형태)
+// 공통 로그 포맷 (함수 정보 포함)
 const fileLogFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
   winston.format.errors({ stack: true }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
-    return `${timestamp} [${level.toUpperCase()}] ${message}${metaStr}`;
+    const functionName = meta.function || '';
+    const fnStr = functionName ? `[${functionName}]` : '';
+    const metaFiltered = { ...meta };
+    delete metaFiltered.function;
+    const metaStr = Object.keys(metaFiltered).length > 0 ? ` ${JSON.stringify(metaFiltered)}` : '';
+    return `${timestamp} [${level.toUpperCase()}]${fnStr} ${message}${metaStr}`;
   })
 );
 
-// 로거 생성
+// 애플리케이션 로거 생성 (app_yyyy-mm-dd.log)
 export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
-  format: logFormat,
+  format: fileLogFormat,
   defaultMeta: {
     service: 'iitp-dabt-platform-be',
     version: process.env.npm_package_version || '1.0.0',
@@ -43,27 +33,46 @@ export const logger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple(),
         winston.format.printf(({ timestamp, level, message, ...meta }) => {
-          const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
-          return `${timestamp} [${level}] ${message}${metaStr}`;
+          const functionName = meta.function || '';
+          const fnStr = functionName ? `[${functionName}]` : '';
+          const metaFiltered = { ...meta };
+          delete metaFiltered.function;
+          delete metaFiltered.service;
+          delete metaFiltered.version;
+          const metaStr = Object.keys(metaFiltered).length > 0 ? ` ${JSON.stringify(metaFiltered)}` : '';
+          return `${timestamp} [${level}]${fnStr} ${message}${metaStr}`;
         })
       ),
     }),
     
-    // 애플리케이션 로그 파일
-    new winston.transports.File({
-      filename: path.join(env.LOG_DIR, 'app.log'),
+    // 애플리케이션 로그 파일 (날짜별 로테이션: app_yyyy-mm-dd.log)
+    new DailyRotateFile({
+      dirname: env.LOG_DIR,
+      filename: 'app_%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       format: fileLogFormat,
-      maxsize: 10 * 1024 * 1024, // 10MB
-      maxFiles: 5,
+      maxSize: '10m',
+      maxFiles: '30d', // 30일 보관
     }),
-    
-    // 에러 로그 파일
-    new winston.transports.File({
-      filename: path.join(env.LOG_DIR, 'error.log'),
-      level: 'error',
+  ],
+});
+
+// API Access 로거 생성 (access_yyyy-mm-dd.log)
+export const accessLogger = winston.createLogger({
+  level: 'info',
+  format: fileLogFormat,
+  defaultMeta: {
+    service: 'iitp-dabt-platform-be-access',
+  },
+  transports: [
+    // API 호출 로그 파일 (날짜별 로테이션: access_yyyy-mm-dd.log)
+    new DailyRotateFile({
+      dirname: env.LOG_DIR,
+      filename: 'access_%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       format: fileLogFormat,
-      maxsize: 10 * 1024 * 1024, // 10MB
-      maxFiles: 5,
+      maxSize: '10m',
+      maxFiles: '30d', // 30일 보관
     }),
   ],
 });
@@ -87,9 +96,10 @@ if (!fs.existsSync(env.LOG_DIR)) {
 
 // 로거 헬퍼 함수들
 export const loggers = {
-  // API 요청 로그
+  // API 요청 로그 (access log에 기록)
   apiRequest: (req: any, res: any, responseTime: number) => {
-    logger.info('API 요청 처리 완료', {
+    accessLogger.info('API Request', {
+      function: 'apiRequest',
       method: req.method,
       url: req.originalUrl,
       statusCode: res.statusCode,
@@ -101,7 +111,8 @@ export const loggers = {
 
   // API 에러 로그
   apiError: (req: any, error: any) => {
-    logger.error('API 요청 처리 중 오류 발생', {
+    logger.error('API Error', {
+      function: 'apiError',
       method: req.method,
       url: req.originalUrl,
       error: error.message,
@@ -109,29 +120,41 @@ export const loggers = {
       userAgent: req.get('User-Agent'),
       ip: req.ip,
     });
+    
+    // access log에도 기록
+    accessLogger.error('API Error', {
+      function: 'apiError',
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: error.statusCode || 500,
+      error: error.message,
+    });
   },
 
   // 데이터베이스 쿼리 로그
   dbQuery: (query: string, params: any[], duration: number) => {
-    logger.debug('데이터베이스 쿼리 실행', {
+    logger.debug('Database Query', {
+      function: 'dbQuery',
       query,
       params,
       duration: `${duration}ms`,
     });
   },
 
-  // 서비스 로직 로그
-  service: (serviceName: string, method: string, data: any) => {
-    logger.info('서비스 로직 실행', {
-      service: serviceName,
-      method,
-      data,
-    });
+  // 서비스 로직 로그 (dev 환경에서만)
+  service: (serviceName: string, method: string, result: any) => {
+    if (env.NODE_ENV === 'development') {
+      logger.info(`Service: ${serviceName}`, {
+        function: method,
+        result: typeof result === 'object' ? JSON.stringify(result).substring(0, 200) : result,
+      });
+    }
   },
 
   // 성능 메트릭 로그
   performance: (operation: string, duration: number, metadata?: any) => {
-    logger.info('성능 메트릭', {
+    logger.info('Performance', {
+      function: 'performance',
       operation,
       duration: `${duration}ms`,
       ...metadata,

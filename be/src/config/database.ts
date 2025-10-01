@@ -42,7 +42,7 @@ export async function connectDatabase(): Promise<Sequelize> {
         timestamps: true,
         underscored: true,
         freezeTableName: true,
-        paranoid: true, // soft delete 활성화
+        //paranoid: true, // soft delete 활성화
       },
     };
 
