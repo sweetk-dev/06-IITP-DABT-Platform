@@ -281,14 +281,7 @@ export const SELF_CHECK_MORE_CONSTANTS = {
   },
   
   // 모든 메뉴 타입 코드 배열 (API 엔드포인트와 일치)
-  ALL_CODES: ['policies', 'providers', 'facilities'] as const,
-  
-  // 메뉴 타입별 한글명 매핑
-  NAMES: {
-    policies: '자립 지원 정책',
-    providers: '자립 지원 기관',
-    facilities: '자립 지원 시설'
-  } as const
+  ALL_CODES: ['policies', 'providers', 'facilities'] as const
 } as const;
 
 // ============================================================================
@@ -320,7 +313,7 @@ export function getSelfRelTypeName(code: SelfRelTypeCode): string {
  * 자립 지원 정보 메뉴 타입 코드로 한글명 가져오기
  */
 export function getSelfCheckMoreMenuName(code: SelfCheckMoreMenuType): string {
-  return SELF_CHECK_MORE_CONSTANTS.NAMES[code];
+  return SELF_CHECK_MORE_CONSTANTS.MENU_TYPES[code].name;
 }
 
 /**
