@@ -20,6 +20,7 @@ import {
   SELF_CHECK_MORE_CONSTANTS, 
   type SelfCheckMoreMenuType,
   getSelfCheckMoreMenuName,
+  formatCount,
   SELF_CHECK_POLICIES_DEFAULTS,
   SELF_CHECK_PROVIDERS_DEFAULTS,
   SELF_CHECK_FACILITIES_DEFAULTS
@@ -165,8 +166,8 @@ export function SelfCheckMore() {
   };
 
   const getCount = () => {
-    return currentApiState.loading ? '...' : 
-           currentApiState.data?.length?.toLocaleString() || '0';
+    // API 응답의 total 필드 사용 (BE가 PaginationRes 형식으로 반환)
+    return currentApiState.loading ? '...' : formatCount(currentApiState.data?.total);
   };
 
   return (

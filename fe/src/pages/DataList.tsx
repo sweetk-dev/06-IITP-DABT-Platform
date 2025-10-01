@@ -4,7 +4,7 @@ import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
 import { Table, TableHeader, TableBodyWithState, TableColumn, DataItemRow } from '../components/ui/Table';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '@iitp-dabt-platform/common';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, getThemeName, getDataTypeName, formatCount, type ThemeCode, type DataTypeCode, DATA_THEME_ITEMS_DEFAULTS, DATA_TYPE_ITEMS_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useThemeItems, useTypeItems } from '../api/hooks';
 import '../styles/data-pages.css';
 
@@ -79,10 +79,9 @@ export function DataList() {
   };
 
   const getCount = () => {
-    // 모든 경우에 API 응답의 meta.totalItems 사용
+    // API 응답의 total 필드 사용 (BE가 PaginationRes 형식으로 반환)
     const currentState = activeFilter === 'theme' ? themeItemsState : typeItemsState;
-    const totalItems = currentState.data?.meta?.totalItems || currentState.data?.meta?.total || 0;
-    return totalItems > 0 ? totalItems.toLocaleString() : '0';
+    return formatCount(currentState.data?.total);
   };
 
   // 현재 데이터 상태 결정

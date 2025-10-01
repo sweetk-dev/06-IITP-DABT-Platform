@@ -5,7 +5,7 @@ import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
 import { FilterOption } from '../components/ui/FilterOption';
 import { Table, TableHeader, TableBodyWithState, TableColumn, DataItemRow } from '../components/ui/Table';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '@iitp-dabt-platform/common';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, formatCount, type ThemeCode, type DataTypeCode, DATA_SEARCH_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useDataSearch } from '../api/hooks';
 
 import '../styles/data-pages.css';
@@ -106,8 +106,7 @@ export function DataSearch() {
             </div>
             <div id="data-search-data-count" className="data-count">
               총 <span id="data-search-count-number" className="count-number">
-                {searchState.loading ? '...' : 
-                 searchState.data?.totalCount?.toLocaleString() || '0'}
+                {searchState.loading ? '...' : formatCount(searchState.data?.total)}
               </span>건
             </div>
           </div>

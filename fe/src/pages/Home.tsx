@@ -3,7 +3,7 @@ import { getDataListPath, getDataSearchPath, ROUTE_PATHS } from './App';
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
-import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '@iitp-dabt-platform/common';
+import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, formatCount, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useLatestData, useThemeCounts, useTypeCounts } from '../api/hooks';
 
 export function Home() {
@@ -234,7 +234,7 @@ export function Home() {
                   <div id={`home-theme-card-${themeCode}-count`} className="home-theme-card-count">
                     <div id={`home-theme-card-${themeCode}-count-number`} className="home-theme-card-count-number">
                       {themeCountsState.loading ? '...' : 
-                       themeCountsState.data?.[themeCode as keyof DataThemeCountsRes]?.toLocaleString() || '0'}
+                       formatCount(themeCountsState.data?.[themeCode as keyof DataThemeCountsRes])}
                     </div>
                     <div id={`home-theme-card-${themeCode}-count-unit`} className="home-theme-card-count-unit">
                       건
@@ -315,7 +315,7 @@ export function Home() {
                         <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-1`} className="stat-item">
                         <div id={`home-data-type-card-${dataTypeCode}-count-number`} className="stat-number">
                           {typeCountsState.loading ? '...' : 
-                           typeCountsState.data?.[dataTypeCode as keyof DataTypeCountsRes]?.toLocaleString() || '0'}
+                           formatCount(typeCountsState.data?.[dataTypeCode as keyof DataTypeCountsRes])}
                         </div>
                         </div>
                         <div id={`home-data-type-card-${dataTypeCode}-count-stat-item-2`} className="stat-item">
