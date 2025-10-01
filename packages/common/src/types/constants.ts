@@ -23,6 +23,8 @@ export function parseKeywords(keywords?: string, maxCount: number = KEYWORDS_CON
     .slice(0, maxCount);
 }
 
+
+
 // ============================================================================
 // 페이지네이션 관련 상수
 // ============================================================================
@@ -407,4 +409,28 @@ export function parseDataTypeCodesString(codesString: string): DataTypeCode[] {
  */
 export function parseSelfRelTypeCodesString(codesString: string): SelfRelTypeCode[] {
   return codesString.split(',').filter(isValidSelfRelTypeCode) as SelfRelTypeCode[];
+}
+
+
+// ============================================================================
+// 포맷팅 유틸리티 함수
+// ============================================================================
+
+/**
+ * 숫자를 천 단위 구분자로 포맷팅
+ * @param count - 포맷팅할 숫자
+ * @returns 천 단위 구분자가 적용된 문자열 (예: '1,234')
+ */
+export function formatCount(count?: number): string {
+  return count ? count.toLocaleString() : '0';
+}
+
+/**
+ * 날짜 문자열을 포맷팅 (YYYY-MM-DD → YYYY.MM.DD)
+ * @param dateString - 포맷팅할 날짜 문자열 (ISO 형식)
+ * @returns 점(.)으로 구분된 날짜 문자열 (예: '2025.01.15')
+ */
+export function formatDate(dateString?: string): string {
+  if (!dateString) return '-';
+  return dateString.replace(/-/g, '.');
 }
