@@ -1,5 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ESM에서 __dirname 대체
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 빌드 정보 생성
 function generateBuildInfo() {
@@ -25,9 +30,7 @@ function generateBuildInfo() {
   return buildInfo;
 }
 
-// 직접 실행 시
-if (require.main === module) {
-  generateBuildInfo();
-}
+// 직접 실행 시 (ESM 방식) - 항상 실행
+generateBuildInfo();
 
-module.exports = { generateBuildInfo };
+export { generateBuildInfo };

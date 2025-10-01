@@ -2,6 +2,7 @@
   "name": "@iitp-dabt-platform/common",
   "version": "1.0.0",
   "description": "IITP 장애인 데이터 플랫폼 공통 라이브러리",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

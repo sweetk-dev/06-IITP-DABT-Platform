@@ -1,5 +1,7 @@
-const crypto = require('crypto');
-const prompt = require('prompt-sync')({ sigint: true });
+import crypto from 'crypto';
+import promptSync from 'prompt-sync';
+
+const prompt = promptSync({ sigint: true });
 
 function encryptAes256(plainText, secret) {
   const iv = crypto.randomBytes(16);
