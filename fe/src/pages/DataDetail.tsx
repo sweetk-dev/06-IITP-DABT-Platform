@@ -77,22 +77,22 @@ export function DataDetail() {
       <div id="data-detail-header" className="data-detail-header" style={{
         marginBottom: '32px'
       }}>
-        <h1 id="data-detail-title" style={{ 
+        <h1 id="data-detail-title" className="data-title-large" style={{ 
           fontSize: '32px', 
           fontWeight: 700, 
-          marginBottom: '16px',
-          color: 'var(--color-text-primary)',
-          lineHeight: 1.4
+          marginBottom: '12px',
+          color: 'black'
         }}>
           {dataDetailState.loading ? '로딩 중...' : 
            dataDetailState.error ? '데이터를 불러올 수 없습니다' :
            detailData?.title || '데이터 제목'}
         </h1>
         
-        <p id="data-detail-description" style={{
-          fontSize: '16px',
-          color: 'var(--color-text-secondary)',
-          lineHeight: 1.6,
+        <p id="data-detail-description" className="data-description" style={{
+          fontSize: '20px',
+          color: 'black',
+          lineHeight: '30px',
+          fontWeight: 400,
           marginBottom: '0'
         }}>
           {detailData?.data_desc || '데이터 설명이 없습니다.'}
@@ -101,16 +101,13 @@ export function DataDetail() {
 
       {/* Data Info Table */}
       <div id="data-info-table" className="data-info-table" style={{
-        background: 'white',
-        border: '1px solid var(--color-border)',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        marginBottom: '32px'
+        borderTop: '1.5px solid #252525',
+        marginBottom: '64px'
       }}>
         {/* 데이터 유형 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid #ECECEC',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -122,7 +119,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             데이터 유형
           </div>
@@ -143,7 +140,7 @@ export function DataDetail() {
         {/* 키워드 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid #ECECEC',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -155,7 +152,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             키워드
           </div>
@@ -183,7 +180,7 @@ export function DataDetail() {
         {/* 제공 포맷 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid #ECECEC',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -195,7 +192,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             제공 포맷
           </div>
@@ -214,7 +211,7 @@ export function DataDetail() {
         {/* 제공 기관 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid #ECECEC',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -226,7 +223,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             제공 기관
           </div>
@@ -245,7 +242,7 @@ export function DataDetail() {
         {/* 최종 수정일 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid #ECECEC',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -257,7 +254,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             최종 수정일
           </div>
@@ -276,7 +273,6 @@ export function DataDetail() {
         {/* 데이터 등록일 */}
         <div className="info-row" style={{
           display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -288,7 +284,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             데이터 등록일
           </div>
@@ -304,9 +300,12 @@ export function DataDetail() {
           </div>
         </div>
 
-        {/* 이용 허락 범위 */}
+        {/* 이용 허락 범위 - 마지막 행이므로 하단 보더 없음 */}
         <div className="info-row" style={{
           display: 'flex',
+          border: 'none',
+          borderRight: '0',
+          borderBottom: '0',
           minHeight: '56px'
         }}>
           <div className="info-label" style={{
@@ -318,7 +317,7 @@ export function DataDetail() {
             color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
-            borderRight: '1px solid var(--color-border)'
+            borderRight: '1px solid #ECECEC'
           }}>
             이용 허락 범위
           </div>
@@ -337,22 +336,20 @@ export function DataDetail() {
 
       {/* Data View Section */}
       <div id="data-view-section" className="data-view-section" style={{
-        background: 'white',
-        border: '1px solid var(--color-border)',
-        borderRadius: '8px',
-        padding: '24px',
         marginBottom: '32px'
       }}>
         <div className="data-view-header" style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          paddingBottom: '24px',
+          borderBottom: '1px solid #ECECEC',
           marginBottom: '24px'
         }}>
           <h2 className="section-title" style={{
-            fontSize: '20px',
+            fontSize: '28px',
             fontWeight: 600,
-            color: 'var(--color-text-primary)',
+            color: 'black',
             margin: 0
           }}>
             데이터 보기
@@ -388,20 +385,20 @@ export function DataDetail() {
             데이터 미리보기를 불러올 수 없습니다.
           </div>
         ) : dataPreviewState.data ? (
-          <div className="data-table-preview" style={{
-            overflowX: 'auto',
-            border: '1px solid var(--color-border)',
-            borderRadius: '8px'
+          <div className="data-table" style={{
+            borderTop: '1.5px solid #252525',
+            overflow: 'hidden'
           }}>
             <pre style={{
               margin: 0,
               padding: '20px',
-              background: '#f8f9fa',
+              background: 'white',
               fontSize: '14px',
               lineHeight: 1.6,
               fontFamily: 'monospace',
               whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all'
+              wordBreak: 'break-all',
+              color: 'black'
             }}>
               {JSON.stringify(dataPreviewState.data, null, 2)}
             </pre>
