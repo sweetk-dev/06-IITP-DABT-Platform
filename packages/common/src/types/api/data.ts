@@ -37,22 +37,15 @@ export type DataLatestRes = DataLatestItem[];
 // 자립테마 데이터 건수 API
 // ============================================================================
 
-export interface DataThemeCountsRes {
-  phy: number;
-  emo: number;
-  econ: number;
-  soc: number;
-}
+// ThemeCode를 Record로 동적 생성
+export type DataThemeCountsRes = Record<ThemeCode, number>;
 
 // ============================================================================
 // 데이터 유형별 데이터 건수 API
 // ============================================================================
 
-export interface DataTypeCountsRes {
-  basic: number;
-  poi: number;
-  emp: number;
-}
+// DataTypeCode를 Record로 동적 생성
+export type DataTypeCountsRes = Record<DataTypeCode, number>;
 
 // ============================================================================
 // 데이터 검색 API

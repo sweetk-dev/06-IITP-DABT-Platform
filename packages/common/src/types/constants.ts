@@ -50,13 +50,11 @@ export const PAGINATION_CONSTANTS = {
 // 자립 테마 (theme) 관련 상수
 // ============================================================================
 
-export type ThemeCode = 'phy' | 'emo' | 'econ' | 'soc';
-
 export const THEME_CONSTANTS = {
   // 자립테마별 코드와 정보
   THEMES: {
-    phy: {
-      code: 'phy',
+    phys: {
+      code: 'phys',
       name: '신체적 자립',
       description: '신체적 자립 수준 및 건강 상태 등 신체 기능과 관련된 데이터'
     },
@@ -78,22 +76,15 @@ export const THEME_CONSTANTS = {
   },
   
   // 모든 자립테마 코드 배열
-  ALL_CODES: ['phy', 'emo', 'econ', 'soc'] as const,
-  
-  // 자립테마별 한글명 매핑
-  NAMES: {
-    phy: '신체적 자립',
-    emo: '정서적 자립',
-    econ: '경제적 자립', 
-    soc: '사회적 자립'
-  } as const
+  ALL_CODES: ['phys', 'emo', 'econ', 'soc'] as const,
 } as const;
+
+// ALL_CODES에서 타입 자동 추출
+export type ThemeCode = typeof THEME_CONSTANTS.ALL_CODES[number];
 
 // ============================================================================
 // 데이터 유형 (data_type) 관련 상수
 // ============================================================================
-
-export type DataTypeCode = 'basic' | 'poi' | 'emp';
 
 export const DATA_TYPE_CONSTANTS = {
   // 데이터 유형별 코드와 정보
@@ -121,70 +112,56 @@ export const DATA_TYPE_CONSTANTS = {
   // 모든 데이터 유형 코드 배열
   ALL_CODES: ['basic', 'poi', 'emp'] as const,
   
-  // 데이터 유형별 한글명 매핑
-  NAMES: {
-    basic: '기초 데이터',
-    poi: '이동권 데이터',
-    emp: '일자리 데이터'
-  } as const
 } as const;
+
+// ALL_CODES에서 타입 자동 추출
+export type DataTypeCode = typeof DATA_TYPE_CONSTANTS.ALL_CODES[number];
 
 // ============================================================================
 // 자립유형 (self_rlty_type) 관련 상수
 // ============================================================================
-
-export type SelfRelTypeCode = 'basic' | 'phys' | 'emo' | 'econ' | 'soc';
 
 export const SELF_REL_TYPE_CONSTANTS = {
   // 자립유형별 코드와 정보
   SELF_REL_TYPES: {
     basic: {
       code: 'basic',
-      name: '기초',
+      name: '기초적 자립',
       description: '기본 적인 장애 자립 관련 정보(정책, 기관, 시설)'
     },
     phys: {
       code: 'phys',
-      name: '신체',
+      name: '신체적 자립',
       description: '신체적 자립 관련 정보 (정책, 기관, 시설)'
     },
     emo: {
       code: 'emo',
-      name: '정서', 
+      name: '정서적 자립', 
       description: '정서적 자립 관련된 정보 (정책, 기관, 시설)'
     },
     econ: {
       code: 'econ',
-      name: '경제',
+      name: '경제적 자립',
       description: '경제적 자립 관련된 정보 (정책, 기관, 시설)'
     },
     soc: {
       code: 'soc',
-      name: '사회',
+      name: '사회적 자립',
       description: '사회적 자립 관련된 정보 (정책, 기관, 시설)'
     }
   },
   
   // 모든 자립유형 코드 배열
   ALL_CODES: ['basic', 'phys', 'emo', 'econ', 'soc'] as const,
-  
-  // 자립유형별 한글명 매핑
-  NAMES: {
-    basic: '기초',
-    phys: '신체',
-    emo: '정서',
-    econ: '경제',
-    soc: '사회'
-  } as const
+
 } as const;
+
+// ALL_CODES에서 타입 자동 추출
+export type SelfRelTypeCode = typeof SELF_REL_TYPE_CONSTANTS.ALL_CODES[number];
 
 // ============================================================================
 // 성별/연령/장애정도 관련 상수
 // ============================================================================
-
-export type GenderCode = 'male' | 'female';
-export type AgeCondCode = 'minor' | 'adult' | 'all';
-export type DisLevelCode = 'mild' | 'severe';
 
 // ============================================================================
 // 성별 관련 상수
@@ -206,6 +183,9 @@ export const GENDER_CONSTANTS = {
   // ALL_CODES 배열
   ALL_CODES: ['male', 'female'] as const
 } as const;
+
+// ALL_CODES에서 타입 자동 추출
+export type GenderCode = typeof GENDER_CONSTANTS.ALL_CODES[number];
 
 // ============================================================================
 // 연령 조건 관련 상수
@@ -232,6 +212,9 @@ export const AGE_COND_CONSTANTS = {
   ALL_CODES: ['minor', 'adult', 'all'] as const
 } as const;
 
+// ALL_CODES에서 타입 자동 추출
+export type AgeCondCode = typeof AGE_COND_CONSTANTS.ALL_CODES[number];
+
 // ============================================================================
 // 장애정도 관련 상수
 // ============================================================================
@@ -253,12 +236,13 @@ export const DIS_LEVEL_CONSTANTS = {
   ALL_CODES: ['mild', 'severe'] as const
 } as const;
 
+// ALL_CODES에서 타입 자동 추출
+export type DisLevelCode = typeof DIS_LEVEL_CONSTANTS.ALL_CODES[number];
+
 
 // ============================================================================
 // 자립 지원 정보 메뉴 타입 관련 상수
 // ============================================================================
-
-export type SelfCheckMoreMenuType = 'policies' | 'providers' | 'facilities';
 
 export const SELF_CHECK_MORE_CONSTANTS = {
   // 자립 지원 정보 메뉴별 코드와 정보 (API 엔드포인트와 일치)
@@ -284,6 +268,9 @@ export const SELF_CHECK_MORE_CONSTANTS = {
   ALL_CODES: ['policies', 'providers', 'facilities'] as const
 } as const;
 
+// ALL_CODES에서 타입 자동 추출
+export type SelfCheckMoreMenuType = typeof SELF_CHECK_MORE_CONSTANTS.ALL_CODES[number];
+
 // ============================================================================
 // 유틸리티 함수
 // ============================================================================
@@ -292,21 +279,21 @@ export const SELF_CHECK_MORE_CONSTANTS = {
  * 자립테마 코드로 한글명 가져오기
  */
 export function getThemeName(code: ThemeCode): string {
-  return THEME_CONSTANTS.NAMES[code];
+  return THEME_CONSTANTS.THEMES[code].name;
 }
 
 /**
  * 데이터 유형 코드로 한글명 가져오기
  */
 export function getDataTypeName(code: DataTypeCode): string {
-  return DATA_TYPE_CONSTANTS.NAMES[code];
+  return DATA_TYPE_CONSTANTS.DATA_TYPES[code].name;
 }
 
 /**
  * 자립유형 코드로 한글명 가져오기
  */
 export function getSelfRelTypeName(code: SelfRelTypeCode): string {
-  return SELF_REL_TYPE_CONSTANTS.NAMES[code];
+  return SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[code].name;
 }
 
 /**
