@@ -137,7 +137,7 @@ export function processFilterConditions(filters: {
   // 테마 필터 처리
   if (filters.themes) {
     const themeList = filters.themes.split(',').map(t => t.trim());
-    conditions.self_rel_type = themeList;
+    conditions.self_rlty_type = themeList;
   }
 
   // 데이터 타입 필터 처리
