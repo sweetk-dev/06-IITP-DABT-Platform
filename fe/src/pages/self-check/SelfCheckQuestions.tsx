@@ -6,7 +6,7 @@ import { Modal } from '../../components/ui/Modal';
 import { 
   SELF_CHECK_QUESTIONS, 
   SELF_CHECK_CONSTANTS, 
-  AREA_NAMES, 
+  getAreaName, 
   type SelfCheckAreaType,
   type SelfCheckResponse 
 } from '@iitp-dabt-platform/common';
@@ -119,7 +119,7 @@ export function SelfCheckQuestions() {
   const getAreaProgress = () => {
     const progress: { [key: string]: string } = {};
     areas.forEach((area, index) => {
-      const areaName = AREA_NAMES[area];
+      const areaName = getAreaName(area);
       const totalQuestions = SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA[area];
       
       if (index < currentAreaIndex) {
@@ -170,7 +170,7 @@ export function SelfCheckQuestions() {
           fontWeight: 700,
           marginBottom: '20px'
         }}>
-          {AREA_NAMES[currentArea]} 영역
+          {getAreaName(currentArea)} 영역
         </div>
 
         {/* Question Title */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SELF_CHECK_CONSTANTS, AREA_NAMES } from '@iitp-dabt-platform/common';
+import { SELF_CHECK_CONSTANTS, getAreaName } from '@iitp-dabt-platform/common';
 
 interface SelfCheckProgressProps {
   currentStep: number;
@@ -11,7 +11,7 @@ interface SelfCheckProgressProps {
 // 기본 stepNames를 상수에서 동적으로 생성
 const getDefaultStepNames = () => {
   const areaKeys = Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA);
-  return ['본인 확인', ...areaKeys.map(key => AREA_NAMES[key as keyof typeof AREA_NAMES])];
+  return ['본인 확인', ...areaKeys.map(key => getAreaName(key as any))];
 };
 
 export function SelfCheckProgress({ 

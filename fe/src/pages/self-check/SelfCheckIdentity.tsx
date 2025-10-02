@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
 import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
-import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, AREA_NAMES, type IdentityQuestionType, type IdentityResponse } from '@iitp-dabt-platform/common';
+import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, getAreaName, type IdentityQuestionType, type IdentityResponse } from '@iitp-dabt-platform/common';
 
 export function SelfCheckIdentity() {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export function SelfCheckIdentity() {
         totalSteps={Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).length + 1} // 본인 확인 + 영역 수
         stepNames={undefined} // 기본값 사용 (상수에서 동적 생성)
         areaProgress={Object.keys(SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA).reduce((acc, key) => {
-          const areaName = AREA_NAMES[key as keyof typeof AREA_NAMES];
+          const areaName = getAreaName(key as any);
           const questionCount = SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA[key as keyof typeof SELF_CHECK_CONSTANTS.QUESTIONS_PER_AREA];
           acc[areaName] = `${areaName}(0/${questionCount})`;
           return acc;
