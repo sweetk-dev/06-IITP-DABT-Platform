@@ -402,6 +402,49 @@ export function parseSelfRltyTypeCodesString(codesString: string): SelfRltyTypeC
 
 
 // ============================================================================
+// 정렬 옵션 관련 상수
+// ============================================================================
+
+export const SORT_CONSTANTS = {
+  // 정렬 옵션 코드와 정보
+  SORT_OPTIONS: {
+    recent: {
+      code: 'recent',
+      name: '최신순',
+      description: '데이터 등록일 기준 내림차순 정렬'
+    },
+    alpha: {
+      code: 'alpha',
+      name: '가나다순',
+      description: '데이터 제목 기준 오름차순 정렬'
+    }
+  },
+  
+  // 모든 정렬 옵션 코드 배열
+  ALL_CODES: ['recent', 'alpha'] as const,
+  
+  // 기본 정렬 옵션
+  DEFAULT: 'recent' as const
+} as const;
+
+// ALL_CODES에서 타입 자동 추출
+export type SortOption = typeof SORT_CONSTANTS.ALL_CODES[number];
+
+/**
+ * 정렬 옵션 코드로 한글명 가져오기
+ */
+export function getSortOptionName(code: SortOption): string {
+  return SORT_CONSTANTS.SORT_OPTIONS[code].name;
+}
+
+/**
+ * 정렬 옵션 코드가 유효한지 확인
+ */
+export function isValidSortOption(code: string): code is SortOption {
+  return SORT_CONSTANTS.ALL_CODES.includes(code as SortOption);
+}
+
+// ============================================================================
 // 포맷팅 유틸리티 함수
 // ============================================================================
 

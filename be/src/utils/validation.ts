@@ -7,7 +7,8 @@ import {
   THEME_CONSTANTS,
   DATA_TYPE_CONSTANTS,
   SELF_RLTY_TYPE_CONSTANTS,
-  PAGINATION_CONSTANTS
+  PAGINATION_CONSTANTS,
+  SORT_CONSTANTS
 } from '@iitp-dabt-platform/common';
 
 // 공통 검증 스키마들
@@ -21,7 +22,7 @@ export const validationSchemas = {
   pageSize: z.number().int().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE),
 
   // 정렬 검증
-  sort: z.enum(['recent', 'alpha']),
+  sort: z.enum(SORT_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
 
   // 테마 코드 검증
   theme: z.enum(THEME_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
@@ -126,9 +127,9 @@ export const validators = {
 
   // 정렬 옵션 검증
   validateSort: (value: string, defaultSort: string = 'recent'): string => {
-    const validSorts = ['recent', 'alpha'];
+    const validSorts = SORT_CONSTANTS.ALL_CODES;
     if (!value) return defaultSort;
-    if (!validSorts.includes(value)) {
+    if (!validSorts.includes(value as any)) {
       throw new Error('유효하지 않은 정렬 옵션입니다.');
     }
     return value;

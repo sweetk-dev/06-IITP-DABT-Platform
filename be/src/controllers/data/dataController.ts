@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { dataService } from '../../services/data/dataService';
 import { createSuccessResponse, createPaginatedResponse } from '../../utils/response';
 import { logger } from '../../config/logger';
+import { SortOption } from '@iitp-dabt-platform/common';
 
 // 최신 데이터 조회 컨트롤러
 export async function getLatestData(req: Request, res: Response): Promise<void> {
@@ -69,7 +70,7 @@ export async function searchData(req: Request, res: Response): Promise<void> {
       types: types as string,
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as 'recent' | 'alpha',
+      sort: sort as SortOption,
     });
     
     createPaginatedResponse(
@@ -114,7 +115,7 @@ export async function getAllThemeItems(req: Request, res: Response): Promise<voi
     const result = await dataService.getAllThemeItems({
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as 'recent' | 'alpha',
+      sort: sort as SortOption,
     });
     
     createPaginatedResponse(
@@ -145,7 +146,7 @@ export async function getThemeItems(req: Request, res: Response): Promise<void> 
     const result = await dataService.getThemeItems(theme as string, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as 'recent' | 'alpha',
+      sort: sort as SortOption,
     });
     
     createPaginatedResponse(
@@ -190,7 +191,7 @@ export async function getAllTypeItems(req: Request, res: Response): Promise<void
     const result = await dataService.getAllTypeItems({
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as 'recent' | 'alpha',
+      sort: sort as SortOption,
     });
     
     createPaginatedResponse(
@@ -221,7 +222,7 @@ export async function getTypeItems(req: Request, res: Response): Promise<void> {
     const result = await dataService.getTypeItems(type as string, {
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
-      sort: sort as 'recent' | 'alpha',
+      sort: sort as SortOption,
     });
     
     createPaginatedResponse(

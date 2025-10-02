@@ -8,7 +8,8 @@ import {
   THEME_CONSTANTS, 
   DATA_TYPE_CONSTANTS, 
   SELF_RLTY_TYPE_CONSTANTS,
-  PAGINATION_CONSTANTS 
+  PAGINATION_CONSTANTS,
+  SORT_CONSTANTS
 } from '@iitp-dabt-platform/common';
 
 // 검증 스키마 타입
@@ -75,7 +76,7 @@ export const commonSchemas = {
   paginationQuery: z.object({
     page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
     pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
-    sort: z.enum(['recent', 'alpha']).optional(),
+    sort: z.enum(SORT_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]).optional(),
   }),
 
   // ID 파라미터
@@ -100,7 +101,7 @@ export const commonSchemas = {
     types: z.string().optional(),
     page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
     pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
-    sort: z.enum(['recent', 'alpha']).optional(),
+    sort: z.enum(SORT_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]).optional(),
   }),
 
   // 자가진단 쿼리 - common 패키지의 상수 활용
@@ -149,8 +150,8 @@ export const validators = {
   // 정렬 옵션 검증
   validateSort: (sort: string | undefined, defaultSort: string = 'recent'): string => {
     if (!sort) return defaultSort;
-    const validSorts = ['recent', 'alpha'];
-    if (!validSorts.includes(sort)) {
+    const validSorts = SORT_CONSTANTS.ALL_CODES;
+    if (!validSorts.includes(sort as any)) {
       throw createError('유효하지 않은 정렬 옵션입니다.', 400, ErrorCode.INVALID_PARAMETER);
     }
     return sort;
