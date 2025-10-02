@@ -25,7 +25,11 @@ import {
   formatCount,
   SELF_CHECK_POLICIES_DEFAULTS,
   SELF_CHECK_PROVIDERS_DEFAULTS,
-  SELF_CHECK_FACILITIES_DEFAULTS
+  SELF_CHECK_FACILITIES_DEFAULTS,
+  SELF_RLTY_TYPE_CONSTANTS,
+  GENDER_CONSTANTS,
+  AGE_COND_CONSTANTS,
+  DIS_LEVEL_CONSTANTS
 } from '@iitp-dabt-platform/common';
 import { useRecommendations, usePolicies, useProviders, useFacilities } from '../../api/hooks';
 import '../../styles/data-pages.css';
@@ -149,6 +153,166 @@ export function SelfCheckMore() {
     return formatCount(currentApiState.data?.total);
   };
 
+  // ============================================================================
+  // 유형별 메타 정보 렌더링 함수들
+  // ============================================================================
+
+  // Policy 메타 정보 렌더링
+  const renderPolicyMeta = (item: any, index: number) => (
+    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
+      {item.region && (
+        <MetaItem
+          label="지역"
+          value={item.region}
+          labelId={`self-check-more-row-${index + 1}-meta-region-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-region-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+        />
+      )}
+      {item.dis_level && (
+        <MetaItem
+          label="장애정도"
+          value={item.dis_level.split(',').map(level => 
+            DIS_LEVEL_CONSTANTS.DIS_LEVEL[level.trim() as keyof typeof DIS_LEVEL_CONSTANTS.DIS_LEVEL]?.name || level.trim()
+          ).join(', ')}
+          labelId={`self-check-more-row-${index + 1}-meta-dis-level-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-dis-level-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+        />
+      )}
+      {item.gender && (
+        <MetaItem
+          label="성별"
+          value={item.gender.split(',').map(g => 
+            GENDER_CONSTANTS.GENDER[g.trim() as keyof typeof GENDER_CONSTANTS.GENDER]?.name || g.trim()
+          ).join(', ')}
+          labelId={`self-check-more-row-${index + 1}-meta-gender-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-gender-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+        />
+      )}
+      {item.age_cond && (
+        <MetaItem
+          label="연령조건"
+          value={item.age_cond.split(',').map(age => 
+            AGE_COND_CONSTANTS.AGE_COND[age.trim() as keyof typeof AGE_COND_CONSTANTS.AGE_COND]?.name || age.trim()
+          ).join(', ')}
+          labelId={`self-check-more-row-${index + 1}-meta-age-cond-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-age-cond-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-4`}
+        />
+      )}
+    </DataMeta>
+  );
+
+  // Provider 메타 정보 렌더링
+  const renderProviderMeta = (item: any, index: number) => (
+    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
+      {item.service_name && (
+        <MetaItem
+          label="서비스명"
+          value={item.service_name}
+          labelId={`self-check-more-row-${index + 1}-meta-service-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-service-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+        />
+      )}
+      {item.phone && (
+        <MetaItem
+          label="전화번호"
+          value={item.phone}
+          labelId={`self-check-more-row-${index + 1}-meta-phone-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-phone-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+        />
+      )}
+      {item.address && (
+        <MetaItem
+          label="주소"
+          value={item.address}
+          labelId={`self-check-more-row-${index + 1}-meta-address-label`}
+          valueId={`self-check-more-row-${index + 1}-meta-address-value`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+        />
+      )}
+    </DataMeta>
+  );
+
+  // Facility 메타 정보 렌더링
+  const renderFacilityMeta = (item: any, index: number) => {
+    // 설치정보 조합: install_area + install_site + (install_spot)
+    let installInfo = '';
+    if (item.install_area) {
+      installInfo += item.install_area;
+    }
+    if (item.install_site) {
+      installInfo += (installInfo ? ' ' : '') + item.install_site;
+    }
+    if (item.install_spot) {
+      installInfo += (installInfo ? ' ' : '') + '(' + item.install_spot + ')';
+    }
+
+    return (
+      <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
+        {installInfo && (
+          <MetaItem
+            label="설치정보"
+            value={installInfo}
+            labelId={`self-check-more-row-${index + 1}-meta-install-label`}
+            valueId={`self-check-more-row-${index + 1}-meta-install-value`}
+            separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
+          />
+        )}
+        {item.opening_hours && (
+          <MetaItem
+            label="운영시간"
+            value={item.opening_hours}
+            labelId={`self-check-more-row-${index + 1}-meta-hours-label`}
+            valueId={`self-check-more-row-${index + 1}-meta-hours-value`}
+            separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+          />
+        )}
+        {item.address && (
+          <MetaItem
+            label="주소"
+            value={item.address}
+            labelId={`self-check-more-row-${index + 1}-meta-address-label`}
+            valueId={`self-check-more-row-${index + 1}-meta-address-value`}
+            separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+          />
+        )}
+      </DataMeta>
+    );
+  };
+
+  // ============================================================================
+  // 유형별 태그 렌더링 함수들
+  // ============================================================================
+
+  // Policy 태그 렌더링
+  const renderPolicyTags = (item: any, index: number) => (
+    <>
+      {item.self_rlty_type && (
+        <Tag id={`self-check-more-row-${index + 1}-tag-self-rlty-type`}>
+          {SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[item.self_rlty_type as keyof typeof SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES]?.shortName || item.self_rlty_type}
+        </Tag>
+      )}
+      {item.category && (
+        <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
+      )}
+    </>
+  );
+
+  // Provider 태그 렌더링 (현재 정의 없음)
+  const renderProviderTags = (item: any, index: number) => (
+    <></>
+  );
+
+  // Facility 태그 렌더링 (현재 정의 없음)
+  const renderFacilityTags = (item: any, index: number) => (
+    <></>
+  );
+
   return (
     <Layout idPrefix="self-check-more">
       <div id="self-check-more-container" className="data-list-container">
@@ -205,79 +369,16 @@ export function SelfCheckMore() {
                     <DataTitle id={`self-check-more-row-${index + 1}-title`}>
                       {item.title || item.policy_name || item.provider_name || item.device || '제목'}
                     </DataTitle>
-                    <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
-                      {item.category && (
-                        <MetaItem
-                          label="카테고리"
-                          value={item.category}
-                          labelId={`self-check-more-row-${index + 1}-meta-category-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-category-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
-                        />
-                      )}
-                      {item.organization && (
-                        <MetaItem
-                          label="제공 기관"
-                          value={item.organization}
-                          labelId={`self-check-more-row-${index + 1}-meta-org-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-org-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
-                        />
-                      )}
-                      {item.location && (
-                        <MetaItem
-                          label="위치"
-                          value={item.location}
-                          labelId={`self-check-more-row-${index + 1}-meta-location-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-location-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
-                        />
-                      )}
-                      {item.install_area && (
-                        <MetaItem
-                          label="설치 지역"
-                          value={item.install_area}
-                          labelId={`self-check-more-row-${index + 1}-meta-area-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-area-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-4`}
-                        />
-                      )}
-                      {item.address && (
-                        <MetaItem
-                          label="주소"
-                          value={item.address}
-                          labelId={`self-check-more-row-${index + 1}-meta-address-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-address-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-5`}
-                        />
-                      )}
-                      {item.reg_date && (
-                        <MetaItem
-                          label="등록일"
-                          value={item.reg_date}
-                          labelId={`self-check-more-row-${index + 1}-meta-date-label`}
-                          valueId={`self-check-more-row-${index + 1}-meta-date-value`}
-                          separatorId={`self-check-more-row-${index + 1}-meta-separator-6`}
-                        />
-                      )}
-                    </DataMeta>
+                    {/* 유형별 메타 정보 렌더링 */}
+                    {selectedMenu === 'policies' && renderPolicyMeta(item, index)}
+                    {selectedMenu === 'providers' && renderProviderMeta(item, index)}
+                    {selectedMenu === 'facilities' && renderFacilityMeta(item, index)}
                   </TableCell>
                   <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
-                    {item.category && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-category`}>{item.category}</Tag>
-                    )}
-                    {item.organization && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-org`}>{item.organization}</Tag>
-                    )}
-                    {item.location && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
-                    )}
-                    {item.install_area && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-area`}>{item.install_area}</Tag>
-                    )}
-                    {item.install_site && (
-                      <Tag id={`self-check-more-row-${index + 1}-tag-site`}>{item.install_site}</Tag>
-                    )}
+                    {/* 유형별 태그 렌더링 */}
+                    {selectedMenu === 'policies' && renderPolicyTags(item, index)}
+                    {selectedMenu === 'providers' && renderProviderTags(item, index)}
+                    {selectedMenu === 'facilities' && renderFacilityTags(item, index)}
                   </TableCell>
                 </TableRow>
               )}
