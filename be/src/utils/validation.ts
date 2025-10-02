@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { 
   ThemeCode, 
   DataTypeCode, 
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   THEME_CONSTANTS,
   DATA_TYPE_CONSTANTS,
-  SELF_REL_TYPE_CONSTANTS,
+  SELF_RLTY_TYPE_CONSTANTS,
   PAGINATION_CONSTANTS
 } from '@iitp-dabt-platform/common';
 
@@ -36,7 +36,7 @@ export const validationSchemas = {
   ),
 
   // 자립 유형 코드 검증
-  selfRelType: z.enum(SELF_REL_TYPE_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
+  selfRelType: z.enum(SELF_RLTY_TYPE_CONSTANTS.ALL_CODES as unknown as [string, ...string[]]),
 
   // 검색어 검증
   searchQuery: z.string().min(1).max(100).regex(/^[가-힣a-zA-Z0-9\s]+$/),
@@ -106,11 +106,11 @@ export const validators = {
   },
 
   // 자립 유형 코드 검증
-  validateSelfRelType: (value: string): SelfRelTypeCode => {
-    if (!SELF_REL_TYPE_CONSTANTS.ALL_CODES.includes(value as SelfRelTypeCode)) {
+  validateSelfRelType: (value: string): SelfRltyTypeCode => {
+    if (!SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.includes(value as SelfRltyTypeCode)) {
       throw new Error('유효하지 않은 자립 유형 코드입니다.');
     }
-    return value as SelfRelTypeCode;
+    return value as SelfRltyTypeCode;
   },
 
   // 검색어 검증

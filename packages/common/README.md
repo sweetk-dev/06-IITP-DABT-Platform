@@ -255,7 +255,7 @@ interface SelfCheckPolicyItem {
   policy_id: number;
   category: string;
   policy_name: string;
-  self_rlty_type?: SelfRelTypeCode;
+  self_rlty_type?: SelfRltyTypeCode;
   region?: string;
   gender?: string;
   age_cond?: string;

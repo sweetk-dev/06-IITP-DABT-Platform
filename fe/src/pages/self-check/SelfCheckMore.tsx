@@ -187,7 +187,7 @@ export function SelfCheckMore() {
               </TableColumn>
               <TableColumn id="self-check-more-table-column-tags" variant="tags">태그</TableColumn>
             </TableHeader>
-
+  
             <TableBodyWithState
               id="self-check-more-table-body"
               data={currentData}

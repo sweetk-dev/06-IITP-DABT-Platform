@@ -7,7 +7,7 @@ import { logger } from '../config/logger';
 import { 
   THEME_CONSTANTS, 
   DATA_TYPE_CONSTANTS, 
-  SELF_REL_TYPE_CONSTANTS,
+  SELF_RLTY_TYPE_CONSTANTS,
   PAGINATION_CONSTANTS 
 } from '@iitp-dabt-platform/common';
 

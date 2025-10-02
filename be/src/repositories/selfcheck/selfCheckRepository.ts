@@ -4,7 +4,7 @@ import {
   SelfCheckPoliciesRes,
   SelfCheckProvidersRes,
   SelfCheckFacilitiesRes,
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   GenderCode,
   AgeCondCode,
   DisLevelCode
@@ -56,7 +56,7 @@ class SelfCheckRepository {
     try {
       logger.debug('자가진단 Repository - 추천 정책 조회', { options });
       
-      const themes = options.filterConditions.self_rlty_type as SelfRelTypeCode[] | undefined;
+      const themes = options.filterConditions.self_rlty_type as SelfRltyTypeCode[] | undefined;
       const allResults: any[] = [];
 
       // themes가 있으면 각 테마별로 limit개씩 병렬 조회 (성능 최적화)
@@ -150,7 +150,7 @@ class SelfCheckRepository {
         policy_id: item.policy_id,
         category: item.category,
         policy_name: item.policy_name,
-        self_rlty_type: item.self_rlty_type as SelfRelTypeCode | undefined,
+        self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
         region: item.region || undefined,
         gender: item.gender as GenderCode | undefined,
         age_cond: item.age_cond as AgeCondCode | undefined,

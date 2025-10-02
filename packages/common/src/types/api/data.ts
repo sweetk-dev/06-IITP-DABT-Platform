@@ -2,7 +2,7 @@
 import { 
   ThemeCode, 
   DataTypeCode, 
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   PAGINATION_CONSTANTS
 } from '../constants.js';
 import { PaginationReq, PaginationRes, SearchReq, SortReq } from './api.js';
@@ -75,7 +75,7 @@ export interface DataSearchItem {
   id: number;
   title: string;
   data_type: DataTypeCode;
-  self_rel_type?: SelfRelTypeCode;
+  self_rlty_type?: SelfRltyTypeCode;
   category?: string;
   data_keywords?: string; // 콤마 구분 문자열, 최대 3개 (예: '키워드1,키워드2,키워드3')
   sys_tbl_id: string;
@@ -181,7 +181,7 @@ export interface DataDetailRes {
   id: number;
   title: string;
   data_type: DataTypeCode;
-  self_rel_type?: SelfRelTypeCode;
+  self_rlty_type?: SelfRltyTypeCode;
   category?: string;
   sys_tbl_id: string;
   data_desc?: string;

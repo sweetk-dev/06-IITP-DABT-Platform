@@ -121,7 +121,7 @@ export type DataTypeCode = typeof DATA_TYPE_CONSTANTS.ALL_CODES[number];
 // 자립유형 (self_rlty_type) 관련 상수
 // ============================================================================
 
-export const SELF_REL_TYPE_CONSTANTS = {
+export const SELF_RLTY_TYPE_CONSTANTS = {
   // 자립유형별 코드와 정보
   SELF_REL_TYPES: {
     basic: {
@@ -157,7 +157,7 @@ export const SELF_REL_TYPE_CONSTANTS = {
 } as const;
 
 // ALL_CODES에서 타입 자동 추출
-export type SelfRelTypeCode = typeof SELF_REL_TYPE_CONSTANTS.ALL_CODES[number];
+export type SelfRltyTypeCode = typeof SELF_RLTY_TYPE_CONSTANTS.ALL_CODES[number];
 
 // ============================================================================
 // 성별/연령/장애정도 관련 상수
@@ -296,8 +296,8 @@ export function getDataTypeName(code: DataTypeCode): string {
 /**
  * 자립유형 코드로 한글명 가져오기
  */
-export function getSelfRelTypeName(code: SelfRelTypeCode): string {
-  return SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[code].name;
+export function getSelfRelTypeName(code: SelfRltyTypeCode): string {
+  return SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[code].name;
 }
 
 /**
@@ -345,8 +345,8 @@ export function isValidDataTypeCode(code: string): code is DataTypeCode {
 /**
  * 자립유형 코드가 유효한지 확인
  */
-export function isValidSelfRelTypeCode(code: string): code is SelfRelTypeCode {
-  return SELF_REL_TYPE_CONSTANTS.ALL_CODES.includes(code as SelfRelTypeCode);
+export function isValidSelfRltyTypeCode(code: string): code is SelfRltyTypeCode {
+  return SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.includes(code as SelfRltyTypeCode);
 }
 
 // ============================================================================
@@ -370,7 +370,7 @@ export function getDataTypeCodesString(codes: DataTypeCode[]): string {
 /**
  * 자립유형 코드들을 콤마로 구분된 문자열로 변환
  */
-export function getSelfRelTypeCodesString(codes: SelfRelTypeCode[]): string {
+export function getSelfRltyTypeCodesString(codes: SelfRltyTypeCode[]): string {
   return codes.join(',');
 }
 
@@ -391,8 +391,8 @@ export function parseDataTypeCodesString(codesString: string): DataTypeCode[] {
 /**
  * 콤마로 구분된 문자열을 자립유형 코드 배열로 변환
  */
-export function parseSelfRelTypeCodesString(codesString: string): SelfRelTypeCode[] {
-  return codesString.split(',').filter(isValidSelfRelTypeCode) as SelfRelTypeCode[];
+export function parseSelfRltyTypeCodesString(codesString: string): SelfRltyTypeCode[] {
+  return codesString.split(',').filter(isValidSelfRltyTypeCode) as SelfRltyTypeCode[];
 }
 
 

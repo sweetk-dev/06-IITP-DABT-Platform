@@ -13,7 +13,7 @@ import {
   THEME_CONSTANTS,
   DATA_TYPE_CONSTANTS,
   DataTypeCode,
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   ThemeCode
 } from '@iitp-dabt-platform/common';
 import { BaseRepository } from '../base/BaseRepository';
@@ -69,9 +69,9 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           status: 'A',
           del_yn: 'N',
         },
-        groupBy: ['self_rel_type'],
+        groupBy: ['self_rlty_type'],
         attributes: [
-          'self_rel_type',
+          'self_rlty_type',
           [getSequelize().fn('COUNT', '*'), 'count'],
         ],
       });
@@ -83,7 +83,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       });
 
       results.forEach((item: any) => {
-        const themeCode = item.self_rel_type as ThemeCode;
+        const themeCode = item.self_rlty_type as ThemeCode;
         const count = parseInt(item.dataValues.count);
         
         // THEME_CONSTANTS.ALL_CODES로 검증
@@ -178,7 +178,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_id',
           'title',
           'data_type',
-          'self_rel_type',
+          'self_rlty_type',
           'category',
           'sys_tbl_id',
           'src_org_name',
@@ -192,7 +192,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           id: item.data_id,
           title: item.title,
           data_type: item.data_type as DataTypeCode,
-          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
@@ -217,15 +217,15 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           status: 'A',
           del_yn: 'N',
         },
-        groupBy: ['self_rel_type'],
+        groupBy: ['self_rlty_type'],
         attributes: [
-          'self_rel_type',
+          'self_rlty_type',
           [getSequelize().fn('COUNT', '*'), 'total_count'],
         ],
       });
 
       return results.map((item: any) => {
-        const themeCode = item.self_rel_type as ThemeCode;
+        const themeCode = item.self_rlty_type as ThemeCode;
         const count = parseInt(item.dataValues.total_count);
         const themeInfo = THEME_CONSTANTS.THEMES[themeCode];
         
@@ -263,7 +263,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         where: {
           status: 'A',
           del_yn: 'N',
-          self_rel_type: themeCode,
+          self_rlty_type: themeCode,
         },
         page: options.page,
         pageSize: options.pageSize,
@@ -272,7 +272,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_id',
           'title',
           'data_type',
-          'self_rel_type',
+          'self_rlty_type',
           'category',
           'sys_tbl_id',
           'src_org_name',
@@ -286,7 +286,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           id: item.data_id,
           title: item.title,
           data_type: item.data_type as DataTypeCode,
-          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
@@ -359,7 +359,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_id',
           'title',
           'data_type',
-          'self_rel_type',
+          'self_rlty_type',
           'category',
           'sys_tbl_id',
           'src_org_name',
@@ -373,7 +373,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           id: item.data_id,
           title: item.title,
           data_type: item.data_type as DataTypeCode,
-          self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+          self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
@@ -403,7 +403,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_id',
           'title',
           'data_type',
-          'self_rel_type',
+          'self_rlty_type',
           'category',
           'sys_tbl_id',
           'data_desc',
@@ -426,7 +426,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         id: item.data_id,
         title: item.title,
         data_type: item.data_type as DataTypeCode,
-        self_rel_type: item.self_rel_type as SelfRelTypeCode | undefined,
+        self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
         category: item.category || undefined,
         sys_tbl_id: item.sys_tbl_id,
         data_desc: item.data_desc || undefined,

@@ -3,7 +3,7 @@ import {
   GenderCode, 
   AgeCondCode, 
   DisLevelCode, 
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   PAGINATION_CONSTANTS
 } from '../constants.js';
 import { PaginationReq, PaginationRes } from './api.js';
@@ -34,7 +34,7 @@ export interface SelfCheckPolicyItem {
   policy_id: number;
   category: string;
   policy_name: string;
-  self_rlty_type?: SelfRelTypeCode;
+  self_rlty_type?: SelfRltyTypeCode;
   region?: string;
   gender?: string;
   age_cond?: string;

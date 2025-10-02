@@ -1,5 +1,5 @@
 // 자가진단 관련 타입 및 상수 정의
-import { SelfRelTypeCode, SELF_REL_TYPE_CONSTANTS, DIS_LEVEL_CONSTANTS } from './constants.js';
+import { SelfRltyTypeCode, SELF_RLTY_TYPE_CONSTANTS, DIS_LEVEL_CONSTANTS } from './constants.js';
 
 // ============================================================================
 // 상수 정의
@@ -35,8 +35,8 @@ export const SELF_CHECK_CONSTANTS = {
   // 미달 기준 점수
   DEFICIENCY_THRESHOLD: 70,
   
-  // 정책 노출 우선순위 (SELF_REL_TYPE_CONSTANTS에서 동적으로 가져옴, basic 제외)
-  POLICY_PRIORITY_ORDER: SELF_REL_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code) as Exclude<SelfRelTypeCode, 'basic'>[]
+  // 정책 노출 우선순위 (SELF_RLTY_TYPE_CONSTANTS에서 동적으로 가져옴, basic 제외)
+  POLICY_PRIORITY_ORDER: SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code) as Exclude<SelfRltyTypeCode, 'basic'>[]
 } as const;
 
 // 총 소요시간 계산 (초)
@@ -46,9 +46,9 @@ export const TOTAL_TIME_SECONDS = SELF_CHECK_CONSTANTS.TIME_PER_QUESTION * SELF_
 // 타입 정의
 // ============================================================================
 
-// 자립 영역 타입 (constants.ts의 SelfRelTypeCode에서 자가진단 관련 영역만 사용)
-// SelfCheckAreaType은 SelfRelTypeCode의 subset으로 정의 (basic 제외)
-export type SelfCheckAreaType = Exclude<SelfRelTypeCode, typeof SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code>;
+// 자립 영역 타입 (constants.ts의 SelfRltyTypeCode에서 자가진단 관련 영역만 사용)
+// SelfCheckAreaType은 SelfRltyTypeCode의 subset으로 정의 (basic 제외)
+export type SelfCheckAreaType = Exclude<SelfRltyTypeCode, typeof SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code>;
 
 // 본인 확인 문항 타입
 export type IdentityQuestionType = 
@@ -197,9 +197,9 @@ export const SELF_CHECK_QUESTIONS = {
 // 유틸리티 함수
 // ============================================================================
 
-// AREA_NAMES와 AREA_CODES는 SELF_REL_TYPE_CONSTANTS에서 가져옴
+// AREA_NAMES와 AREA_CODES는 SELF_RLTY_TYPE_CONSTANTS에서 가져옴
 export function getAreaName(area: SelfCheckAreaType): string {
-  return SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[area].name;
+  return SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[area].name;
 }
 
 export function getAreaCode(area: SelfCheckAreaType): string {

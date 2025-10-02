@@ -6,7 +6,7 @@ export class DataSummaryInfo extends Model {
   public data_id!: number;
   public target_data_id!: number | null;
   public data_type!: string;
-  public self_rel_type!: string | null;
+  public self_rlty_type!: string | null;
   public category!: string | null;
   public title!: string;
   public sys_tbl_id!: string;
@@ -46,7 +46,7 @@ export function initDataSummaryInfo(sequelize: Sequelize): typeof DataSummaryInf
         allowNull: false,
         comment: 'Data Type (basic/poi/emp)',
       },
-      self_rel_type: {
+      self_rlty_type: {
         type: DataTypes.STRING(24),
         allowNull: true,
         comment: '자립 테마 타입 (physical,emotional, economic,social)',
@@ -162,8 +162,8 @@ export function initDataSummaryInfo(sequelize: Sequelize): typeof DataSummaryInf
           name: 'idx_sys_data_sumary_info_data_type',
         },
         {
-          fields: ['self_rel_type'],
-          name: 'idx_sys_data_sumary_info_self_rel_type',
+          fields: ['self_rlty_type'],
+          name: 'idx_sys_data_sumary_info_self_rlty_type',
         },
       ],
     }

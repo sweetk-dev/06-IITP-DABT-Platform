@@ -6,9 +6,9 @@ import { SelfThemaCard, CardContent, CardTitle, CardSubtitle, CardIcon } from '.
 import { 
   SELF_CHECK_CONSTANTS, 
   SELF_CHECK_MORE_CONSTANTS,
-  SELF_REL_TYPE_CONSTANTS,
+  SELF_RLTY_TYPE_CONSTANTS,
   DIS_LEVEL_CONSTANTS,
-  type SelfRelTypeCode,
+  type SelfRltyTypeCode,
   type SelfCheckResponse,
   type IdentityResponse,
   calculateAreaScore,
@@ -39,20 +39,14 @@ export function SelfCheckResult() {
       const parsedResponses = JSON.parse(savedResponses) as SelfCheckResponse;
       setResponses(parsedResponses);
       
-      // 점수 계산 - SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES 사용
+      // 점수 계산 - SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES 사용
       const calculatedScores: Record<string, number> = {};
-      
-      console.log('=== 점수 계산 디버깅 ===');
-      console.log('Parsed Responses:', parsedResponses);
-      console.log('Policy Priority Order:', SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER);
       
       SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER.forEach((area) => {
         const score = Math.round(calculateAreaScore(parsedResponses, area));
         calculatedScores[area] = score;
-        console.log(`Area ${area}: ${score}점`);
       });
       
-      console.log('Calculated Scores:', calculatedScores);
       setScores(calculatedScores);
     } else {
       // 자가진단을 하지 않았으면 시작 페이지로 리다이렉트
@@ -68,16 +62,16 @@ export function SelfCheckResult() {
     }
   }, [identityInfo, scores]);
 
-  // 자가진단 결과를 기반으로 themes 파라미터 생성 (SelfRelTypeCode 사용, basic 제외)
+  // 자가진단 결과를 기반으로 themes 파라미터 생성 (SelfRltyTypeCode 사용, basic 제외)
   const getThemesFromScores = (): string => {
-    const themes: Exclude<SelfRelTypeCode, 'basic'>[] = [];
+    const themes: Exclude<SelfRltyTypeCode, 'basic'>[] = [];
     const THRESHOLD = SELF_CHECK_CONSTANTS.DEFICIENCY_THRESHOLD; // 미달 기준점 (70점)
     
     // SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER 사용 (basic 제외)
     SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER.forEach((area) => {
       const score = scores[area] || 0;
       if (score < THRESHOLD) {
-        themes.push(area as Exclude<SelfRelTypeCode, 'basic'>);
+        themes.push(area as Exclude<SelfRltyTypeCode, 'basic'>);
       }
     });
     
@@ -87,7 +81,7 @@ export function SelfCheckResult() {
   // 미달 영역 정보 계산 (우선순위대로 정렬)
   const getUnderThresholdAreas = (currentScores = scores) => {
     const THRESHOLD = SELF_CHECK_CONSTANTS.DEFICIENCY_THRESHOLD; // 70점
-    const underAreas: Array<{theme: SelfRelTypeCode, score: number}> = [];
+    const underAreas: Array<{theme: SelfRltyTypeCode, score: number}> = [];
     
     // SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER 사용
     SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER.forEach((area) => {
@@ -107,8 +101,6 @@ export function SelfCheckResult() {
     
     // 장애정도 "모름"일 경우 basic 추가
     const isDisLevelUnknown = identityInfo?.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.code;
-    console.log('Identity Info:', identityInfo);
-    console.log('Is Dis Level Unknown:', isDisLevelUnknown);
     
     if (isDisLevelUnknown) {
       themesArray.push('basic');
@@ -122,7 +114,6 @@ export function SelfCheckResult() {
       limit: 3 
     };
     
-    console.log('API Params Result:', result);
     return result;
   };
 
@@ -192,7 +183,6 @@ export function SelfCheckResult() {
       result.push(...filtered.slice(0, 3));
     }
     
-    console.log('Final Result:', result);
     return result;
   };
 
@@ -488,7 +478,7 @@ export function SelfCheckResult() {
                           <CardContent style={{ flex: 1 }}>
                             <CardSubtitle>
                               {rec.self_rlty_type 
-                                ? `${SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRelTypeCode].name}을 위한`
+                                ? `${SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRltyTypeCode].name}을 위한`
                                 : '정책'}
                             </CardSubtitle>
                             <CardTitle style={{ 
@@ -539,7 +529,7 @@ export function SelfCheckResult() {
                           <CardContent style={{ flex: 1 }}>
                             <CardSubtitle>
                               {rec.self_rlty_type 
-                                ? `${SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRelTypeCode].name}을 위한`
+                                ? `${SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRltyTypeCode].name}을 위한`
                                 : '정책'}
                             </CardSubtitle>
                             <CardTitle style={{ 

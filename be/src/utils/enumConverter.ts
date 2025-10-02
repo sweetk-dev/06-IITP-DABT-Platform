@@ -2,13 +2,13 @@
 import { 
   ThemeCode, 
   DataTypeCode, 
-  SelfRelTypeCode,
+  SelfRltyTypeCode,
   GenderCode,
   DisLevelCode,
   AgeCondCode,
   THEME_CONSTANTS,
   DATA_TYPE_CONSTANTS,
-  SELF_REL_TYPE_CONSTANTS,
+  SELF_RLTY_TYPE_CONSTANTS,
   GENDER_CONSTANTS,
   DIS_LEVEL_CONSTANTS,
   AGE_COND_CONSTANTS
@@ -48,19 +48,19 @@ export function convertToDataTypeCode(value: string): DataTypeCode {
 }
 
 /**
- * SelfRelTypeCode 변환 및 검증 - common 패키지 상수 활용
+ * SelfRltyTypeCode 변환 및 검증 - common 패키지 상수 활용
  */
-export function convertToSelfRelTypeCode(value: string): SelfRelTypeCode {
+export function convertToSelfRltyTypeCode(value: string): SelfRltyTypeCode {
   if (!value) {
     throw new Error('자립 유형 코드가 필요합니다.');
   }
   
-  if (!SELF_REL_TYPE_CONSTANTS.ALL_CODES.includes(value as SelfRelTypeCode)) {
-    throw new Error(`유효하지 않은 자립 유형 코드입니다: ${value}. 유효한 값: ${SELF_REL_TYPE_CONSTANTS.ALL_CODES.join(', ')}`);
+  if (!SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.includes(value as SelfRltyTypeCode)) {
+    throw new Error(`유효하지 않은 자립 유형 코드입니다: ${value}. 유효한 값: ${SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.join(', ')}`);
   }
   
-  logEnumConversion(value, value, 'SelfRelTypeCode');
-  return value as SelfRelTypeCode;
+  logEnumConversion(value, value, 'SelfRltyTypeCode');
+  return value as SelfRltyTypeCode;
 }
 
 /**
