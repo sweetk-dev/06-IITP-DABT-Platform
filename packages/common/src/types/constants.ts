@@ -127,26 +127,31 @@ export const SELF_RLTY_TYPE_CONSTANTS = {
     basic: {
       code: 'basic',
       name: '기초적 자립',
+      shortName: '기초',
       description: '기본 적인 장애 자립 관련 정보(정책, 기관, 시설)'
     },
     phys: {
       code: 'phys',
       name: '신체적 자립',
+      shortName: '신체',
       description: '신체적 자립 관련 정보 (정책, 기관, 시설)'
     },
     emo: {
       code: 'emo',
       name: '정서적 자립', 
+      shortName: '정서',
       description: '정서적 자립 관련된 정보 (정책, 기관, 시설)'
     },
     econ: {
       code: 'econ',
       name: '경제적 자립',
+      shortName: '경제',
       description: '경제적 자립 관련된 정보 (정책, 기관, 시설)'
     },
     soc: {
       code: 'soc',
       name: '사회적 자립',
+      shortName: '사회',
       description: '사회적 자립 관련된 정보 (정책, 기관, 시설)'
     }
   },
