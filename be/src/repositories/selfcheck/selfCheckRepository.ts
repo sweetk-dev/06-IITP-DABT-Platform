@@ -48,7 +48,7 @@ class SelfCheckRepository {
     this.facilityRepo = new FacilityRepository();
   }
 
-  // 추천 정책 조회
+  // 추천 정책 조회 - 각 테마별로 limit개씩 조회
   async getRecommendations(options: {
     filterConditions: Record<string, any>;
     limit: number;
@@ -56,45 +56,97 @@ class SelfCheckRepository {
     try {
       logger.debug('자가진단 Repository - 추천 정책 조회', { options });
       
-      const where: any = {};
+      const themes = options.filterConditions.themes as SelfRelTypeCode[] | undefined;
+      const allResults: any[] = [];
 
-      // 필터 조건 적용
-      Object.entries(options.filterConditions).forEach(([key, value]) => {
-        if (value) {
-          if (key === 'themes' && Array.isArray(value)) {
-            where.self_rlty_type = { [Op.in]: value };
-          } else if (key === 'gender' && value) {
-            where.gender = value;
-          } else if (key === 'disLevel' && value) {
-            where.dis_level = value;
-          } else if (key === 'ageCond' && value) {
-            where.age_cond = value;
+      // themes가 있으면 각 테마별로 limit개씩 병렬 조회 (성능 최적화)
+      if (themes && Array.isArray(themes) && themes.length > 0) {
+        // 각 테마별 쿼리를 병렬로 실행
+        const queryPromises = themes.map(async (theme) => {
+          const where: any = {
+            self_rlty_type: theme,
+            link: { [Op.ne]: null }, // 링크가 있는 정책만
+          };
+
+          // 추가 필터 조건 적용
+          if (options.filterConditions.gender) {
+            where.gender = options.filterConditions.gender;
           }
+          if (options.filterConditions.disLevel) {
+            where.dis_level = options.filterConditions.disLevel;
+          }
+          if (options.filterConditions.ageCond) {
+            where.age_cond = options.filterConditions.ageCond;
+          }
+
+          // 각 테마별로 limit개씩 조회
+          return await this.policyRepo.findAll({
+            where,
+            limit: options.limit,
+            order: [['created_at', 'DESC']],
+            attributes: [
+              'policy_id',
+              'category',
+              'policy_name',
+              'self_rlty_type',
+              'region',
+              'gender',
+              'age_cond',
+              'dis_level',
+              'fin_cond',
+              'link',
+            ],
+          });
+        });
+
+        // 모든 쿼리를 병렬로 실행
+        const results = await Promise.all(queryPromises);
+        results.forEach(data => allResults.push(...data));
+      } else {
+        // themes가 없으면 기존 로직대로 전체 조회
+        const where: any = {
+          link: { [Op.ne]: null }, // 링크가 있는 정책만
+        };
+
+        if (options.filterConditions.gender) {
+          where.gender = options.filterConditions.gender;
         }
-      });
+        if (options.filterConditions.disLevel) {
+          where.dis_level = options.filterConditions.disLevel;
+        }
+        if (options.filterConditions.ageCond) {
+          where.age_cond = options.filterConditions.ageCond;
+        }
 
-      // 링크가 있는 정책만 조회
-      where.link = { [Op.ne]: null };
+        const data = await this.policyRepo.findAll({
+          where,
+          limit: options.limit,
+          order: [['created_at', 'DESC']],
+          attributes: [
+            'policy_id',
+            'category',
+            'policy_name',
+            'self_rlty_type',
+            'region',
+            'gender',
+            'age_cond',
+            'dis_level',
+            'fin_cond',
+            'link',
+          ],
+        });
 
-      const data = await this.policyRepo.findAll({
-        where,
+        allResults.push(...data);
+      }
+
+      logger.info('추천 정책 조회 완료', { 
+        themesCount: themes?.length || 0, 
+        totalResults: allResults.length,
         limit: options.limit,
-        order: [['created_at', 'DESC']],
-        attributes: [
-          'policy_id',
-          'category',
-          'policy_name',
-          'self_rlty_type',
-          'region',
-          'gender',
-          'age_cond',
-          'dis_level',
-          'fin_cond',
-          'link',
-        ],
+        perTheme: themes && themes.length > 0 ? `${options.limit}개씩` : 'N/A'
       });
 
-      return data.map(item => ({
+      return allResults.map(item => ({
         policy_id: item.policy_id,
         category: item.category,
         policy_name: item.policy_name,

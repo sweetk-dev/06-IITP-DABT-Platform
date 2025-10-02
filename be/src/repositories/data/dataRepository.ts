@@ -76,18 +76,17 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         ],
       });
 
-      const counts: DataThemeCountsRes = {
-        phy: 0,
-        emo: 0,
-        econ: 0,
-        soc: 0,
-      };
+      // THEME_CONSTANTS.ALL_CODES를 사용하여 동적으로 초기화
+      const counts: DataThemeCountsRes = {} as DataThemeCountsRes;
+      THEME_CONSTANTS.ALL_CODES.forEach((code) => {
+        counts[code] = 0;
+      });
 
       results.forEach((item: any) => {
         const themeCode = item.self_rel_type as ThemeCode;
         const count = parseInt(item.dataValues.count);
         
-        // DB에 저장된 값이 이미 ThemeCode 형식 (phy, emo, econ, soc)
+        // THEME_CONSTANTS.ALL_CODES로 검증
         if (THEME_CONSTANTS.ALL_CODES.includes(themeCode)) {
           counts[themeCode] = count;
         }
