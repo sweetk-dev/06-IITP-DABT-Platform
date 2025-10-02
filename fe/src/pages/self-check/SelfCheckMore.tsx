@@ -172,7 +172,7 @@ export function SelfCheckMore() {
       {item.dis_level && (
         <MetaItem
           label="장애정도"
-          value={item.dis_level.split(',').map(level => 
+          value={item.dis_level.split(',').map((level: string) => 
             DIS_LEVEL_CONSTANTS.DIS_LEVEL[level.trim() as keyof typeof DIS_LEVEL_CONSTANTS.DIS_LEVEL]?.name || level.trim()
           ).join(', ')}
           labelId={`self-check-more-row-${index + 1}-meta-dis-level-label`}
@@ -183,7 +183,7 @@ export function SelfCheckMore() {
       {item.gender && (
         <MetaItem
           label="성별"
-          value={item.gender.split(',').map(g => 
+          value={item.gender.split(',').map((g: string) => 
             GENDER_CONSTANTS.GENDER[g.trim() as keyof typeof GENDER_CONSTANTS.GENDER]?.name || g.trim()
           ).join(', ')}
           labelId={`self-check-more-row-${index + 1}-meta-gender-label`}
@@ -194,7 +194,7 @@ export function SelfCheckMore() {
       {item.age_cond && (
         <MetaItem
           label="연령조건"
-          value={item.age_cond.split(',').map(age => 
+          value={item.age_cond.split(',').map((age: string) => 
             AGE_COND_CONSTANTS.AGE_COND[age.trim() as keyof typeof AGE_COND_CONSTANTS.AGE_COND]?.name || age.trim()
           ).join(', ')}
           labelId={`self-check-more-row-${index + 1}-meta-age-cond-label`}
