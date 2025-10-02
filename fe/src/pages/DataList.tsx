@@ -71,7 +71,7 @@ export function DataList() {
     }
     if (activeFilter === 'theme') {
       const themeInfo = THEME_CONSTANTS.THEMES[activeValue as ThemeCode];
-      return themeInfo?.description || THEME_CONSTANTS.THEMES.phy.description;
+      return themeInfo?.description || THEME_CONSTANTS.THEMES.phys.description;
     } else {
       const dataTypeInfo = DATA_TYPE_CONSTANTS.DATA_TYPES[activeValue as DataTypeCode];
       return dataTypeInfo?.description || DATA_TYPE_CONSTANTS.DATA_TYPES.basic.description;

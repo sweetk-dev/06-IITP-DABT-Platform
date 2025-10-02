@@ -126,7 +126,7 @@ export function DataDetail() {
             alignItems: 'center'
           }}>
             {detailData?.data_type 
-              ? DATA_TYPE_CONSTANTS.NAMES[detailData.data_type as DataTypeCode] 
+              ? DATA_TYPE_CONSTANTS.DATA_TYPES[detailData.data_type as DataTypeCode].name 
               : '-'}
           </div>
         </div>

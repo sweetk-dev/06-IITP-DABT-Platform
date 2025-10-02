@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Sidebar } from '../../components/ui/Sidebar';
 import { FilterSection } from '../../components/ui/FilterSection';
 import { FilterOption } from '../../components/ui/FilterOption';
+import { Modal } from '../../components/ui/Modal';
 import { 
   Table, 
   TableHeader, 
@@ -29,99 +31,63 @@ import { useRecommendations, usePolicies, useProviders, useFacilities } from '..
 import '../../styles/data-pages.css';
 
 export function SelfCheckMore() {
-  const [selectedMenu, setSelectedMenu] = useState<SelfCheckMoreMenuType>('policies'); // 기본값: 자립 지원 정책
+  const [searchParams] = useSearchParams();
+  
+  // URL parameter에서 메뉴와 자가진단 결과 가져오기
+  const menuParam = searchParams.get('menu') as SelfCheckMoreMenuType | null;
+  const themesParam = searchParams.get('themes') || '';
+  
+  const [selectedMenu, setSelectedMenu] = useState<SelfCheckMoreMenuType>(
+    menuParam || SELF_CHECK_MORE_CONSTANTS.MENU_TYPES.policies.code // URL parameter 또는 기본값
+  );
+
+  // Modal 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: '',
+    description: ''
+  });
 
   // ============================================================================
-  // API 데이터 조회 (common 패키지의 모든 타입 활용)
+  // API 데이터 조회 (immediate=false로 설정, 필요시에만 호출)
   // ============================================================================
   
-  // 자가진단 관련 API 호출
-  const recommendationsState = useRecommendations({ themes: 'phy,emo' });
+  // 자가진단 관련 API 호출 - immediate=false로 설정
+  const recommendationsState = useRecommendations({ themes: themesParam }, false);
   const policiesState = usePolicies({ 
-    themes: 'phy,emo', 
+    themes: themesParam, 
     page: SELF_CHECK_POLICIES_DEFAULTS.PAGE, 
     pageSize: SELF_CHECK_POLICIES_DEFAULTS.PAGE_SIZE 
-  });
+  }, false);
   const providersState = useProviders({ 
     page: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE, 
     pageSize: SELF_CHECK_PROVIDERS_DEFAULTS.PAGE_SIZE 
-  });
+  }, false);
   const facilitiesState = useFacilities({ 
     page: SELF_CHECK_FACILITIES_DEFAULTS.PAGE, 
     pageSize: SELF_CHECK_FACILITIES_DEFAULTS.PAGE_SIZE 
-  });
+  }, false);
+
+  // selectedMenu 변경시 해당 API만 호출
+  useEffect(() => {
+    switch (selectedMenu) {
+      case 'policies':
+        policiesState.execute();
+        break;
+      case 'providers':
+        providersState.execute();
+        break;
+      case 'facilities':
+        facilitiesState.execute();
+        break;
+    }
+  }, [selectedMenu]);
 
   // 메뉴 데이터 정의 - common 패키지의 상수 사용
   const menuItems = SELF_CHECK_MORE_CONSTANTS.ALL_CODES.map((code: SelfCheckMoreMenuType) => ({
     id: code,
     name: getSelfCheckMoreMenuName(code)
   }));
-
-  // 임시 데이터 (API 연동 시 제거)
-  const mockData = {
-    policies: [
-      {
-        id: '1',
-        title: '장애인연금',
-        category: '생활 안정 지원',
-        organization: '보건복지부',
-        description: '장애로 인한 생활의 어려움을 해소하기 위한 기초생활보장제도',
-        link: 'https://example.com/policy/1'
-      },
-      {
-        id: '2', 
-        title: '장애수당',
-        category: '생활 안정 지원',
-        organization: '보건복지부',
-        description: '장애인에게 지급되는 월정액 수당',
-        link: 'https://example.com/policy/2'
-      },
-      {
-        id: '3',
-        title: '장애인 자립생활 지원',
-        category: '자립생활 지원',
-        organization: '보건복지부',
-        description: '장애인의 자립생활을 위한 종합적인 지원 서비스',
-        link: 'https://example.com/policy/3'
-      }
-    ],
-    providers: [
-      {
-        id: '1',
-        title: '장애인자립생활지원센터',
-        organization: '보건복지부',
-        address: '서울특별시 중구 세종대로 110',
-        phone: '02-1234-5678',
-        description: '장애인의 자립생활을 위한 종합적인 지원 서비스'
-      },
-      {
-        id: '2',
-        title: '한국장애인고용공단',
-        organization: '고용노동부',
-        address: '서울특별시 영등포구 여의대로 92',
-        phone: '02-2345-6789',
-        description: '장애인 고용촉진 및 직업재활 지원'
-      }
-    ],
-    facilities: [
-      {
-        id: '1',
-        title: '무장애 화장실',
-        location: '서울시청',
-        address: '서울특별시 중구 세종대로 110',
-        hours: '24시간 이용가능',
-        description: '휠체어 이용자를 위한 무장애 화장실'
-      },
-      {
-        id: '2',
-        title: '장애인 전용 주차장',
-        location: '강남구청',
-        address: '서울특별시 강남구 테헤란로 521',
-        hours: '평일 09:00-18:00',
-        description: '장애인 전용 주차공간 제공'
-      }
-    ]
-  };
 
   // 현재 선택된 메뉴에 따른 API 데이터 상태 결정
   const getCurrentApiState = () => {
@@ -138,7 +104,10 @@ export function SelfCheckMore() {
   };
 
   const currentApiState = getCurrentApiState();
-  const currentData = currentApiState.data || [];
+  // API 응답 형식이 다름: recommendations는 배열, 나머지는 PaginationRes
+  const currentData = Array.isArray(currentApiState.data) 
+    ? currentApiState.data 
+    : (currentApiState.data?.items || []);
 
   // 메뉴 클릭 핸들러
   const handleMenuClick = (menuType: SelfCheckMoreMenuType) => {
@@ -151,8 +120,13 @@ export function SelfCheckMore() {
       // 링크가 있으면 새창으로 열기
       window.open(item.link, '_blank', 'noopener,noreferrer');
     } else {
-      // 링크가 없으면 상세 정보 표시
-      alert(`${item.title} 상세 정보는 준비 중입니다.`);
+      // 링크가 없으면 상세 정보 표시 (Modal)
+      const itemTitle = item.title || item.policy_name || item.provider_name || item.device || '정보';
+      setModalContent({
+        title: '준비 중입니다',
+        description: `${itemTitle}의 상세 정보는 준비 중입니다.\n곧 서비스 예정입니다.`
+      });
+      setIsModalOpen(true);
     }
   };
 
@@ -166,8 +140,13 @@ export function SelfCheckMore() {
   };
 
   const getCount = () => {
-    // API 응답의 total 필드 사용 (BE가 PaginationRes 형식으로 반환)
-    return currentApiState.loading ? '...' : formatCount(currentApiState.data?.total);
+    if (currentApiState.loading) return '...';
+    
+    // API 응답 형식이 다름: recommendations는 배열, 나머지는 PaginationRes
+    if (Array.isArray(currentApiState.data)) {
+      return formatCount(currentApiState.data.length);
+    }
+    return formatCount(currentApiState.data?.total);
   };
 
   return (
@@ -220,12 +199,11 @@ export function SelfCheckMore() {
               renderRow={(item: any, index: number) => (
                 <TableRow 
                   key={item.id || index} 
-                  id={`self-check-more-row-${index + 1}`} 
-                  onClick={() => handleCardClick(item)}
+                  id={`self-check-more-row-${index + 1}`}
                 >
                   <TableCell variant="info" id={`self-check-more-row-${index + 1}-info`}>
                     <DataTitle id={`self-check-more-row-${index + 1}-title`}>
-                      {item.title || item.policy_name || item.provider_name || item.facility_name || '제목'}
+                      {item.title || item.policy_name || item.provider_name || item.device || '제목'}
                     </DataTitle>
                     <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
                       {item.category && (
@@ -255,12 +233,33 @@ export function SelfCheckMore() {
                           separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
                         />
                       )}
-                      <MetaItem
-                        label="등록일"
-                        value={item.reg_date || '2025.01.15'}
-                        labelId={`self-check-more-row-${index + 1}-meta-date-label`}
-                        valueId={`self-check-more-row-${index + 1}-meta-date-value`}
-                      />
+                      {item.install_area && (
+                        <MetaItem
+                          label="설치 지역"
+                          value={item.install_area}
+                          labelId={`self-check-more-row-${index + 1}-meta-area-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-area-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-4`}
+                        />
+                      )}
+                      {item.address && (
+                        <MetaItem
+                          label="주소"
+                          value={item.address}
+                          labelId={`self-check-more-row-${index + 1}-meta-address-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-address-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-5`}
+                        />
+                      )}
+                      {item.reg_date && (
+                        <MetaItem
+                          label="등록일"
+                          value={item.reg_date}
+                          labelId={`self-check-more-row-${index + 1}-meta-date-label`}
+                          valueId={`self-check-more-row-${index + 1}-meta-date-value`}
+                          separatorId={`self-check-more-row-${index + 1}-meta-separator-6`}
+                        />
+                      )}
                     </DataMeta>
                   </TableCell>
                   <TableCell variant="tags" id={`self-check-more-row-${index + 1}-tags`}>
@@ -273,6 +272,12 @@ export function SelfCheckMore() {
                     {item.location && (
                       <Tag id={`self-check-more-row-${index + 1}-tag-location`}>{item.location}</Tag>
                     )}
+                    {item.install_area && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-area`}>{item.install_area}</Tag>
+                    )}
+                    {item.install_site && (
+                      <Tag id={`self-check-more-row-${index + 1}-tag-site`}>{item.install_site}</Tag>
+                    )}
                   </TableCell>
                 </TableRow>
               )}
@@ -280,6 +285,15 @@ export function SelfCheckMore() {
           </Table>
         </div>
       </div>
+
+      {/* Modal - 상세 정보 준비 중 */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={modalContent.title}
+        description={modalContent.description}
+        primaryButtonText="확인"
+      />
     </Layout>
   );
 }

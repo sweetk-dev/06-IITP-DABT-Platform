@@ -187,7 +187,7 @@ export function Home() {
               
               // 각 테마별 스타일 설정 (피그마 디자인 보존)
               const themeStyles = {
-                phy: {
+                phys: {
                   background: '#ffeef2',
                   outline: '#ffdde5',
                   image: '/medal2.png',
