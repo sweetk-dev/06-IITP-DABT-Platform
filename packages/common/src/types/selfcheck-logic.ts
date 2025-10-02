@@ -1,5 +1,5 @@
 // 자가진단 관련 타입 및 상수 정의
-import { SelfRelTypeCode } from './constants.js';
+import { SelfRelTypeCode, SELF_REL_TYPE_CONSTANTS, DIS_LEVEL_CONSTANTS } from './constants.js';
 
 // ============================================================================
 // 상수 정의
@@ -35,13 +35,8 @@ export const SELF_CHECK_CONSTANTS = {
   // 미달 기준 점수
   DEFICIENCY_THRESHOLD: 70,
   
-  // 정책 노출 우선순위 (API 코드와 동일)
-  POLICY_PRIORITY_ORDER: [
-    'phys',   // 신체적 자립
-    'econ',   // 경제적 자립
-    'emo',    // 정서적 자립
-    'soc'     // 사회적 자립
-  ] as const
+  // 정책 노출 우선순위 (SELF_REL_TYPE_CONSTANTS에서 동적으로 가져옴, basic 제외)
+  POLICY_PRIORITY_ORDER: SELF_REL_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code) as Exclude<SelfRelTypeCode, 'basic'>[]
 } as const;
 
 // 총 소요시간 계산 (초)
@@ -52,7 +47,8 @@ export const TOTAL_TIME_SECONDS = SELF_CHECK_CONSTANTS.TIME_PER_QUESTION * SELF_
 // ============================================================================
 
 // 자립 영역 타입 (constants.ts의 SelfRelTypeCode에서 자가진단 관련 영역만 사용)
-export type SelfCheckAreaType = 'phys' | 'emo' | 'econ' | 'soc';
+// SelfCheckAreaType은 SelfRelTypeCode의 subset으로 정의 (basic 제외)
+export type SelfCheckAreaType = Exclude<SelfRelTypeCode, typeof SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code>;
 
 // 본인 확인 문항 타입
 export type IdentityQuestionType = 
@@ -65,7 +61,7 @@ export type IdentityQuestionType =
 export type IdentityResponse = {
   is_person_with_disability: 'yes' | 'no';
   gender: 'male' | 'female';
-  disability_level: 'mild' | 'severe' | 'unknown';
+  disability_level: typeof DIS_LEVEL_CONSTANTS.ALL_CODES[number];
   age_group: 'minor' | 'adult';
 };
 
@@ -130,9 +126,9 @@ export const IDENTITY_QUESTIONS = [
     id: 'disability_level' as IdentityQuestionType,
     question: '장애 정도를 알려주세요.',
     options: [
-      { value: 'mild', label: '경증' },
-      { value: 'severe', label: '중증' },
-      { value: 'unknown', label: '모름' }
+      { value: DIS_LEVEL_CONSTANTS.DIS_LEVEL.mild.code, label: DIS_LEVEL_CONSTANTS.DIS_LEVEL.mild.name },
+      { value: DIS_LEVEL_CONSTANTS.DIS_LEVEL.severe.code, label: DIS_LEVEL_CONSTANTS.DIS_LEVEL.severe.name },
+      { value: DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.code, label: DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.name }
     ],
     note: '모름의 경우, \'기초\' 정책 안내'
   },
@@ -201,21 +197,21 @@ export const SELF_CHECK_QUESTIONS = {
 // 유틸리티 함수
 // ============================================================================
 
-// 영역별 한글명 매핑
-export const AREA_NAMES: Record<SelfCheckAreaType, string> = {
-  phys: '신체적 자립',
-  emo: '정서적 자립', 
-  econ: '경제적 자립',
-  soc: '사회적 자립'
-};
+// AREA_NAMES와 AREA_CODES는 SELF_REL_TYPE_CONSTANTS에서 가져옴
+export function getAreaName(area: SelfCheckAreaType): string {
+  return SELF_REL_TYPE_CONSTANTS.SELF_REL_TYPES[area].name;
+}
 
-// 영역별 영문 약자 매핑 (자가진단 문항용)
-export const AREA_CODES: Record<SelfCheckAreaType, string> = {
-  phys: 'PI',
-  emo: 'MI',
-  econ: 'EI', 
-  soc: 'SI'
-};
+export function getAreaCode(area: SelfCheckAreaType): string {
+  // 자가진단 영역별 코드 매핑
+  const areaCodeMap: Record<SelfCheckAreaType, string> = {
+    phys: 'PI',
+    emo: 'MI', 
+    econ: 'EI',
+    soc: 'SI'
+  };
+  return areaCodeMap[area];
+}
 
 /**
  * 모든 영역의 코드 배열을 우선순위 순으로 반환
@@ -234,8 +230,8 @@ export function getQuestionCountByArea(area: SelfCheckAreaType): number {
 export function getAllSelfCheckQuestions() {
   const allQuestions: Array<{ id: string; question: string }> = [];
   
-  // 영역 순서: phys -> emo -> econ -> soc
-  const areas: SelfCheckAreaType[] = ['phys', 'emo', 'econ', 'soc'];
+  // 영역 순서: SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER 사용
+  const areas: SelfCheckAreaType[] = SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER;
   
   for (const area of areas) {
     allQuestions.push(...SELF_CHECK_QUESTIONS[area]);
@@ -333,26 +329,31 @@ export function recommendPolicies(
 ): string[] {
   const policies: string[] = [];
   
-  // Case: 장애정도 모름
-  if (userInfo?.disability_level === 'unknown') {
+  // Case: 장애정도 모름 - 기초 정책 무조건 추가
+  const isDisLevelUnknown = userInfo?.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.code;
+  if (isDisLevelUnknown) {
     policies.push('기초 정책');
-    return policies;
   }
   
   const numDeficient = deficientAreas.length;
   
   if (numDeficient === 0) {
-    // 모든 영역 양호
-    policies.push('전체 영역 양호 정책');
-  } else if (numDeficient >= 3) {
-    // Case1: 모두 미달 또는 Case2: 3개 미달
-    // 우선순위에 따라 각 미달 영역에서 1개씩 (최대 3개)
-    for (let i = 0; i < Math.min(numDeficient, 3); i++) {
-      policies.push(`${deficientAreas[i]}_policy_1`);
+    // 모든 영역 양호 - 기초만 있으면 기초만, 없으면 일반 정책
+    if (!isDisLevelUnknown) {
+      policies.push('전체 영역 양호 정책');
+    }
+  } else if (numDeficient >= 4) {
+    // Case1: 4개 모두 미달 - 각 1개씩 (4개)
+    for (const area of deficientAreas) {
+      policies.push(`${area}_policy_1`);
+    }
+  } else if (numDeficient === 3) {
+    // Case2: 3개 미달 - 각 1개씩 (3개)
+    for (const area of deficientAreas) {
+      policies.push(`${area}_policy_1`);
     }
   } else if (numDeficient === 2) {
-    // Case3: 2개 미달
-    // 더 낮은 점수를 받은 영역에서 2개, 나머지에서 1개
+    // Case3: 2개 미달 - 기존 로직 (최대 3개)
     const [area1, area2] = deficientAreas;
     if (areaScores[area1] < areaScores[area2]) {
       policies.push(`${area1}_policy_1`, `${area1}_policy_2`);
@@ -362,8 +363,7 @@ export function recommendPolicies(
       policies.push(`${area1}_policy_1`);
     }
   } else if (numDeficient === 1) {
-    // Case4: 1개 미달
-    // 해당 영역 관련 정책 3개
+    // Case4: 1개 미달 - 해당 영역 관련 정책 3개
     policies.push(`${deficientAreas[0]}_policy_1`, `${deficientAreas[0]}_policy_2`, `${deficientAreas[0]}_policy_3`);
   }
   
@@ -380,13 +380,11 @@ export function calculateSelfCheckResult(
   responses: SelfCheckResponse,
   userInfo?: IdentityResponse
 ): SelfCheckResult {
-  // 영역별 점수 계산
-  const areaScores: { [key in SelfCheckAreaType]: number } = {
-    phys: calculateAreaScore(responses, 'phys'),
-    emo: calculateAreaScore(responses, 'emo'),
-    econ: calculateAreaScore(responses, 'econ'),
-    soc: calculateAreaScore(responses, 'soc')
-  };
+  // 영역별 점수 계산 (동적으로)
+  const areaScores: { [key in SelfCheckAreaType]: number } = {} as any;
+  SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER.forEach(area => {
+    areaScores[area] = calculateAreaScore(responses, area);
+  });
   
   // 전체 평균 점수 계산
   const totalScore = calculateTotalScore(areaScores);

@@ -229,11 +229,15 @@ export const DIS_LEVEL_CONSTANTS = {
     severe: {
       code: 'severe',
       name: '중증'
+    },
+    unknown: {
+      code: 'unknown',
+      name: '모름'
     }
   },
   
   // ALL_CODES 배열
-  ALL_CODES: ['mild', 'severe'] as const
+  ALL_CODES: ['mild', 'severe', 'unknown'] as const
 } as const;
 
 // ALL_CODES에서 타입 자동 추출
