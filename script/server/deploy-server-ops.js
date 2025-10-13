@@ -44,13 +44,13 @@ if (process.platform !== 'linux') {
 
 const config = {
   buildHost: (process.env.BUILD_SERVER_HOST || 'localhost').toLowerCase(),
-  buildUser: process.env.BUILD_SERVER_USER || 'root',
+  buildUser: process.env.BUILD_SERVER_USER || 'iitp-plf',
   buildPort: process.env.BUILD_SERVER_PORT || '22',
-  sourcePath: process.env.SOURCE_PATH || '/home/iitp-adm/iitp-dabt-admin/source',
+  sourcePath: process.env.SOURCE_PATH || '/home/iitp-plf/iitp-dabt-platform/source',
   prodHost: (process.env.PROD_SERVER_HOST || 'localhost').toLowerCase(),
-  prodUser: process.env.PROD_SERVER_USER || 'root',
+  prodUser: process.env.PROD_SERVER_USER || 'iitp-plf',
   prodPort: process.env.PROD_SERVER_PORT || '22',
-  opsPath: process.env.OPS_SCRIPT_PATH || '/var/www/iitp-dabt-admin/script'
+  opsPath: process.env.OPS_SCRIPT_PATH || '/var/www/iitp-dabt-platform/script'
 };
 
 function hostsEqual(a, b) {
@@ -124,7 +124,7 @@ async function copyOpsScripts() {
 async function deployRuntimePackageJson() {
   const runtimeRoot = path.posix.dirname(config.opsPath);
   const pkgContent = JSON.stringify({
-    name: 'iitp-dabt-admin-runtime',
+    name: 'iitp-dabt-platform-runtime',
     private: true,
     scripts: {
       'start:be': 'node script/start-server-be.js',

@@ -50,10 +50,10 @@ if (!isLinux) {
 
 // Git 설정
 const gitConfig = {
-  repoUrl: process.env.GIT_REPO_URL || 'https://github.com/iitp/dabt-admin.git',
+  repoUrl: process.env.GIT_REPO_URL || 'https://github.com/sweetk-dev/06-IITP-DABT-Platform.git',
   branch: process.env.GIT_BRANCH || 'main',
-  sourcePath: process.env.SOURCE_PATH || '/home/iitp-adm/iitp-dabt-admin/source',
-  deployPath: process.env.DEPLOY_PATH || '/home/iitp-adm/iitp-dabt-admin/deploy'
+  sourcePath: process.env.SOURCE_PATH || '/home/iitp-plf/iitp-dabt-platform/source',
+  deployPath: process.env.DEPLOY_PATH || '/home/iitp-plf/iitp-dabt-platform/deploy'
 };
 
 // 버전 정보 출력 (소스 package.json 기준)
@@ -132,10 +132,7 @@ async function ensureBuilt(name, pkgRelPath, distRelPath) {
   const distPath = path.join(gitConfig.sourcePath, distRelPath);
   if (!pathExists(distPath) || isDirEmpty(distPath)) {
     console.log(`⚙️  ${name} dist가 없어 빌드 수행: ${pkgPath}`);
-    // prebuild (빌드 정보 생성) 실행 후 빌드
-    if (name === 'Backend' || name === 'Frontend') {
-      await run('npm', ['run', 'prebuild'], pkgPath);
-    }
+    // build:clean이 빌드 정보 생성 포함
     await run('npm', ['run', 'build:clean'], pkgPath);
   }
   if (!pathExists(distPath)) {
@@ -167,8 +164,7 @@ async function buildCommon() {
 // Backend 빌드
 async function buildBe() {
   console.log('🔧 Backend 빌드 중...');
-  // prebuild 실행(빌드 정보 생성)
-  await run('npm', ['run', 'prebuild'], path.join(gitConfig.sourcePath, 'be'));
+  // build:clean이 빌드 정보 생성 포함 (generate-build-info.js 실행)
   await run('npm', ['run', 'build:clean'], path.join(gitConfig.sourcePath, 'be'));
   console.log('✅ Backend 빌드 완료');
 }
@@ -176,8 +172,7 @@ async function buildBe() {
 // Frontend 빌드
 async function buildFe() {
   console.log('🎨 Frontend 빌드 중...');
-  // prebuild 실행(빌드 정보 생성)
-  await run('npm', ['run', 'prebuild'], path.join(gitConfig.sourcePath, 'fe'));
+  // build:clean이 전체 빌드 수행
   await run('npm', ['run', 'build:clean'], path.join(gitConfig.sourcePath, 'fe'));
   console.log('✅ Frontend 빌드 완료');
 }
@@ -272,15 +267,15 @@ async function main() {
 if (!process.env.SOURCE_PATH) {
   console.log('⚠️  환경 변수가 설정되지 않았습니다.');
   console.log('📋 필요한 환경 변수:');
-  console.log('   SOURCE_PATH: 소스 코드 경로 (기본값: /home/iitp-adm/iitp-dabt-admin/source)');
-  console.log('   DEPLOY_PATH: 배포 폴더 경로 (기본값: /home/iitp-adm/iitp-dabt-admin/deploy)');
+  console.log('   SOURCE_PATH: 소스 코드 경로 (기본값: /home/iitp-plf/iitp-dabt-platform/source)');
+  console.log('   DEPLOY_PATH: 배포 폴더 경로 (기본값: /home/iitp-plf/iitp-dabt-platform/deploy)');
   console.log('   GIT_REPO_URL: Git 저장소 URL');
   console.log('   GIT_BRANCH: Git 브랜치 (기본값: main)');
   console.log('');
   console.log('💡 예시:');
-  console.log('   export SOURCE_PATH=/home/iitp-adm/iitp-dabt-admin/source');
-  console.log('   export DEPLOY_PATH=/home/iitp-adm/iitp-dabt-admin/deploy');
-  console.log('   export GIT_REPO_URL=https://github.com/iitp/dabt-admin.git');
+  console.log('   export SOURCE_PATH=/home/iitp-plf/iitp-dabt-platform/source');
+  console.log('   export DEPLOY_PATH=/home/iitp-plf/iitp-dabt-platform/deploy');
+  console.log('   export GIT_REPO_URL=https://github.com/sweetk-dev/06-IITP-DABT-Platform.git');
   console.log('   export GIT_BRANCH=main');
   console.log('');
   console.log('🔧 또는 .env 파일에 설정하세요.');

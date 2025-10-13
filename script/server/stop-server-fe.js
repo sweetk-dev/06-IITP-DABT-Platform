@@ -9,7 +9,7 @@ if (!isLinux) {
   process.exit(1);
 }
 
-const nginxSitePath = process.env.NGINX_CONFIG_PATH || '/etc/nginx/sites-available/iitp-dabt-adm-fe';
+const nginxSitePath = process.env.NGINX_CONFIG_PATH || '/etc/nginx/sites-available/iitp-dabt-plf-fe';
 
 async function run(cmd, args) {
   return new Promise((resolve, reject) => {

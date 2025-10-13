@@ -290,15 +290,50 @@ function App() {
 
 ## 🔧 설정
 
-### 환경 변수
+### 환경 변수 ⚠️
+
+**중요**: Frontend는 **빌드 시점에만** 환경변수가 필요합니다! (실행 시에는 불필요)
+
+| 시점 | 환경변수 필요 | 방법 | 이유 |
+|------|--------------|------|------|
+| **빌드 시** | ✅ **필수** | shell export 또는 .env | Vite가 코드에 하드코딩 |
+| **실행 시** | ❌ 불필요 | - | 이미 빌드된 정적 파일 |
+
+#### 로컬 개발
+
+로컬에서는 `.env` 파일 또는 `.env.local` 파일로 설정:
 
 ```env
 # .env.local
-VITE_API_BASE_URL=http://localhost:3000/api/v1
-VITE_OPEN_API_CENTER_URL=https://api-center.example.com
-VITE_VISUAL_TOOL=https://visual-tool.example.com
-VITE_EMPLOYMENT_SITE_URL=https://employment.example.com
+VITE_BASE=/
+VITE_API_BASE_URL=http://localhost:33000
 ```
+
+#### 프로덕션 빌드
+
+프로덕션 빌드 시에는 **shell 환경변수로 export** (빌드 서버에서):
+
+```bash
+# 프로덕션 환경변수 설정 (빌드 전 필수!)
+export VITE_BASE=/plf/
+export VITE_API_BASE_URL=/plf
+
+# 빌드 실행
+npm run build
+```
+
+**프로덕션 주의사항**:
+- ✅ 빌드 전에 shell에 export 필수 (또는 빌드 서버의 fe/.env에 설정)
+- ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요
+- ✅ Vite가 빌드 시 환경변수를 코드에 하드코딩하므로 런타임 변경 불가
+- 🔧 `VITE_API_BASE_URL=/plf` (not `/plf/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
+
+#### 환경변수 목록
+
+| 변수명 | 설명 | 로컬 개발 | 프로덕션 |
+|--------|------|-----------|---------|
+| `VITE_BASE` | 베이스 경로 | `/` | `/plf/` |
+| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/plf` |
 
 ### API 설정
 

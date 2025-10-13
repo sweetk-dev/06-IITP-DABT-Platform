@@ -198,20 +198,46 @@ GET /api/v1/selfcheck/policies?gender=남성&disLevel=경증&ageCond=adult&theme
 
 ## 🔧 설정
 
-### 환경변수
+### 환경변수 ⚠️
 
-| 변수명 | 설명 | 기본값 |
-|--------|------|--------|
-| `NODE_ENV` | 실행 환경 | `development` |
-| `PORT` | 서버 포트 | `3001` |
-| `DB_HOST` | 데이터베이스 호스트 | `localhost` |
-| `DB_PORT` | 데이터베이스 포트 | `5432` |
-| `DB_NAME` | 데이터베이스 이름 | `iitp_dabt_platform` |
-| `DB_USER` | 데이터베이스 사용자 | `postgres` |
-| `DB_PASSWORD` | 데이터베이스 비밀번호 | - |
-| `CORS_ORIGINS` | CORS 허용 오리진 | `http://localhost:33000` |
-| `OPEN_API_SERVER_URL` | OpenAPI 서버 URL | - |
-| `LOG_LEVEL` | 로그 레벨 | `info` |
+**중요**: Backend는 **실행 시점에만** `.env` 파일이 필요합니다! (빌드 시에는 불필요)
+
+| 시점 | .env 필요 여부 | 위치 | 이유 |
+|------|---------------|------|------|
+| **빌드 시** | ❌ 불필요 | - | TypeScript 컴파일만 수행 |
+| **실행 시** | ✅ **필수** | `be/.env` | dotenv로 런타임에 로드 |
+
+#### 로컬 개발
+```bash
+# env.sample을 복사하여 .env 생성
+cp env.sample .env
+```
+
+#### 프로덕션 서버
+```bash
+# 실행 서버에 .env 생성 (최초 1회)
+sudo vi /var/www/iitp-dabt-platform/be/.env
+```
+
+#### 환경변수 목록
+
+| 변수명 | 설명 | 개발 | 프로덕션 |
+|--------|------|------|---------|
+| `NODE_ENV` | 실행 환경 | `development` | `production` |
+| `PORT` | 서버 포트 | `3001` | `33000` |
+| `DB_HOST` | 데이터베이스 호스트 | `localhost` | `localhost` |
+| `DB_PORT` | 데이터베이스 포트 | `5432` | `5432` |
+| `DB_NAME` | 데이터베이스 이름 | `iitp_dabt_platform` | `iitp_dabt` |
+| `DB_USER` | 데이터베이스 사용자 | `postgres` | `iitp_platform_user` |
+| `DB_PASSWORD` | 데이터베이스 비밀번호 | - | - |
+| `CORS_ORIGINS` | CORS 허용 오리진 | `http://localhost:5173` | `http://서버주소` |
+| `OPEN_API_SERVER_URL` | OpenAPI 서버 URL | - | - |
+| `LOG_LEVEL` | 로그 레벨 | `info` | `warn` |
+
+**프로덕션 주의사항**:
+- ✅ 실행 서버의 `/var/www/iitp-dabt-platform/be/.env` **반드시 필요**
+- ✅ 배포 스크립트는 `.env` 파일을 exclude하므로 **수동으로 최초 1회 생성**
+- ✅ 한 번 생성하면 배포 시 자동 보존됨
 
 ### 로깅 설정
 

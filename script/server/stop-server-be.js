@@ -9,7 +9,7 @@ if (!isLinux) {
   process.exit(1);
 }
 
-const pm2AppName = process.env.PM2_APP_NAME_BE || 'iitp-dabt-adm-be';
+const pm2AppName = process.env.PM2_APP_NAME_BE || 'iitp-dabt-plf-be';
 
 async function run(cmd, args) {
   return new Promise((resolve, reject) => {

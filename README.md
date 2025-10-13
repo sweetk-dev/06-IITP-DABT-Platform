@@ -212,6 +212,7 @@ npm run build:common           # 공통 패키지 빌드
 
 ### 암호화된 환경변수 지원
 - **AES-256-CBC 암호화**: `DB_PASSWORD=ENC(암호화된문자열)` 형태 지원
+- **복호화 키**: `ENC_SECRET` 환경변수로 암호화/복호화 키 관리
 - **자동 복호화**: 환경변수 로딩 시 자동 복호화
 - **보안 강화**: 민감한 정보 암호화 저장
 
@@ -221,9 +222,15 @@ npm run build:common           # 공통 패키지 빌드
 - **일관성**: FE/BE 간 동일한 enum 값 사용
 
 ### 환경변수 암호화 도구
-- **AES-256-CBC 암호화**: `script/encrypt-env.js`로 민감한 환경변수 암호화
+- **스크립트**: `be/script/encrypt-env.js`로 민감한 환경변수 암호화
+  ```bash
+  # 사용법
+  cd be
+  ENC_SECRET=your_secret_key node script/encrypt-env.js
+  ```
 - **ENC() 형식**: `DB_PASSWORD=ENC(암호화된문자열)` 형태로 저장
 - **자동 복호화**: BE에서 `getDecryptedEnv()` 함수로 자동 복호화
+- **주의**: `ENC_SECRET` 값은 `.env` 파일에 반드시 설정 필요
 
 ## 🔧 개발 가이드
 
@@ -273,7 +280,16 @@ npm run preview
 ```
 
 ### 서버 배포
+
+**프로덕션 서버 배포 전 필수 사항**:
+1. Backend `.env` 파일 생성 (실행 서버에서, 최초 1회)
+2. Frontend 빌드 환경변수 설정 (빌드 서버에서)
+
 ```bash
+# Frontend 빌드 환경변수 설정 (빌드 전 필수!)
+export VITE_BASE=/plf/
+export VITE_API_BASE_URL=/plf
+
 # 서버 빌드
 npm run build:server
 
@@ -281,10 +297,24 @@ npm run build:server
 npm run deploy:server
 ```
 
+**상세 가이드**: 
+- [서버 기동 방법](./README-IITP-DABT-Platform-서버-기동-방법.md)
+- [단일 서버 배포 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md)
+- [분리 서버 배포 가이드](./script/README-SERVER-DEPLOYMENT.md)
+
 ## 📚 문서
 
+### 개발 문서
 - [프론트엔드 문서](./fe/README.md)
+- [백엔드 문서](./be/README.md)
 - [공통 패키지 문서](./packages/common/README.md)
+
+### 서버 배포 문서
+- [서버 기동 방법](./README-IITP-DABT-Platform-서버-기동-방법.md) ⭐ **필독**
+- [단일 서버 배포 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md)
+- [분리 서버 배포 가이드](./script/README-SERVER-DEPLOYMENT.md)
+
+### 참고 자료
 - [API 스펙](./01.references/openapi-v0.0.3.yaml)
 - [Figma 디자인](./01.references/figma_designs/)
 

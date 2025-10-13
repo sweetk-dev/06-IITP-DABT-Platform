@@ -74,8 +74,8 @@ if (!isLinux) {
 
 // 설정
 const config = {
-  bePath: process.env.PROD_BE_PATH || '/var/www/iitp-dabt-admin/be',
-  pm2AppName: process.env.PM2_APP_NAME_BE || 'iitp-dabt-adm-be'
+  bePath: process.env.PROD_BE_PATH || '/var/www/iitp-dabt-platform/be',
+  pm2AppName: process.env.PM2_APP_NAME_BE || 'iitp-dabt-plf-be'
 };
 
 // 버전 정보 출력
@@ -178,12 +178,12 @@ async function main() {
 if (!process.env.PROD_BE_PATH) {
   console.log('⚠️  환경 변수가 설정되지 않았습니다.');
   console.log('📋 필요한 환경 변수:');
-  console.log('   PROD_BE_PATH: Backend 서버 경로 (기본값: /var/www/iitp-dabt-admin/be)');
-  console.log('   PM2_APP_NAME_BE: PM2 앱 이름 (기본값: iitp-dabt-adm-be)');
+  console.log('   PROD_BE_PATH: Backend 서버 경로 (기본값: /var/www/iitp-dabt-platform/be)');
+  console.log('   PM2_APP_NAME_BE: PM2 앱 이름 (기본값: iitp-dabt-plf-be)');
   console.log('');
   console.log('💡 예시:');
-  console.log('   export PROD_BE_PATH=/var/www/iitp-dabt-admin/be');
-  console.log('   export PM2_APP_NAME_BE=iitp-dabt-adm-be');
+  console.log('   export PROD_BE_PATH=/var/www/iitp-dabt-platform/be');
+  console.log('   export PM2_APP_NAME_BE=iitp-dabt-plf-be');
   console.log('');
   console.log('🔧 또는 .env 파일에 설정하세요.');
 }

@@ -17,8 +17,8 @@ if (!isLinux) {
 
 // 설정
 const config = {
-  fePath: process.env.PROD_FE_PATH || '/var/www/iitp-dabt-admin/fe',
-  nginxConfigPath: process.env.NGINX_CONFIG_PATH || '/etc/nginx/sites-available/iitp-dabt-adm-fe'
+  fePath: process.env.PROD_FE_PATH || '/var/www/iitp-dabt-platform/fe',
+  nginxConfigPath: process.env.NGINX_CONFIG_PATH || '/etc/nginx/sites-available/iitp-dabt-plf-fe'
 };
 
 // 버전 정보 출력
@@ -57,29 +57,50 @@ async function startFrontend() {
   // Nginx 설정 파일 생성
   console.log('📝 Nginx 설정 파일 생성 중...');
   const nginxConfig = `
-server {
-    listen 80;
-    server_name ${process.env.FRONTEND_DOMAIN || 'localhost'};
-    root ${config.fePath};
+# IITP 장애인 데이터 플랫폼 Frontend (기존 서비스와 공존)
+# 주의: 이 설정은 기존 Nginx 설정 파일에 location 블록만 추가하거나,
+# 별도의 conf.d 파일로 include되어야 합니다.
+
+# FE: /plf → /plf/
+location = /plf {
+    return 301 /plf/;
+}
+
+# 정적 자산 캐시
+location ^~ /plf/assets/ {
+    alias ${config.fePath}/dist/assets/;
+    try_files $uri =404;
+    expires 7d;
+    add_header Cache-Control "public, max-age=604800";
+}
+
+location ~* ^/plf/(.+\\.(png|jpg|jpeg|gif|svg|ico|woff2?|js|css))$ {
+    alias ${config.fePath}/dist/$1;
+    try_files $uri =404;
+    expires 7d;
+    add_header Cache-Control "public, max-age=604800";
+}
+
+# SPA 진입점
+location ^~ /plf/ {
+    alias ${config.fePath}/dist/;
     index index.html;
-    
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-    
-    location /api {
-        proxy_pass http://localhost:30000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-    
-    # 정적 파일 캐싱
-    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
+    try_files $uri $uri/ /index.html;
+}
+
+# API 프록시 (/plf/api/* → /api/*)
+location /plf/api/ {
+    proxy_pass http://127.0.0.1:33000/api/;  # 끝 슬래시 필수
+    proxy_http_version 1.1;
+    proxy_read_timeout 120s;
+    proxy_send_timeout 120s;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    client_max_body_size 20m;
 }
 `;
   
@@ -170,16 +191,21 @@ async function main() {
 if (!process.env.PROD_FE_PATH) {
   console.log('⚠️  환경 변수가 설정되지 않았습니다.');
   console.log('📋 필요한 환경 변수:');
-  console.log('   PROD_FE_PATH: Frontend 서버 경로 (기본값: /var/www/iitp-dabt-admin/fe)');
-  console.log('   NGINX_CONFIG_PATH: Nginx 설정 파일 경로 (기본값: /etc/nginx/sites-available/iitp-dabt-adm-fe)');
+  console.log('   PROD_FE_PATH: Frontend 서버 경로 (기본값: /var/www/iitp-dabt-platform/fe)');
+  console.log('   NGINX_CONFIG_PATH: Nginx 설정 파일 경로 (기본값: /etc/nginx/sites-available/iitp-dabt-plf-fe)');
   console.log('   FRONTEND_DOMAIN: Frontend 도메인 (기본값: localhost)');
   console.log('');
   console.log('💡 예시:');
-  console.log('   export PROD_FE_PATH=/var/www/iitp-dabt-admin/fe');
-  console.log('   export NGINX_CONFIG_PATH=/etc/nginx/sites-available/iitp-dabt-adm-fe');
+  console.log('   export PROD_FE_PATH=/var/www/iitp-dabt-platform/fe');
+  console.log('   export NGINX_CONFIG_PATH=/etc/nginx/sites-available/iitp-dabt-plf-fe');
   console.log('   export FRONTEND_DOMAIN=your-domain.com');
   console.log('');
   console.log('🔧 또는 .env 파일에 설정하세요.');
+  console.log('');
+  console.log('⚠️  중요: Platform은 기존 Admin 서비스와 공존합니다!');
+  console.log('   - Platform: /plf, /plf/api (포트 33000)');
+  console.log('   - Admin: /adm, /adm/api (포트 30000)');
+  console.log('   - Nginx 설정은 기존 설정에 추가하거나 conf.d에 include하세요.');
 }
 
 main();
