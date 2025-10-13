@@ -17,6 +17,7 @@ import {
 
 // FULL_API_URLS를 사용하므로 baseUrl은 빈 문자열
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000');
 
 
 // ============================================================================
@@ -78,8 +79,14 @@ export class ApiClient {
       options.body = JSON.stringify(request.body);
     }
     
+    // Timeout 설정
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+    options.signal = controller.signal;
+    
     try {
       const response = await fetch(fullUrl, options);
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         await this.handleHttpError(response);
@@ -93,6 +100,12 @@ export class ApiClient {
       // BE 응답 형식: { success: true, data: T } 에서 data만 추출
       return result.data !== undefined ? result.data : result;
     } catch (error) {
+      // 타임아웃 에러 처리
+      if (error instanceof Error && error.name === 'AbortError') {
+        const timeoutError = new Error('요청 시간이 초과되었습니다.');
+        this.handleError(timeoutError);
+        throw timeoutError;
+      }
       // 이미 처리된 에러가 아닌 경우에만 에러 핸들러 호출
       if (!(error as any).isHandled) {
         this.handleError(error);

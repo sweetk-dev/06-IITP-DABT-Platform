@@ -12,6 +12,10 @@ interface ModalProps {
   secondaryButtonText?: string;
   onPrimaryClick?: () => void;
   onSecondaryClick?: () => void;
+  helpText?: string;
+  helpTextLink?: string;
+  allowHtml?: boolean;
+  autoHeight?: boolean;
 }
 
 export function Modal({
@@ -25,7 +29,11 @@ export function Modal({
   primaryButtonText = '확인',
   secondaryButtonText = '',
   onPrimaryClick,
-  onSecondaryClick
+  onSecondaryClick,
+  helpText,
+  helpTextLink,
+  allowHtml = false,
+  autoHeight = false
 }: ModalProps) {
   // ESC 키로 모달 닫기
   useEffect(() => {
@@ -95,7 +103,7 @@ export function Modal({
         className="modal-content"
         style={{
           width: '408px',
-          height: '252px',
+          ...(autoHeight ? { minHeight: '252px' } : { height: '252px' }),
           padding: '28px 32px 24px 32px',
           background: 'white',
           boxShadow: '0px 0px 100px rgba(0, 0, 0, 0.08)',
@@ -172,27 +180,45 @@ export function Modal({
               {title}
             </div>
             
-            <div 
-              className="modal-description"
-              style={{
-                textAlign: 'center',
-                color: 'black',
-                fontSize: '16px',
-                fontFamily: 'Pretendard',
-                fontWeight: 400,
-                lineHeight: '20.8px',
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-line',
-                width: '100%'
-              }}
-            >
-              {description.split('\\n').map((line, index, array) => (
-                <span key={index}>
-                  {line}
-                  {index < array.length - 1 && <br />}
-                </span>
-              ))}
-            </div>
+            {allowHtml ? (
+              <div 
+                className="modal-description"
+                style={{
+                  textAlign: 'center',
+                  color: 'black',
+                  fontSize: '16px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 400,
+                  lineHeight: '20.8px',
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-line',
+                  width: '100%'
+                }}
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+            ) : (
+              <div 
+                className="modal-description"
+                style={{
+                  textAlign: 'center',
+                  color: 'black',
+                  fontSize: '16px',
+                  fontFamily: 'Pretendard',
+                  fontWeight: 400,
+                  lineHeight: '20.8px',
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-line',
+                  width: '100%'
+                }}
+              >
+                {description.split('\\n').map((line, index, array) => (
+                  <span key={index}>
+                    {line}
+                    {index < array.length - 1 && <br />}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -274,6 +300,65 @@ export function Modal({
             >
               {primaryButtonText}
             </button>
+          </div>
+        )}
+
+        {/* Help Text (optional) */}
+        {helpText && (
+          <div 
+            className="modal-footer"
+            style={{
+              marginTop: '8px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <div 
+              className="help-link"
+              onClick={() => {
+                if (helpTextLink) {
+                  window.open(helpTextLink, '_blank');
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#666',
+                fontSize: '14px',
+                cursor: helpTextLink ? 'pointer' : 'default',
+                transition: 'color 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (helpTextLink) {
+                  e.currentTarget.style.color = '#0090ff';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#666';
+              }}
+            >
+              <div 
+                className="help-icon"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  border: '1.5px solid #666',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  color: '#666'
+                }}
+              >
+                ?
+              </div>
+              <span>{helpText}</span>
+            </div>
           </div>
         )}
       </div>

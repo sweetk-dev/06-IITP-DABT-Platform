@@ -14,6 +14,7 @@ export function DataDetail() {
   const navigate = useNavigate();
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [isOpenApiModalOpen, setIsOpenApiModalOpen] = useState(false);
 
   // ============================================================================
   // API 데이터 조회 (common 패키지의 모든 타입 활용)
@@ -63,6 +64,16 @@ export function DataDetail() {
 
   const handleDownloadClick = () => {
     setIsDownloadModalOpen(true);
+  };
+
+  const handleOpenApiClick = () => {
+    setIsOpenApiModalOpen(true);
+  };
+
+  const handleOpenApiConfirm = () => {
+    const openApiCenterUrl = import.meta.env.VITE_OPEN_API_CENTER_URL || '#';
+    window.open(openApiCenterUrl, '_blank');
+    setIsOpenApiModalOpen(false);
   };
 
   return (
@@ -404,6 +415,42 @@ export function DataDetail() {
         )}
       </div>
 
+      {/* Open API 센터 버튼 */}
+      <div id="open-api-section" className="open-api-section" style={{
+        marginTop: '32px',
+        marginBottom: '64px',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <button
+          className="btn-open-api-center"
+          onClick={handleOpenApiClick}
+          style={{
+            background: 'white',
+            color: 'black',
+            outline: '1px solid #dadada',
+            outlineOffset: '-1px',
+            border: 'none',
+            padding: '14px 24px',
+            borderRadius: '16px',
+            fontSize: '20px',
+            fontFamily: 'Pretendard',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            minWidth: '200px'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#f8f9fa';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'white';
+          }}
+        >
+          Open API 센터
+        </button>
+      </div>
+
       {/* 차트보기 모달 */}
       <Modal
         isOpen={isChartModalOpen}
@@ -424,6 +471,22 @@ export function DataDetail() {
         description="데이터 다운로드 기능은 현재 준비 중입니다.\n빠른 시일 내에 서비스할 예정입니다."
         primaryButtonText="확인"
         onPrimaryClick={() => setIsDownloadModalOpen(false)}
+      />
+
+      {/* Open API 센터 모달 */}
+      <Modal
+        isOpen={isOpenApiModalOpen}
+        onClose={() => setIsOpenApiModalOpen(false)}
+        title="Open API 센터로 이동"
+        description="Open API 센터로 이동이 필요합니다.<br/>이동하시겠습니까?"
+        primaryButtonText="이동하기"
+        secondaryButtonText="취소"
+        onPrimaryClick={handleOpenApiConfirm}
+        onSecondaryClick={() => setIsOpenApiModalOpen(false)}
+        helpText="Open API 센터는 무엇인가요?"
+        helpTextLink={import.meta.env.VITE_OPEN_API_CENTER_ABOUT_URL}
+        allowHtml={true}
+        autoHeight={true}
       />
     </Layout>
   );
