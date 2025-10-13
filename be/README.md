@@ -326,12 +326,20 @@ docker run -p 3001:3001 iitp-dabt-platform-be
 # PM2 설치
 npm install -g pm2
 
-# 애플리케이션 시작
-pm2 start dist/server.js --name "iitp-dabt-platform-be"
+# 애플리케이션 시작 (프로덕션)
+pm2 start dist/server.js --name "iitp-dabt-plf-be"
 
 # 상태 확인
 pm2 status
+
+# 로그 확인
+pm2 logs iitp-dabt-plf-be
 ```
+
+**프로덕션 서버 참고**:
+- PM2 앱명: `iitp-dabt-plf-be`
+- 포트: `33000`
+- 서비스 경로: `/plf/api`
 
 ## 📦 패키지 정보
 

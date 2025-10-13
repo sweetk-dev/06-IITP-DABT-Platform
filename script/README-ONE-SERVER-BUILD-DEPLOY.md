@@ -67,27 +67,49 @@ sudo chown -R iitp-plf:iitp-plf /var/www/iitp-dabt-platform
 
 #### 📋 환경변수 요구사항 요약
 
-| 구분 | 빌드 시 | 실행 시 | 위치 | 방법 |
-|------|---------|---------|------|------|
-| **Backend** | ❌ 불필요 | ✅ **필수** | `/var/www/iitp-dabt-platform/be/.env` | 수동 생성 (최초 1회) |
-| **Frontend** | ✅ **필수** | ❌ 불필요 | 빌드 서버에서 export | shell 환경변수 |
+| 구분 | 빌드 시 | 실행 시 | 위치 | 권장 방법 |
+|------|---------|---------|------|----------|
+| **Backend** | ❌ 불필요 | ✅ **필수** | 실행 서버: `/var/www/iitp-dabt-platform/be/.env` | 수동 생성 (최초 1회) |
+| **Frontend** | ✅ **필수** | ❌ 불필요 | 빌드 서버: `fe/.env` | `.env` 파일 또는 export |
 
 #### FE(빌드 시 주입: Vite)
 
 **빌드 시점에만 필요** - Vite가 환경변수를 코드에 하드코딩합니다.
 
-빌드 서버에서 빌드 전에 아래 변수를 **shell에 export** 하세요:
+빌드 서버에서 빌드 전에 환경변수를 설정하세요. 두 가지 방법이 있습니다:
+
+**방법 1: .env 파일 사용 (권장)**
 ```bash
+# 빌드 서버: fe/.env 생성 (최초 1회)
+cd /home/iitp-plf/iitp-dabt-platform/source/fe
+cp env.sample .env
+vi .env
+
+# env.sample에 프로덕션 값이 기본으로 설정되어 있음
+# 필요 시 서버 주소만 수정:
+# VITE_VISUAL_TOOL=http://실제서버주소:포트/
+# VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+```
+
+**방법 2: shell 환경변수 export (대안)**
+```bash
+export VITE_PORT=5173
 export VITE_BASE=/plf/
 export VITE_API_BASE_URL=/plf
+export VITE_API_TIMEOUT=10000
+export VITE_VISUAL_TOOL=http://실제서버주소:포트/
+export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
 # 주의: VITE_API_BASE_URL=/plf (not /plf/api)
 # FE 코드가 /api/v1/...을 자동으로 추가하므로 baseUrl은 /plf만 설정
 ```
 
 **중요**:
-- ✅ 빌드 서버에서 `npm run build:server` 실행 **전**에 export 필수
+- ✅ **권장**: 빌드 서버에 `fe/.env` 파일 생성 (`fe/env.sample` 참고)
+- ✅ **대안**: shell 환경변수 export
 - ❌ 실행 서버의 FE 디렉토리에는 `.env` 파일 불필요 (이미 빌드된 정적 파일)
-- ❌ 빌드 서버의 FE 디렉토리에도 `.env` 파일 불필요 (export로 충분)
+- ✅ `fe/.env`는 Git에 커밋되지 않으며, 배포 시 exclude됨
 
 #### BE(런타임 주입: dotenv)
 
@@ -144,12 +166,19 @@ sudo -iu iitp-plf
 cd /home/iitp-plf/iitp-dabt-platform/source
 git clone https://github.com/sweetk-dev/06-IITP-DABT-Platform.git .
 
-# 빌드 스크립트용 .env 작성
+# 1. 빌드 스크립트용 .env 작성
 cp script/server/env.sample.build-server script/server/.env
 vi script/server/.env
+
+# 2. Frontend 빌드용 .env 작성 (권장)
+cd fe
+cp env.sample .env
+vi .env
+# 프로덕션 빌드용 설정 (env.sample 참고)
+cd ..
 ```
 
-필수 항목 예시:
+필수 항목 예시 (script/server/.env):
 ```bash
 SOURCE_PATH=/home/iitp-plf/iitp-dabt-platform/source
 DEPLOY_PATH=/home/iitp-plf/iitp-dabt-platform/deploy
@@ -157,9 +186,22 @@ GIT_REPO_URL=https://github.com/sweetk-dev/06-IITP-DABT-Platform.git
 GIT_BRANCH=main
 ```
 
+필수 항목 예시 (fe/.env):
+```bash
+# env.sample에 이미 설정되어 있음 (서버 주소만 수정)
+VITE_PORT=5173
+VITE_BASE=/plf/
+VITE_API_BASE_URL=/plf
+VITE_API_TIMEOUT=10000
+VITE_VISUAL_TOOL=http://실제서버주소:포트/
+VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
+```
+
 **주의**: 
 - ❌ `be/.env` 파일은 만들 필요 없음 (빌드 시 불필요, TypeScript 컴파일만)
-- ❌ `fe/.env` 파일도 만들 필요 없음 (export로 충분)
+- ✅ `fe/.env` 파일 **권장** (env.sample 참고, 또는 export로도 가능)
 
 ---
 
@@ -168,9 +210,19 @@ GIT_BRANCH=main
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# Frontend 빌드용 환경변수 설정 (필수!)
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf
+# Frontend 빌드용 환경변수 설정
+# 방법 1 (권장): fe/.env 파일 사용
+# → 이미 1단계에서 생성했으므로 추가 작업 불필요
+
+# 방법 2 (대안): export 사용 (fe/.env가 없는 경우)
+# export VITE_PORT=5173
+# export VITE_BASE=/plf/
+# export VITE_API_BASE_URL=/plf
+# export VITE_API_TIMEOUT=10000
+# export VITE_VISUAL_TOOL=http://실제서버주소:포트/
+# export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+# export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+# export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
 
 # 전체 빌드 (common → be → fe 순, dist 검증 및 보강 포함)
 npm run build:server
@@ -306,41 +358,70 @@ readlink -f /var/www/iitp-dabt-platform/be/node_modules/@iitp-dabt-platform/comm
 파일: `/etc/nginx/conf.d/iitp-services.conf` (또는 기존 설정 파일)
 
 ```nginx
-upstream iitp_dabt_admin_backend {
-    server 127.0.0.1:30000;
+# 백엔드 API 서버
+upstream iitp_dabt_backend {
+    server 127.0.0.1:30000;  # Admin Backend
     keepalive 32;
 }
 
 upstream iitp_dabt_platform_backend {
-    server 127.0.0.1:33000;
+    server 127.0.0.1:33000;  # Platform Backend
     keepalive 32;
 }
 
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name _;
+    server_name 192.168.60.142;
 
     root /var/www/html;
+    index index.html;
 
-    # ========================================
-    # 기존 문서 서비스 (있는 경우)
-    # ========================================
-    # location /docs/ {
-    #     index index.html;
-    #     try_files $uri $uri/ =404;
-    # }
+    # ========================
+    # [1] 정적 문서 (기존 Docs)
+    # ========================
+    location /docs/ {
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
 
-    # ========================================
-    # Admin 서비스 (기존)
-    # ========================================
-    
-    # FE: /adm → /adm/
+    # ========================
+    # [2] Mock 서버 프록시 (선택사항)
+    # ========================
+    location /mock/ {
+        proxy_pass http://192.168.60.142:4010;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # ========================
+    # [3] Admin API 프록시
+    # ========================
+    location /adm/api/ {
+        proxy_pass http://iitp_dabt_backend/api/;
+        proxy_http_version 1.1;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        client_max_body_size 20m;
+    }
+
+    # ========================
+    # [4] Admin FE Redirect (/adm → /adm/)
+    # ========================
     location = /adm {
         return 301 /adm/;
     }
 
-    # Admin 정적 자산 캐시
+    # ========================
+    # [5] Admin FE 정적 자산 (images, fonts 등)
+    # ========================
     location ^~ /adm/assets/ {
         alias /var/www/iitp-dabt-admin/fe/dist/assets/;
         try_files $uri =404;
@@ -348,45 +429,48 @@ server {
         add_header Cache-Control "public, max-age=604800";
     }
 
-    location ~* ^/adm/(.+\.(png|jpg|jpeg|gif|svg|ico|woff2?|js|css))$ {
+    location ~* ^/adm/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
         alias /var/www/iitp-dabt-admin/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
-    # Admin SPA 진입점
-    location ^~ /adm/ {
+    # ========================
+    # [6] Admin SPA Fallback (React, Vue, Vite)
+    # ========================
+    location /adm/ {
         alias /var/www/iitp-dabt-admin/fe/dist/;
         index index.html;
-        try_files $uri $uri/ /index.html;
+        # 핵심 수정: fallback 시 alias 경로 유지
+        try_files $uri $uri/ /adm/index.html;
     }
 
-    # Admin API 프록시 (/adm/api/* → /api/*)
-    location /adm/api/ {
-        proxy_pass http://iitp_dabt_admin_backend/api/;  # 끝 슬래시 필수
+    # ========================
+    # [7] Platform API 프록시 (신규)
+    # ========================
+    location /plf/api/ {
+        proxy_pass http://iitp_dabt_platform_backend/api/;
         proxy_http_version 1.1;
         proxy_read_timeout 120s;
         proxy_send_timeout 120s;
-
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
         client_max_body_size 20m;
     }
 
-    # ========================================
-    # Platform 서비스 (신규 추가)
-    # ========================================
-    
-    # FE: /plf → /plf/
+    # ========================
+    # [8] Platform FE Redirect (/plf → /plf/)
+    # ========================
     location = /plf {
         return 301 /plf/;
     }
 
-    # Platform 정적 자산 캐시
+    # ========================
+    # [9] Platform FE 정적 자산 (images, fonts 등)
+    # ========================
     location ^~ /plf/assets/ {
         alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
@@ -394,38 +478,26 @@ server {
         add_header Cache-Control "public, max-age=604800";
     }
 
-    location ~* ^/plf/(.+\.(png|jpg|jpeg|gif|svg|ico|woff2?|js|css))$ {
+    location ~* ^/plf/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
         alias /var/www/iitp-dabt-platform/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
-    # Platform SPA 진입점
-    location ^~ /plf/ {
+    # ========================
+    # [10] Platform SPA Fallback (React, Vue, Vite)
+    # ========================
+    location /plf/ {
         alias /var/www/iitp-dabt-platform/fe/dist/;
         index index.html;
-        try_files $uri $uri/ /index.html;
+        # 핵심: fallback 시 alias 경로 유지
+        try_files $uri $uri/ /plf/index.html;
     }
 
-    # Platform API 프록시 (/plf/api/* → /api/*)
-    location /plf/api/ {
-        proxy_pass http://iitp_dabt_platform_backend/api/;  # 끝 슬래시 필수
-        proxy_http_version 1.1;
-        proxy_read_timeout 120s;
-        proxy_send_timeout 120s;
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        client_max_body_size 20m;
-    }
-
-    # ========================================
-    # 공통 보안 헤더
-    # ========================================
+    # ========================
+    # [11] 보안 헤더
+    # ========================
     add_header X-Frame-Options SAMEORIGIN always;
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;

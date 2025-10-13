@@ -303,37 +303,75 @@ function App() {
 
 로컬에서는 `.env` 파일 또는 `.env.local` 파일로 설정:
 
-```env
-# .env.local
-VITE_BASE=/
-VITE_API_BASE_URL=http://localhost:33000
+```bash
+# env.sample을 복사하여 .env 생성
+cp env.sample .env
+vi .env
+
+# 로컬 개발용 값으로 수정 (env.sample의 로컬 개발용 주석 해제)
+# VITE_PORT=5173
+# VITE_BASE=/
+# VITE_API_BASE_URL=http://localhost:33000
+# VITE_API_TIMEOUT=10000
+# VITE_VISUAL_TOOL=http://localhost:3000/
+# VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+# VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
+# VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
 ```
 
 #### 프로덕션 빌드
 
-프로덕션 빌드 시에는 **shell 환경변수로 export** (빌드 서버에서):
+프로덕션 빌드 시에는 **빌드 서버에서 fe/.env 파일 생성** (권장):
 
 ```bash
-# 프로덕션 환경변수 설정 (빌드 전 필수!)
+# 빌드 서버에서: fe/.env 생성 (최초 1회)
+cd /home/iitp-plf/iitp-dabt-platform/source/fe
+cp env.sample .env
+vi .env
+
+# env.sample에 프로덕션 빌드용 설정이 기본값으로 되어 있음
+# 필요 시 서버 주소만 수정:
+# VITE_VISUAL_TOOL=http://실제서버주소:포트/
+# VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+# VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
+```
+
+또는 **shell 환경변수로 export**도 가능:
+
+```bash
+# 빌드 전 환경변수 export (모든 변수 설정)
+export VITE_PORT=5173
 export VITE_BASE=/plf/
 export VITE_API_BASE_URL=/plf
+export VITE_API_TIMEOUT=10000
+export VITE_VISUAL_TOOL=http://실제서버주소:포트/
+export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
+export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
 
 # 빌드 실행
 npm run build
 ```
 
 **프로덕션 주의사항**:
-- ✅ 빌드 전에 shell에 export 필수 (또는 빌드 서버의 fe/.env에 설정)
-- ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요
+- ✅ **권장**: 빌드 서버의 `fe/.env` 파일 생성 (env.sample 참고)
+- ✅ **대안**: shell 환경변수 export
+- ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요 (이미 빌드된 정적 파일)
 - ✅ Vite가 빌드 시 환경변수를 코드에 하드코딩하므로 런타임 변경 불가
 - 🔧 `VITE_API_BASE_URL=/plf` (not `/plf/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
 
 #### 환경변수 목록
 
-| 변수명 | 설명 | 로컬 개발 | 프로덕션 |
-|--------|------|-----------|---------|
-| `VITE_BASE` | 베이스 경로 | `/` | `/plf/` |
-| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/plf` |
+| 변수명 | 설명 | 로컬 개발 | 프로덕션 | 사용 위치 |
+|--------|------|-----------|---------|----------|
+| `VITE_PORT` | 개발 서버 포트 | `5173` | `5173` | vite.config.ts |
+| `VITE_BASE` | 베이스 경로 | `/` | `/plf/` | vite.config.ts |
+| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/plf` | api/client.ts |
+| `VITE_API_TIMEOUT` | API 타임아웃 (ms) | `10000` | `10000` | api/client.ts |
+| `VITE_VISUAL_TOOL` | 시각화 도구 URL | `http://localhost:3000/` | `http://서버:포트/` | DataDetail.tsx |
+| `VITE_EMPLOYMENT_SITE_URL` | 구인구직 사이트 URL | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | Home.tsx |
+| `VITE_OPEN_API_CENTER_URL` | Open API 센터 URL | `http://192.168.60.142/adm/` | `http://서버/adm/` | DataDetail.tsx |
+| `VITE_OPEN_API_CENTER_ABOUT_URL` | Open API 센터 소개 페이지 | `http://192.168.60.142/adm/about` | `http://서버/adm/about` | DataDetail.tsx (Modal helpText) |
 
 ### API 설정
 

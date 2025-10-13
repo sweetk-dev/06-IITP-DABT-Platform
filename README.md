@@ -283,17 +283,29 @@ npm run preview
 
 **프로덕션 서버 배포 전 필수 사항**:
 1. Backend `.env` 파일 생성 (실행 서버에서, 최초 1회)
-2. Frontend 빌드 환경변수 설정 (빌드 서버에서)
+2. Frontend `.env` 파일 생성 (빌드 서버에서, 최초 1회, 권장)
 
 ```bash
-# Frontend 빌드 환경변수 설정 (빌드 전 필수!)
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf
+# 1. Frontend 빌드 환경변수 설정 (빌드 서버, 최초 1회)
+cd fe
+cp env.sample .env
+vi .env  # 필요 시 서버 주소 수정 (env.sample에 프로덕션 값 기본 설정됨)
+cd ..
 
-# 서버 빌드
+# 또는 shell export 사용 (대안) - 모든 변수 설정 필요
+# export VITE_PORT=5173
+# export VITE_BASE=/plf/
+# export VITE_API_BASE_URL=/plf
+# export VITE_API_TIMEOUT=10000
+# export VITE_VISUAL_TOOL=http://서버:포트/
+# export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+# export VITE_OPEN_API_CENTER_URL=http://서버/adm/
+# export VITE_OPEN_API_CENTER_ABOUT_URL=http://서버/adm/about
+
+# 2. 서버 빌드
 npm run build:server
 
-# 서버 배포
+# 3. 서버 배포
 npm run deploy:server
 ```
 
