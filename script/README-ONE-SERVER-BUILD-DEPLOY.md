@@ -1,364 +1,384 @@
-# 🚀 IITP DABT Platform 단일 서버(Build+Deploy+Run) 가이드
+# 🚀 IITP DABT Platform 복합 서비스 설치 가이드 (Multi-Service Coexistence)
 
-본 문서는 하나의 서버에서 빌드 서버와 실행(배포) 서버 역할을 동시에 수행하는 환경을 대상으로, 처음부터 끝까지 문제 없이 Backend/Frontend가 기동되도록 상세 스텝을 정리합니다.
+본 문서는 **Admin + Platform 등 여러 서비스가 공존**하는 환경에서의 Platform 설치 가이드입니다.
 
-**전제 조건(요약)**:
-- 동일 서버에서 빌드와 배포 수행 (1대 서버)
-- 빌드/배포: `iitp-plf` 계정으로 실행
-- **기존 Admin 서비스와 공존**: Admin(`/adm`, `/adm/api`, 포트 30000)과 Platform(`/hub`, `/hub/api`, 포트 33000)
-- Nginx: 기존 설정에 Platform location 블록 추가
+> **📌 복합 서비스 환경**
+> 
+> 이 가이드는 **Admin + Platform 공존 설치** 기준입니다
+> - **Admin 서비스**: `/adm`, `/adm/api` (포트 30000)
+> - **Platform 서비스**: `/hub`, `/hub/api` (포트 33000)
+> 
+> **Platform 단독 설치**는 [단독 설치 가이드](./README-SERVER-DEPLOYMENT.md) 참조
+>
+> **이 문서대로 순서대로 실행하면 기존 Admin 서비스에 영향 없이 Platform이 추가됩니다.**
+
+## 📋 목차
+
+### 0. [개요 및 사전 요구사항](#0-개요-및-사전-요구사항)
+- [0.1 복합 서비스 아키텍처](#01-복합-서비스-아키텍처)
+- [0.2 전제조건](#02-전제조건)
+- [0.3 기존 Admin 서비스 확인](#03-기존-admin-서비스-확인)
+
+### 1. [초기 설치 - 단일 서버 환경](#1-초기-설치---단일-서버-환경)
+- [1.0 서버 기본 세팅](#10-서버-기본-세팅)
+- [1.1 Platform 계정 및 디렉토리 구조](#11-platform-계정-및-디렉토리-구조)
+- [1.2 데이터베이스 설정](#12-데이터베이스-설정)
+- [1.3 프로젝트 클론 및 초기 설정](#13-프로젝트-클론-및-초기-설정)
+- [1.4 환경변수 설정](#14-환경변수-설정)
+- [1.5 빌드](#15-빌드)
+- [1.6 배포 (단일 서버)](#16-배포-단일-서버)
+- [1.7 Backend 실행 환경 설정](#17-backend-실행-환경-설정)
+- [1.8 Nginx 통합 설정 (Admin + Platform)](#18-nginx-통합-설정-admin--platform)
+- [1.9 서비스 시작](#19-서비스-시작)
+- [1.10 검증](#110-검증)
+
+### 2. [초기 설치 - 서버 분리 환경](#2-초기-설치---서버-분리-환경)
+- [2.1 빌드 서버 설정](#21-빌드-서버-설정)
+- [2.2 실행 서버 설정](#22-실행-서버-설정)
+- [2.3 빌드 및 배포](#23-빌드-및-배포)
+- [2.4 실행 서버 설정 계속](#24-실행-서버-설정-계속)
+- [2.5 검증](#25-검증)
+
+### 3. [업데이트 배포 (일상 운영)](#3-업데이트-배포-일상-운영)
+- [3.1 사전 확인](#31-사전-확인)
+- [3.2 소스 업데이트](#32-소스-업데이트)
+- [3.3 의존성 확인](#33-의존성-확인)
+- [3.4 빌드](#34-빌드)
+- [3.5 배포](#35-배포)
+- [3.6 서비스 재시작 (Platform만)](#36-서비스-재시작-platform만)
+- [3.7 검증](#37-검증)
+- [3.8 롤백 (문제 발생 시)](#38-롤백-문제-발생-시)
+
+### 4. [복합 서비스 운영 관리](#4-복합-서비스-운영-관리)
+- [4.1 서비스별 관리](#41-서비스별-관리)
+- [4.2 Nginx 로그 분석](#42-nginx-로그-분석)
+- [4.3 데이터베이스 관리](#43-데이터베이스-관리)
+- [4.4 리소스 모니터링](#44-리소스-모니터링)
+
+### 5. [문제 해결 및 FAQ](#5-문제-해결-및-faq)
+- [5.1 복합 서비스 특화 문제](#51-복합-서비스-특화-문제)
+- [5.2 FAQ (복합 서비스)](#52-faq-복합-서비스)
+
+### 📋 [체크리스트](#-복합-서비스-체크리스트)
+- [초기 설치 체크리스트](#초기-설치-체크리스트)
+- [업데이트 체크리스트](#업데이트-체크리스트)
 
 ---
 
-## 0. 서버 기본 세팅
+## 0. 개요 및 사전 요구사항
 
-아래는 Ubuntu 20.04+ 기준 예시입니다. 다른 배포판은 패키지 명칭만 차이 있을 수 있습니다.
+### 0.1 복합 서비스 아키텍처
 
-```bash
-sudo apt update && sudo apt upgrade -y
-
-# 필수 패키지
-sudo apt install -y git curl unzip jq build-essential nginx
-
-# Node.js 22.x 설치 (NodeSource)
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# PM2 글로벌 설치
-sudo npm install -g pm2
-
-# PostgreSQL (이미 설치되어 있을 경우 생략)
-# sudo apt install -y postgresql postgresql-contrib
+```
+서버 IP:192.168.60.142
+├── /adm/           → Admin Frontend (포트 80 → Nginx)
+├── /adm/api/       → Admin Backend (포트 30000)
+├── /hub/           → Platform Frontend (포트 80 → Nginx) ⭐ 신규
+└── /hub/api/       → Platform Backend (포트 33000) ⭐ 신규
 ```
 
-확인:
+### 0.2 전제조건
+
+**필수 확인사항:**
+1. ✅ Admin 서비스가 이미 운영 중
+2. ✅ Admin이 `/adm` 경로 사용 중
+3. ✅ Admin Backend가 포트 30000 사용 중
+4. ✅ PostgreSQL 데이터베이스 `iitp_dabt` 존재
+5. ✅ Nginx가 Admin 서비스 제공 중
+
+**시스템 요구사항:**
+- 섹션 0.2는 단독 설치 가이드와 동일
+- 추가: 충분한 메모리 (Admin + Platform 동시 실행)
+
+### 0.3 기존 Admin 서비스 확인
+
 ```bash
-node -v
-npm -v
-pm2 -v
-nginx -t && systemctl status nginx --no-pager | cat
+# Admin Backend 확인
+pm2 list | grep admin
+# 또는
+sudo netstat -tlnp | grep 30000
+
+# Admin Frontend 확인
+curl -I http://localhost/adm/
+
+# Nginx 설정 확인
+sudo nginx -t
+sudo cat /etc/nginx/conf.d/*.conf | grep adm
 ```
 
-### 0.1 운영 계정 및 디렉터리 구조
+---
+
+## 1. 초기 설치 - 단일 서버 환경
+
+> **전제조건**: 빌드 서버 = 실행 서버, Admin 서비스 운영 중
+
+### 1.0 서버 기본 세팅
+
+Admin이 이미 설치되어 있으므로 대부분 완료된 상태입니다.
 
 ```bash
-# iitp-plf 사용자 생성 (존재하지 않는 경우)
+# 확인만 수행
+node -v   # v22.x.x
+npm -v    # 9.x.x 이상
+pm2 -v    # 최신 버전
+nginx -t  # 설정 정상
+psql --version  # PostgreSQL 12.x 이상
+```
+
+### 1.1 Platform 계정 및 디렉토리 구조
+
+```bash
+# iitp-plf 사용자 생성 (Admin과 별도 관리)
 sudo useradd -m -s /bin/bash iitp-plf
 sudo passwd iitp-plf
 
-# 홈 아래 기본 구조 생성
-sudo mkdir -p /home/iitp-plf/iitp-dabt-platform/{source,deploy}
+# Platform 빌드/소스 디렉토리
+sudo mkdir -p /home/iitp-plf/iitp-dabt-platform/source
+sudo mkdir -p /home/iitp-plf/iitp-dabt-platform/deploy
 sudo chown -R iitp-plf:iitp-plf /home/iitp-plf/iitp-dabt-platform
 
-# 서비스 루트 생성 (실행 경로)
-sudo mkdir -p /var/www/iitp-dabt-platform/{be,fe,script,packages/common}
+# Platform 실행 디렉토리 (Admin과 분리)
+sudo mkdir -p /var/www/iitp-dabt-platform/be
+sudo mkdir -p /var/www/iitp-dabt-platform/fe
+sudo mkdir -p /var/www/iitp-dabt-platform/script
+sudo mkdir -p /var/www/iitp-dabt-platform/packages/common
 sudo chown -R iitp-plf:iitp-plf /var/www/iitp-dabt-platform
+
+# 디렉토리 구조 확인
+tree -L 2 /home/iitp-plf/iitp-dabt-platform
+tree -L 2 /var/www/
 ```
 
-**설명**:
-- `/var/www/iitp-dabt-platform/packages/common`은 BE가 참조하는 공통 패키지의 실제 위치입니다.
-  - BE의 `be/package.json`에는 `"@iitp-dabt-platform/common": "file:../packages/common"`로 선언되어 있어
-    설치 시 `be/node_modules/@iitp-dabt-platform/common`이 위 경로를 가리키는 심볼릭 링크로 생성됩니다.
-  - 배포 시 이 디렉터리에 `dist/**`와 `package.json`이 동기화되어야 런타임에서 모듈을 정상 로드합니다.
+**디렉토리 구조:**
+```
+/var/www/
+├── iitp-dabt-admin/        # Admin 서비스 (기존)
+│   ├── be/
+│   └── fe/
+└── iitp-dabt-platform/     # Platform 서비스 (신규)
+    ├── be/
+    ├── fe/
+    ├── script/
+    └── packages/common/
+```
 
-### 0.2 환경변수(.env) 설정 가이드 (필수) ⚠️
+### 1.2 데이터베이스 설정
 
-**중요**: 환경변수는 **빌드 시점 vs 실행 시점**에 따라 요구사항이 다릅니다!
+Admin과 동일한 DB를 사용하되, 별도 계정으로 접근합니다.
 
-#### 📋 환경변수 요구사항 요약
+```bash
+# PostgreSQL 접속
+sudo -u postgres psql
 
-| 구분 | 빌드 시 | 실행 시 | 위치 | 권장 방법 |
-|------|---------|---------|------|----------|
-| **Backend** | ❌ 불필요 | ✅ **필수** | 실행 서버: `/var/www/iitp-dabt-platform/be/.env` | 수동 생성 (최초 1회) |
-| **Frontend** | ✅ **필수** | ❌ 불필요 | 빌드 서버: `fe/.env` | `.env` 파일 또는 export |
+# 기존 DB 사용
+\c iitp_dabt
 
-#### FE(빌드 시 주입: Vite)
+# Platform용 사용자 생성 (Admin과 별도)
+CREATE USER iitp_platform_user WITH PASSWORD 'your_secure_password';
 
-**빌드 시점에만 필요** - Vite가 환경변수를 코드에 하드코딩합니다.
+# 권한 부여
+GRANT ALL PRIVILEGES ON DATABASE iitp_dabt TO iitp_platform_user;
 
-빌드 서버에서 빌드 전에 환경변수를 설정하세요. 두 가지 방법이 있습니다:
+# 권한 확인
+\du iitp_platform_user
+
+# 종료
+\q
+```
+
+**확인:**
+```bash
+psql -U iitp_platform_user -d iitp_dabt -c "SELECT 1;"
+```
+
+### 1.3 프로젝트 클론 및 초기 설정
+
+```bash
+# iitp-plf 사용자로 전환
+sudo -iu iitp-plf
+
+# Git에서 Platform 소스 다운로드
+cd /home/iitp-plf/iitp-dabt-platform/source
+git clone https://github.com/sweetk-dev/06-IITP-DABT-Platform.git .
+
+# 브랜치 확인
+git branch
+git status
+
+# 전체 패키지 설치
+npm install
+
+# 설치 확인
+ls -la node_modules/
+ls -la packages/common/node_modules/
+ls -la be/node_modules/
+ls -la fe/node_modules/
+```
+
+### 1.4 환경변수 설정
+
+#### 1.4.1 Backend 환경변수 (실행 서버용)
+
+```bash
+# Platform Backend .env 생성
+sudo vi /var/www/iitp-dabt-platform/be/.env
+```
+
+내용:
+```env
+# 서버 설정
+NODE_ENV=production
+PORT=33000  # Admin(30000)과 다른 포트
+
+# 데이터베이스 설정 (Admin과 동일 DB, 별도 계정)
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=iitp_dabt
+DB_USER=iitp_platform_user  # Admin과 다른 사용자
+DB_PASSWORD=your_secure_password
+DB_SSL=false
+
+# CORS 설정
+CORS_ORIGINS=http://192.168.60.142
+
+# OpenAPI 서버 설정 (Admin과 동일 설정 사용 가능)
+OPEN_API_SERVER_URL=https://api.example.com
+OPEN_API_AUTH_KEY=your_api_key_here
+OPEN_API_AUTH_SECRET=your_api_secret_here
+OPEN_API_PAGE_SIZE=100
+OPEN_API_TIMEOUT=30000
+
+# 로깅 설정
+LOG_LEVEL=info
+LOG_DIR=./logs
+
+# 보안 설정
+ENC_SECRET=your_encryption_secret_key_here
+
+# 기타 설정
+API_RATE_LIMIT=100
+REQUEST_TIMEOUT=30000
+```
+
+**권한 설정:**
+```bash
+sudo chown iitp-plf:iitp-plf /var/www/iitp-dabt-platform/be/.env
+sudo chmod 600 /var/www/iitp-dabt-platform/be/.env
+```
+
+#### 1.4.2 Frontend 빌드 환경변수 (복합 서비스용)
 
 **방법 1: .env 파일 사용 (권장)**
+
 ```bash
-# 빌드 서버: fe/.env 생성 (최초 1회)
 cd /home/iitp-plf/iitp-dabt-platform/source/fe
 cp env.sample .env
 vi .env
-
-# env.sample에 프로덕션 값이 기본으로 설정되어 있음
-# 필요 시 서버 주소만 수정:
-# VITE_VISUAL_TOOL=http://실제서버주소:포트/
-# VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
 ```
 
+내용 (**복합 서비스 기준: /hub 경로**):
+```env
+# 프로덕션 빌드용 설정 (복합 서비스 - /hub 경로)
+VITE_PORT=5173
+VITE_BASE=/hub/
+VITE_API_BASE_URL=/hub
+VITE_API_TIMEOUT=10000
+VITE_API_DATA_PREVIEW_LIMIT=10
+VITE_VISUAL_TOOL=http://192.168.60.142:visual-tool-port/
+VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
+VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
+```
+
+**중요 설정 설명:**
+- `VITE_BASE=/hub/`: 복합 서비스이므로 서브패스 사용
+- `VITE_API_BASE_URL=/hub`: Nginx 프록시를 통한 API 호출 (`/hub/api/`로 변환됨)
+- FE 코드가 자동으로 `/api/v1/...`을 추가하므로 `/api` 포함 금지
+- `VITE_OPEN_API_CENTER_URL`: Admin 서비스 경로 (`/adm/`)
+
 **방법 2: shell 환경변수 export (대안)**
+
 ```bash
 export VITE_PORT=5173
 export VITE_BASE=/hub/
 export VITE_API_BASE_URL=/hub
 export VITE_API_TIMEOUT=10000
-export VITE_VISUAL_TOOL=http://실제서버주소:포트/
+export VITE_API_DATA_PREVIEW_LIMIT=10
+export VITE_VISUAL_TOOL=http://192.168.60.142:visual-tool-port/
 export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
-export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
-# 주의: VITE_API_BASE_URL=/hub (not /hub/api)
-# FE 코드가 /api/v1/...을 자동으로 추가하므로 baseUrl은 /hub만 설정
+export VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
+export VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
 ```
 
-**중요**:
-- ✅ **권장**: 빌드 서버에 `fe/.env` 파일 생성 (`fe/env.sample` 참고)
-- ✅ **대안**: shell 환경변수 export
-- ❌ 실행 서버의 FE 디렉토리에는 `.env` 파일 불필요 (이미 빌드된 정적 파일)
-- ✅ `fe/.env`는 Git에 커밋되지 않으며, 배포 시 exclude됨
-
-#### BE(런타임 주입: dotenv)
-
-**실행 시점에만 필요** - Node.js 런타임에서 dotenv로 로드합니다.
-
-실행 서버의 BE 경로에 `.env`를 **수동으로 생성**하세요: `/var/www/iitp-dabt-platform/be/.env`
-
-최소 예시:
-```env
-NODE_ENV=production
-PORT=33000
-
-# Database (Admin과 동일 DB 사용, 별도 계정)
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=iitp_dabt
-DB_USER=iitp_platform_user
-DB_PASSWORD=your_db_password
-
-# OpenAPI (Admin과 동일 설정)
-OPEN_API_SERVER_URL=https://api.example.com
-OPEN_API_AUTH_KEY=your_api_key
-OPEN_API_AUTH_SECRET=your_api_secret
-
-# CORS (프론트 도메인 추가)
-CORS_ORIGINS=http://your-server-ip
-```
-
-**중요**:
-- ✅ 실행 서버의 `/var/www/iitp-dabt-platform/be/.env` **반드시 필요** (최초 1회 수동 생성)
-- ❌ 빌드 서버의 BE 디렉토리에는 `.env` 불필요 (TypeScript 컴파일만 수행)
-- ✅ `.env`는 배포(rsync) 시 자동 보존됨 (`--exclude .env*`)
-- ✅ 한 번 생성하면 배포 시 덮어쓰지 않으므로 안전
-
-#### ⚙️ 배포 스크립트와 .env 보존
-
-배포 스크립트(`deploy-server.js`)는 다음 파일을 **제외(exclude)**하여 보존합니다:
-- `node_modules/` - 실행 서버의 의존성 보존
-- `.env`, `.env*` - 환경변수 파일 보존
-
-따라서:
-1. **최초 배포 전**: 실행 서버에 `/var/www/iitp-dabt-platform/be/.env` 수동 생성
-2. **이후 배포**: `.env` 파일은 자동 보존되어 덮어쓰지 않음
-
----
-
-## 1. 소스 준비(동일 서버 빌드용)
-
-`iitp-plf` 계정으로 로그인 후 진행합니다.
-
-```bash
-sudo -iu iitp-plf
-
-cd /home/iitp-plf/iitp-dabt-platform/source
-git clone https://github.com/sweetk-dev/06-IITP-DABT-Platform.git .
-
-# 1. 빌드 스크립트용 .env 작성
-cp script/server/env.sample.build-server script/server/.env
-vi script/server/.env
-
-# 2. Frontend 빌드용 .env 작성 (권장)
-cd fe
-cp env.sample .env
-vi .env
-# 프로덕션 빌드용 설정 (env.sample 참고)
-cd ..
-```
-
-필수 항목 예시 (script/server/.env):
-```bash
-SOURCE_PATH=/home/iitp-plf/iitp-dabt-platform/source
-DEPLOY_PATH=/home/iitp-plf/iitp-dabt-platform/deploy
-GIT_REPO_URL=https://github.com/sweetk-dev/06-IITP-DABT-Platform.git
-GIT_BRANCH=main
-```
-
-필수 항목 예시 (fe/.env):
-```bash
-# env.sample에 이미 설정되어 있음 (기본: /hub, 서버 주소만 수정)
-VITE_PORT=5173
-VITE_BASE=/hub/
-VITE_API_BASE_URL=/hub
-VITE_API_TIMEOUT=10000
-VITE_VISUAL_TOOL=http://실제서버주소:포트/
-VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
-VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
-```
-
-**주의**: 
-- ❌ `be/.env` 파일은 만들 필요 없음 (빌드 시 불필요, TypeScript 컴파일만)
-- ✅ `fe/.env` 파일 **권장** (env.sample 참고, 또는 export로도 가능)
-
----
-
-## 2. 빌드(서버에서 수행)
+### 1.5 빌드
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# Frontend 빌드용 환경변수 설정
-# 방법 1 (권장): fe/.env 파일 사용
-# → 이미 1단계에서 생성했으므로 추가 작업 불필요
-
-# 방법 2 (대안): export 사용 (fe/.env가 없는 경우)
-# export VITE_PORT=5173
-# export VITE_BASE=/hub/
-# export VITE_API_BASE_URL=/hub
-# export VITE_API_TIMEOUT=10000
-# export VITE_VISUAL_TOOL=http://실제서버주소:포트/
-# export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-# export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
-# export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
-
-# 전체 빌드 (common → be → fe 순, dist 검증 및 보강 포함)
+# 전체 빌드
 npm run build:server
 
-# 빌드 산출물 확인
-ls -l /home/iitp-plf/iitp-dabt-platform/deploy
-ls -l /home/iitp-plf/iitp-dabt-platform/deploy/backend
-ls -l /home/iitp-plf/iitp-dabt-platform/deploy/frontend
-ls -l /home/iitp-plf/iitp-dabt-platform/deploy/common
+# 빌드 확인
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/be/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/dist/
 ```
 
-**빌드 결과(의도)**:
-- `deploy/backend/`: `be/dist` + `be/package.json` + (있으면) `package-lock.json`, `build-info.json`
-- `deploy/frontend/`: `fe/dist`
-- `deploy/common/`: `packages/common/dist` + `packages/common/package.json`
-
----
-
-## 3. 배포(동일 서버 내 rsync)
-
-### 3.0 배포 전 준비 사항 ⚠️
-
-**매우 중요**: 배포 전 실행 서버에 Backend `.env` 파일을 **반드시 생성**해야 합니다!
-
-```bash
-# 실행 서버에 Backend .env 생성 (최초 1회)
-sudo mkdir -p /var/www/iitp-dabt-platform/be
-sudo vi /var/www/iitp-dabt-platform/be/.env
-
-# env.sample 참고하여 작성
-# - PORT=33000
-# - DB_NAME=iitp_dabt
-# - DB_USER=iitp_platform_user
-# - DB_PASSWORD=실제비밀번호
-# - CORS_ORIGINS=실제서버주소
-```
-
-**왜 필요한가?**
-- ✅ Backend는 **실행(런타임) 시**에만 .env 필요 (dotenv로 로드)
-- ✅ 배포 스크립트는 `.env*` 파일을 exclude하므로 **배포 시 생성되지 않음**
-- ✅ 따라서 **수동으로 최초 1회 생성** 필요
-
-### 3.1 배포 스크립트 설정
-
-동일 서버에서 배포하므로 `BUILD_SERVER_HOST`와 `PROD_SERVER_HOST`가 동일해도 됩니다. 스크립트는 sameHost 모드에서 로컬 rsync 수행하며, 다음을 보존합니다:
-- `node_modules/` 보존
-- `.env`, `.env*` 보존
+### 1.6 배포 (단일 서버)
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 배포 스크립트용 .env 작성
-cp script/server/env.sample.deploy-server script/server/.env
-vi script/server/.env
+# Backend 배포
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/be/* /var/www/iitp-dabt-platform/be/
+
+# Frontend 배포
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/* /var/www/iitp-dabt-platform/fe/
+
+# 공통 패키지 배포
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/* /var/www/iitp-dabt-platform/packages/common/
+
+# 운영 스크립트 배포
+cp -r script/server/* /var/www/iitp-dabt-platform/script/
+
+# 권한 확인
+ls -la /var/www/iitp-dabt-platform/be/
+ls -la /var/www/iitp-dabt-platform/fe/
 ```
 
-필수 항목 예시:
-```bash
-BUILD_SERVER_HOST=localhost
-BUILD_SERVER_USER=iitp-plf
-BUILD_SERVER_PATH=/home/iitp-plf/iitp-dabt-platform/deploy
-BUILD_SERVER_PORT=22
+### 1.7 Backend 실행 환경 설정
 
-PROD_SERVER_HOST=localhost
-PROD_SERVER_USER=iitp-plf
-PROD_SERVER_PORT=22
-
-PROD_BE_PATH=/var/www/iitp-dabt-platform/be
-PROD_FE_PATH=/var/www/iitp-dabt-platform/fe
-
-PM2_APP_NAME_BE=iitp-dabt-plf-be
-```
-
-### 3.2 배포 실행
-
-```bash
-# 동일 서버지만 필요 작업에 sudo가 요구될 수 있음
-sudo npm run deploy:server
-```
-
-### 3.3 배포 후 확인
-```bash
-ls -l /var/www/iitp-dabt-platform/be
-ls -l /var/www/iitp-dabt-platform/fe/dist
-ls -l /var/www/iitp-dabt-platform/packages/common
-```
-
-> **중요**: Backend 의존성 설치 (최초 또는 be/package.json 변경 시)
 ```bash
 cd /var/www/iitp-dabt-platform/be
-npm ci --omit=dev || npm install --omit=dev
+
+# 의존성 설치
+npm install --production
+
+# 심볼릭 링크 확인
+ls -la node_modules/@iitp-dabt-platform/common
+
+# .env 파일 확인
+cat .env
+
+# 로그 디렉토리 생성
+mkdir -p logs
 ```
 
-### 3.1 packages/common 동기화와 BE 연동(중요)
+### 1.8 Nginx 통합 설정 (Admin + Platform)
 
-이 프로젝트의 Backend는 `be/package.json`에 아래와 같이 공통 패키지를 로컬 경로로 참조합니다.
-
-```json
-"@iitp-dabt-platform/common": "file:../packages/common"
-```
-
-그 결과 BE에서 `npm install`을 수행하면 `be/node_modules/@iitp-dabt-platform/common`이 심볼릭 링크(symlink)로 생성되며, 실제 대상은 실행 서버의 워크스페이스 경로인:
-
-```
-/var/www/iitp-dabt-platform/packages/common
-```
-
-입니다. 따라서 배포 시 반드시 위 경로를 다음처럼 채워야 합니다.
-
-- 빌드 서버의 `deploy/common/` → 실행 서버 `/var/www/iitp-dabt-platform/packages/common/`
-  - 포함 파일: `dist/**`, `package.json`
-
-본 문서의 배포 스크립트는 위 동기화를 자동으로 수행합니다. 배포 후 반드시 다음을 확인하세요.
+**중요**: 기존 Admin 설정에 Platform 설정을 **추가**합니다.
 
 ```bash
-ls -l /var/www/iitp-dabt-platform/packages/common
-ls -l /var/www/iitp-dabt-platform/packages/common/dist
-cat /var/www/iitp-dabt-platform/packages/common/package.json | grep -E '"name"|"main"|"version"'
+# 기존 Nginx 설정 확인
+sudo cat /etc/nginx/conf.d/*.conf
 
-# 심볼릭 링크가 올바른지(있다면) 확인
-ls -l /var/www/iitp-dabt-platform/be/node_modules/@iitp-dabt-platform
-readlink -f /var/www/iitp-dabt-platform/be/node_modules/@iitp-dabt-platform/common || true
+# 통합 설정 파일 편집 (또는 새 파일 생성)
+sudo vi /etc/nginx/conf.d/iitp-services.conf
 ```
 
-정상이라면 BE 런타임에서 `@iitp-dabt-platform/common` 모듈을 문제 없이 로드할 수 있습니다.
-
----
-
-## 4. Nginx 설정 (Admin + Platform 공존)
-
-**중요**: Admin 서비스가 이미 운영 중이므로, 기존 Nginx 설정에 Platform location 블록을 **추가**해야 합니다.
-
-파일: `/etc/nginx/conf.d/iitp-services.conf` (또는 기존 설정 파일)
-
+내용 (Admin + Platform 통합):
 ```nginx
-# 백엔드 API 서버
+# Backend upstream
 upstream iitp_dabt_backend {
     server 127.0.0.1:30000;  # Admin Backend
     keepalive 32;
@@ -378,7 +398,7 @@ server {
     index index.html;
 
     # ========================
-    # [1] 정적 문서 (기존 Docs)
+    # [1] 정적 문서 (기존 Docs, 있는 경우)
     # ========================
     location /docs/ {
         index index.html;
@@ -420,7 +440,7 @@ server {
     }
 
     # ========================
-    # [5] Admin FE 정적 자산 (images, fonts 등)
+    # [5] Admin FE 정적 자산
     # ========================
     location ^~ /adm/assets/ {
         alias /var/www/iitp-dabt-admin/fe/dist/assets/;
@@ -437,12 +457,11 @@ server {
     }
 
     # ========================
-    # [6] Admin SPA Fallback (React, Vue, Vite)
+    # [6] Admin SPA Fallback
     # ========================
     location /adm/ {
         alias /var/www/iitp-dabt-admin/fe/dist/;
         index index.html;
-        # 핵심 수정: fallback 시 alias 경로 유지
         try_files $uri $uri/ /adm/index.html;
     }
 
@@ -469,29 +488,28 @@ server {
     }
 
     # ========================
-    # [9] Platform FE 정적 자산 (images, fonts 등)
+    # [9] Platform FE 정적 자산 (신규)
     # ========================
     location ^~ /hub/assets/ {
-        alias /var/www/iitp-dabt-platform/fe/dist/assets/;
+        alias /var/www/iitp-dabt-platform/fe/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
     location ~* ^/hub/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
-        alias /var/www/iitp-dabt-platform/fe/dist/$1;
+        alias /var/www/iitp-dabt-platform/fe/$1;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
     # ========================
-    # [10] Platform SPA Fallback (React, Vue, Vite)
+    # [10] Platform SPA Fallback (신규)
     # ========================
     location /hub/ {
-        alias /var/www/iitp-dabt-platform/fe/dist/;
+        alias /var/www/iitp-dabt-platform/fe/;
         index index.html;
-        # 핵심: fallback 시 alias 경로 유지
         try_files $uri $uri/ /hub/index.html;
     }
 
@@ -504,125 +522,533 @@ server {
 }
 ```
 
-적용:
+**설정 검증 및 적용:**
 ```bash
+# 설정 테스트
 sudo nginx -t
+
+# Admin 서비스 영향 최소화 - Reload 사용 (재시작 대신)
 sudo systemctl reload nginx
+
+# 상태 확인
+sudo systemctl status nginx
+
+# Admin 서비스 정상 동작 확인
+curl -I http://localhost/adm/
 ```
 
----
+### 1.9 서비스 시작
 
-## 5. Backend 시작/재시작/중지 및 검증
+#### Platform Backend 시작
 
-### 시작(최초):
 ```bash
-cd /var/www/iitp-dabt-platform
-# 스크립트는 .env 로드, npm install --omit=dev, PM2 start 수행
-npm run start:server:be
-```
+cd /var/www/iitp-dabt-platform/be
 
-### 재시작/중지:
-```bash
-npm run restart:server:be
-npm run stop:server:be
-```
+# PM2로 시작 (Admin과 별도)
+pm2 start dist/server.js --name iitp-dabt-plf-be
 
-### 상태/로그:
-```bash
-pm2 status
-pm2 logs iitp-dabt-plf-be --lines 100
-```
-
-### 헬스체크:
-```bash
-# BE 직접
-curl -i http://127.0.0.1:33000/api/common/health
-
-# Nginx 경유
-curl -i http://127.0.0.1/hub/api/common/health
-```
-
----
-
-## 6. Frontend 제공 및 검증
-
-브라우저 접속:
-```
-http://<서버_IP_또는_도메인>/hub/
-```
-
-정적 파일 확인:
-```bash
-ls -l /var/www/iitp-dabt-platform/fe/dist
-```
-
----
-
-## 7. 운영 팁 및 주의사항
-
-- 실행 서버에서 `be/package.json`이 변경된 배포를 받은 경우:
-  ```bash
-  cd /var/www/iitp-dabt-platform/be
-  npm ci --omit=dev || npm install --omit=dev
-  pm2 restart iitp-dabt-plf-be
-  ```
-- 배포 스크립트는 `node_modules/`, `.env`, `.env*`를 보존합니다.
-- `@iitp-dabt-platform/common`은 `/var/www/iitp-dabt-platform/packages/common`으로 동기화되며, BE의 `node_modules/@iitp-dabt-platform/common`은 해당 경로를 가리키는 symlink일 수 있습니다.
-- 포트 충돌 시 33000 사용 중인 프로세스 확인: `ss -tlpn | grep :33000 || true`
-- Nginx 프록시 경로 주의: `location /hub/api/` 블록에서 `proxy_pass .../api/;`처럼 끝 슬래시가 꼭 있어야 `/hub/api/* → /api/*`로 정확히 매핑됩니다.
-
----
-
-## 8. 문제 해결(요약)
-
-### PM2 online이지만 즉시 `errored`로 바뀌는 경우
-- `.env` 누락, 포트 충돌, DB 연결 실패, 의존성 미설치 여부 확인
-- `pm2 logs iitp-dabt-plf-be --lines 200`
-
-### `MODULE_NOT_FOUND: '@iitp-dabt-platform/common'`
-- `/var/www/iitp-dabt-platform/packages/common` 경로에 `dist/`와 `package.json`이 있는지 확인
-- BE 디렉터리에서 `npm ci --omit=dev || npm install --omit=dev`
-
-### 배포 후 `node_modules`가 사라짐
-- 현재 스크립트는 `node_modules/`를 제외하도록 수정되어 보존됩니다.
-
-### Nginx 404
-- `proxy_pass http://iitp_dabt_platform_backend/api/;` 끝 슬래시 포함 여부 확인
-
-### Admin과 Platform 포트 충돌
-```bash
-# Admin: 30000, Platform: 33000 확인
-sudo netstat -tulpn | grep -E ':(30000|33000)'
-
-# PM2 프로세스 확인
+# 상태 확인 (Admin과 Platform 모두 확인)
 pm2 list
-```
 
----
+# Platform 로그 확인
+pm2 logs iitp-dabt-plf-be --lines 50
 
-## 9. 서비스 확인
+# PM2 설정 저장
+pm2 save
 
-### 포트 확인
-```bash
-# Admin BE: 30000
-curl http://localhost:30000/api/common/health
-
-# Platform BE: 33000
+# Platform 헬스체크
 curl http://localhost:33000/api/common/health
 ```
 
-### Nginx 경유 확인
-```bash
-# Admin
-curl http://서버주소/adm/api/common/health
+#### 서비스 목록 확인
 
-# Platform
-curl http://서버주소/hub/api/common/health
+```bash
+# PM2 목록
+pm2 list
+# 예상 출력:
+# iitp-dabt-admin-be  (포트 30000) - Admin
+# iitp-dabt-plf-be    (포트 33000) - Platform
+
+# 포트 확인
+sudo netstat -tlnp | grep :30000  # Admin
+sudo netstat -tlnp | grep :33000  # Platform
+```
+
+### 1.10 검증
+
+```bash
+# Admin 서비스 정상 동작 확인 (영향 없어야 함)
+curl http://localhost/adm/api/common/health
+curl http://localhost/adm/
+
+# Platform 서비스 확인
+curl http://localhost:33000/api/common/health  # 직접
+curl http://localhost/hub/api/common/health    # Nginx 경유
+curl http://localhost/hub/                     # Frontend
+
+# PM2 상태
+pm2 list
+
+# Nginx 로그
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+```
+
+**성공 확인:**
+- ✅ Admin 서비스: `/adm/`, `/adm/api/` 정상
+- ✅ Platform 서비스: `/hub/`, `/hub/api/` 정상
+- ✅ PM2: 두 서비스 모두 `online`
+- ✅ Nginx: 에러 로그 없음
+
+---
+
+## 2. 초기 설치 - 서버 분리 환경
+
+> **전제조건**: 빌드 서버 ≠ 실행 서버, 실행 서버에 Admin 운영 중
+
+### 2.1 빌드 서버 설정
+
+단독 설치 가이드의 섹션 2.1과 동일하게 진행하되, **Frontend 환경변수만 복합 서비스 기준**으로 설정합니다.
+
+#### Frontend 환경변수 (복합 서비스 기준)
+
+```bash
+cd /home/iitp-plf/iitp-dabt-platform/source/fe
+cp env.sample .env
+vi .env
+```
+
+내용:
+```env
+# 복합 서비스용 - /hub 경로
+VITE_PORT=5173
+VITE_BASE=/hub/
+VITE_API_BASE_URL=/hub
+VITE_API_TIMEOUT=10000
+VITE_API_DATA_PREVIEW_LIMIT=10
+VITE_VISUAL_TOOL=http://실행서버IP:visual-tool-port/
+VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
+VITE_OPEN_API_CENTER_URL=http://실행서버IP/adm/
+VITE_OPEN_API_CENTER_ABOUT_URL=http://실행서버IP/adm/about
+```
+
+나머지는 단독 설치 가이드 섹션 2.1 참조
+
+### 2.2 실행 서버 설정
+
+#### 2.2.1 기존 Admin 서비스 확인
+
+```bash
+# 실행 서버에서 확인
+pm2 list | grep admin
+curl http://localhost/adm/
+sudo netstat -tlnp | grep 30000
+```
+
+#### 2.2.2 Platform 디렉토리 생성
+
+섹션 1.1과 동일
+
+#### 2.2.3 데이터베이스 설정
+
+섹션 1.2와 동일
+
+#### 2.2.4 Backend 환경변수
+
+섹션 1.4.1과 동일
+
+### 2.3 빌드 및 배포
+
+#### 빌드 (빌드 서버)
+
+```bash
+cd /home/iitp-plf/iitp-dabt-platform/source
+npm run build:server
+```
+
+#### 배포 (빌드 서버 → 실행 서버)
+
+단독 설치 가이드 섹션 2.3.2와 동일 (rsync 사용)
+
+### 2.4 실행 서버 설정 계속
+
+#### Backend 실행 준비
+
+섹션 1.7과 동일
+
+#### Nginx 통합 설정
+
+섹션 1.8과 동일
+
+#### 서비스 시작
+
+섹션 1.9와 동일
+
+### 2.5 검증
+
+섹션 1.10과 동일
+
+---
+
+## 3. 업데이트 배포 (일상 운영)
+
+> **전제조건**: 섹션 1 또는 2의 초기 설치 완료
+
+**중요**: Admin 서비스에 영향을 주지 않고 Platform만 업데이트합니다.
+
+### 3.1 사전 확인
+
+```bash
+# Admin 서비스 상태 확인 (영향 없어야 함)
+pm2 list | grep admin
+curl http://localhost/adm/api/common/health
+
+# Platform 현재 버전 확인
+curl http://localhost:33000/api/common/version
+curl http://localhost/hub/api/common/version
+
+# Platform 서비스 상태
+pm2 list | grep plf
+pm2 logs iitp-dabt-plf-be --lines 50
+
+# 백업 (선택사항)
+pg_dump -U iitp_platform_user iitp_dabt > platform_backup_$(date +%Y%m%d_%H%M%S).sql
+```
+
+### 3.2 소스 업데이트
+
+#### 단일 서버:
+```bash
+cd /home/iitp-plf/iitp-dabt-platform/source
+git fetch origin
+git pull origin main
+git log -5 --oneline
+```
+
+#### 빌드 서버 (서버 분리):
+```bash
+cd /home/iitp-plf/iitp-dabt-platform/source
+git fetch origin
+git pull origin main
+```
+
+### 3.3 의존성 확인
+
+```bash
+git diff HEAD@{1} HEAD -- package.json be/package.json fe/package.json
+
+# 변경 있으면
+npm install
+```
+
+### 3.4 빌드
+
+```bash
+cd /home/iitp-plf/iitp-dabt-platform/source
+npm run build:server
+```
+
+### 3.5 배포
+
+#### 단일 서버:
+```bash
+# Backend 배포
+rsync -av --delete \
+  --exclude='node_modules' --exclude='.env' --exclude='logs' \
+  /home/iitp-plf/iitp-dabt-platform/deploy/be/ \
+  /var/www/iitp-dabt-platform/be/
+
+# Frontend 배포
+rsync -av --delete \
+  /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/ \
+  /var/www/iitp-dabt-platform/fe/
+
+# 공통 패키지 배포
+rsync -av --delete \
+  /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/ \
+  /var/www/iitp-dabt-platform/packages/common/
+
+# Backend 의존성 업데이트 (package.json 변경 시)
+cd /var/www/iitp-dabt-platform/be
+npm install --production
+```
+
+#### 서버 분리:
+```bash
+# 빌드 서버에서 실행
+node script/server/deploy-server.js
+```
+
+### 3.6 서비스 재시작 (Platform만)
+
+```bash
+# Platform Backend만 재시작 (Admin 영향 없음)
+pm2 restart iitp-dabt-plf-be
+
+# 로그 확인
+pm2 logs iitp-dabt-plf-be --lines 50
+
+# Admin 서비스 정상 확인
+pm2 list | grep admin
+curl http://localhost/adm/api/common/health
+```
+
+### 3.7 검증
+
+```bash
+# Platform 버전 확인 (변경되었는지)
+curl http://localhost/hub/api/common/version
+
+# Platform 헬스체크
+curl http://localhost:33000/api/common/health
+curl http://localhost/hub/api/common/health
+
+# Admin 서비스 영향 확인 (정상이어야 함)
+curl http://localhost/adm/api/common/health
+curl http://localhost/adm/
+
+# PM2 상태 (두 서비스 모두 online)
+pm2 list
+```
+
+### 3.8 롤백 (문제 발생 시)
+
+```bash
+# Git 롤백
+cd /home/iitp-plf/iitp-dabt-platform/source
+git reset --hard <이전_커밋>
+
+# 재빌드 및 재배포
+npm run build:server
+# (섹션 3.5 참조)
+
+# 재시작
+pm2 restart iitp-dabt-plf-be
+
+# Admin 서비스 영향 확인
+pm2 list
+curl http://localhost/adm/api/common/health
 ```
 
 ---
 
-이 문서 순서대로 수행하면 단일 서버 환경에서 빌드 → 배포 → 기동까지 원활히 진행되며, Admin(`/adm`)과 Platform(`/hub`)이 정상 동작합니다.
+## 4. 복합 서비스 운영 관리
+
+### 4.1 서비스별 관리
+
+#### Admin 서비스
+```bash
+# 상태 확인
+pm2 list | grep admin
+curl http://localhost/adm/api/common/health
+
+# 로그 확인
+pm2 logs <admin-app-name>
+
+# 재시작
+pm2 restart <admin-app-name>
+```
+
+#### Platform 서비스
+```bash
+# 상태 확인
+pm2 list | grep plf
+curl http://localhost/hub/api/common/health
+
+# 로그 확인
+pm2 logs iitp-dabt-plf-be
+
+# 재시작
+pm2 restart iitp-dabt-plf-be
+```
+
+#### 전체 서비스
+```bash
+# 전체 상태
+pm2 list
+
+# 전체 재시작 (주의: Admin도 재시작됨)
+pm2 restart all
+
+# 전체 로그
+pm2 logs
+```
+
+### 4.2 Nginx 로그 분석
+
+```bash
+# Access 로그 분리 확인
+sudo tail -f /var/log/nginx/access.log | grep /adm/   # Admin
+sudo tail -f /var/log/nginx/access.log | grep /hub/   # Platform
+
+# Error 로그
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 4.3 데이터베이스 관리
+
+```bash
+# Admin 사용자 확인
+psql -U iitp_admin_user -d iitp_dabt -c "\conninfo"
+
+# Platform 사용자 확인
+psql -U iitp_platform_user -d iitp_dabt -c "\conninfo"
+
+# 연결 수 확인
+psql -U postgres -d iitp_dabt -c "SELECT * FROM pg_stat_activity WHERE datname='iitp_dabt';"
+```
+
+### 4.4 리소스 모니터링
+
+```bash
+# 프로세스별 리소스
+pm2 monit
+
+# 메모리 사용량
+free -h
+
+# CPU 사용량
+htop
+
+# 디스크 사용량
+df -h
+```
+
+---
+
+## 5. 문제 해결 및 FAQ
+
+### 5.1 복합 서비스 특화 문제
+
+#### Admin 서비스가 영향받음
+
+```bash
+# Admin 상태 확인
+pm2 list | grep admin
+curl http://localhost/adm/api/common/health
+
+# Nginx 설정 확인 (location 블록 충돌 확인)
+sudo nginx -t
+sudo cat /etc/nginx/conf.d/*.conf
+
+# Nginx 재로드
+sudo systemctl reload nginx
+
+# Admin 로그 확인
+pm2 logs <admin-app-name> --lines 100
+```
+
+#### 포트 충돌
+
+```bash
+# 포트 사용 확인
+sudo netstat -tlnp | grep :30000  # Admin
+sudo netstat -tlnp | grep :33000  # Platform
+
+# 충돌 시 프로세스 종료 또는 포트 변경
+```
+
+#### Nginx location 우선순위 문제
+
+```nginx
+# 더 구체적인 경로가 먼저 와야 함
+# 잘못된 순서:
+location / {  # 이게 먼저 오면 모든 요청을 잡음
+    ...
+}
+location /adm/ {  # 이게 실행 안 됨
+    ...
+}
+
+# 올바른 순서:
+location /adm/api/ {  # 가장 구체적
+    ...
+}
+location /adm/ {
+    ...
+}
+location / {  # 가장 일반적 (마지막)
+    ...
+}
+```
+
+### 5.2 FAQ (복합 서비스)
+
+**Q: Admin과 Platform이 같은 DB를 사용해도 되나요?**
+- ✅ 네, 같은 DB (`iitp_dabt`)를 사용하되 별도 사용자 계정으로 접근합니다.
+- 테이블 이름 충돌 방지를 위해 prefix 사용 권장 (예: `platform_`, `admin_`)
+
+**Q: Nginx에서 /adm/과 /hub/ 경로가 충돌하지 않나요?**
+- ✅ 아니요. Nginx는 location 매칭이 정확하므로 충돌하지 않습니다.
+- 구체적인 경로 (`/adm/api/`, `/hub/api/`)를 먼저 정의하는 것이 중요합니다.
+
+**Q: 한 서비스만 재시작할 수 있나요?**
+- ✅ 네, PM2 앱 이름으로 개별 재시작 가능합니다.
+- `pm2 restart iitp-dabt-plf-be` (Platform만)
+- `pm2 restart <admin-app-name>` (Admin만)
+
+**Q: Frontend 빌드 시 경로를 잘못 설정했어요**
+- 재빌드 및 재배포 필요:
+```bash
+# Frontend .env 수정
+vi fe/.env  # VITE_BASE=/hub/ 확인
+
+# 재빌드
+npm run build:server:fe
+
+# 재배포
+rsync ... (섹션 3.5 참조)
+```
+
+**Q: 두 서비스의 로그를 동시에 보고 싶어요**
+```bash
+# PM2 전체 로그
+pm2 logs
+
+# 또는 tail 동시 실행
+tail -f /var/www/iitp-dabt-admin/be/logs/*.log &
+tail -f /var/www/iitp-dabt-platform/be/logs/*.log &
+```
+
+---
+
+## 📋 복합 서비스 체크리스트
+
+### 초기 설치 체크리스트
+
+- [ ] Admin 서비스 정상 동작 확인
+- [ ] Admin 포트 및 경로 확인 (30000, /adm)
+- [ ] Platform 사용자 및 디렉토리 생성
+- [ ] Platform DB 사용자 생성 (Admin과 별도)
+- [ ] Platform Git 클론
+- [ ] Platform Backend .env 생성 (포트 33000)
+- [ ] Platform Frontend .env 생성 (/hub 경로)
+- [ ] Platform 빌드 성공
+- [ ] Platform 배포 완료
+- [ ] Nginx 통합 설정 (Admin + Platform)
+- [ ] Platform Backend PM2 시작
+- [ ] Admin 서비스 영향 없음 확인
+- [ ] Platform 헬스체크 성공 (/hub/api)
+- [ ] Platform Frontend 접속 성공 (/hub)
+
+### 업데이트 체크리스트
+
+- [ ] Admin 서비스 정상 확인
+- [ ] Platform 현재 버전 확인
+- [ ] 백업 완료
+- [ ] Git pull 완료
+- [ ] 빌드 성공
+- [ ] 배포 완료
+- [ ] Platform 재시작
+- [ ] Admin 서비스 영향 없음 확인
+- [ ] Platform 헬스체크 성공
+- [ ] Platform 버전 변경 확인
+
+---
+
+**이 문서대로 순서대로 실행하면 Admin 서비스에 영향 없이 Platform이 안전하게 설치/운영됩니다!** 🎉
+
+문제 발생 시: [Issues](https://github.com/sweetk-dev/06-IITP-DABT-Platform/issues)
 
 **IITP DABT Platform Team** © 2025
 

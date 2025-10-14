@@ -362,16 +362,17 @@ npm run build
 
 #### 환경변수 목록
 
-| 변수명 | 설명 | 로컬 개발 | 프로덕션 | 사용 위치 |
-|--------|------|-----------|---------|----------|
-| `VITE_PORT` | 개발 서버 포트 | `5173` | `5173` | vite.config.ts |
-| `VITE_BASE` | 베이스 경로 | `/` | `/hub/` | vite.config.ts |
-| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/hub` | api/client.ts |
-| `VITE_API_TIMEOUT` | API 타임아웃 (ms) | `10000` | `10000` | api/client.ts |
-| `VITE_VISUAL_TOOL` | 시각화 도구 URL | `http://localhost:3000/` | `http://서버:포트/` | DataDetail.tsx |
-| `VITE_EMPLOYMENT_SITE_URL` | 구인구직 사이트 URL | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | Home.tsx |
-| `VITE_OPEN_API_CENTER_URL` | Open API 센터 URL | `http://192.168.60.142/adm/` | `http://서버/adm/` | DataDetail.tsx |
-| `VITE_OPEN_API_CENTER_ABOUT_URL` | Open API 센터 소개 페이지 | `http://192.168.60.142/adm/about` | `http://서버/adm/about` | DataDetail.tsx (Modal helpText) |
+| 변수명 | 설명 | 로컬 개발 | 프로덕션 (단독) | 프로덕션 (복합) | 사용 위치 |
+|--------|------|-----------|----------------|----------------|----------|
+| `VITE_PORT` | 개발 서버 포트 | `5173` | `5173` | `5173` | vite.config.ts |
+| `VITE_BASE` | 베이스 경로 | `/` | `/` | `/hub/` | vite.config.ts |
+| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `http://서버` | `/hub` | api/client.ts |
+| `VITE_API_TIMEOUT` | API 타임아웃 (ms) | `10000` | `10000` | `10000` | api/client.ts |
+| `VITE_API_DATA_PREVIEW_LIMIT` | 데이터 미리보기 제한 | `10` | `10` | `10` | (향후 사용) |
+| `VITE_VISUAL_TOOL` | 시각화 도구 URL | `http://localhost:3000/` | `http://서버:포트/` | `http://서버:포트/` | DataDetail.tsx |
+| `VITE_EMPLOYMENT_SITE_URL` | 구인구직 사이트 URL | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | Home.tsx |
+| `VITE_OPEN_API_CENTER_URL` | Open API 센터 URL | `http://192.168.60.142/adm/` | `http://서버/admin/` | `http://서버/adm/` | DataDetail.tsx |
+| `VITE_OPEN_API_CENTER_ABOUT_URL` | Open API 센터 소개 | `http://192.168.60.142/adm/about` | `http://서버/admin/about` | `http://서버/adm/about` | DataDetail.tsx (Modal helpText) |
 
 ### API 설정
 

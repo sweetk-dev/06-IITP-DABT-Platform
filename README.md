@@ -6,9 +6,9 @@ IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and
 
 장애인 자립 생활 지원을 위한 빅데이터 플랫폼으로, 데이터 탐색, 자가진단, 정책 추천 등의 기능을 제공합니다.
 
-> **서비스 경로**: `/hub` (1서버 여러 서비스 공존 시)
-> - Platform 서비스: `/hub`, `/hub/api` (포트 33000)
-> - Admin 서비스: `/adm`, `/adm/api` (포트 30000)
+> **서비스 경로**:
+> - **단독 설치**: `/` (루트 경로)
+> - **복합 설치** (Admin과 공존 시): `/hub` (서브패스)
 
 ## 🎯 핵심 특징
 
@@ -272,51 +272,107 @@ chore: 빌드 설정 등
 - **확장 프로그램**: TypeScript, ESLint, Prettier
 - **Git**: 버전 관리
 
-## 🚀 배포
+## 🚀 빠른 시작 (로컬 개발)
 
-### 로컬 배포
+### 1. 프로젝트 설정
 ```bash
-# 빌드
-npm run build:all
+# 프로젝트 클론
+git clone https://github.com/sweetk-dev/06-IITP-DABT-Platform.git
+cd 06-IITP-DABT-Platform
 
-# 정적 파일 서빙
-npm run preview
+# 전체 패키지 설치
+npm install
 ```
 
-### 서버 배포
-
-**프로덕션 서버 배포 전 필수 사항**:
-1. Backend `.env` 파일 생성 (실행 서버에서, 최초 1회)
-2. Frontend `.env` 파일 생성 (빌드 서버에서, 최초 1회, 권장)
-
+### 2. 데이터베이스 설정
 ```bash
-# 1. Frontend 빌드 환경변수 설정 (빌드 서버, 최초 1회)
+# PostgreSQL 접속
+sudo -u postgres psql
+
+# 데이터베이스 및 사용자 생성
+CREATE DATABASE iitp_dabt;
+CREATE USER iitp_platform_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE iitp_dabt TO iitp_platform_user;
+\q
+```
+
+### 3. 환경변수 설정
+
+**Backend (.env 파일 생성):**
+```bash
+cd be
+cp env.sample .env
+vi .env  # DB 비밀번호 등 수정
+cd ..
+```
+
+**Frontend (.env 파일 생성):**
+```bash
 cd fe
 cp env.sample .env
-vi .env  # 필요 시 서버 주소 수정 (기본값: /hub)
+# 로컬 개발은 env.sample 주석 부분 참고
 cd ..
-
-# 또는 shell export 사용 (대안) - 모든 변수 설정 필요
-# export VITE_PORT=5173
-# export VITE_BASE=/hub/
-# export VITE_API_BASE_URL=/hub
-# export VITE_API_TIMEOUT=10000
-# export VITE_VISUAL_TOOL=http://서버:포트/
-# export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-# export VITE_OPEN_API_CENTER_URL=http://서버/adm/
-# export VITE_OPEN_API_CENTER_ABOUT_URL=http://서버/adm/about
-
-# 2. 서버 빌드
-npm run build:server
-
-# 3. 서버 배포
-npm run deploy:server
 ```
 
-**상세 가이드**: 
-- [서버 기동 방법](./README-IITP-DABT-Platform-서버-기동-방법.md)
-- [단일 서버 배포 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md)
-- [분리 서버 배포 가이드](./script/README-SERVER-DEPLOYMENT.md)
+### 4. 개발 서버 실행
+```bash
+# Backend + Frontend 동시 실행
+npm run dev:all
+
+# 또는 개별 실행
+npm run dev:be  # Backend만
+npm run dev:fe  # Frontend만
+```
+
+**접속:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:33000
+
+---
+
+## 🚀 프로덕션 배포
+
+### 배포 가이드 선택
+
+**상황에 맞는 가이드를 선택하세요:**
+
+| 상황 | 가이드 | 경로 |
+|------|--------|------|
+| **Platform 단독 설치** | [단독 설치 가이드](./script/README-SERVER-DEPLOYMENT.md) | `/` (루트) |
+| **Admin + Platform 공존** | [복합 설치 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md) | `/hub` (서브패스) |
+
+### 배포 요약
+
+**단독 설치 (추천 가이드 참조):**
+```bash
+# 1. Frontend .env 설정 (빌드 서버)
+cd fe
+cp env.sample .env
+vi .env  # VITE_BASE=/ 확인
+
+# 2. Backend .env 설정 (실행 서버)
+# /var/www/iitp-dabt-platform/be/.env 생성
+
+# 3. 빌드 및 배포
+npm run build:server
+# ... (가이드 참조)
+```
+
+**복합 설치 (추천 가이드 참조):**
+```bash
+# 1. Frontend .env 설정 (빌드 서버)
+cd fe
+cp env.sample .env
+vi .env  # VITE_BASE=/hub/ 변경
+
+# 2. Backend .env 설정 (실행 서버)
+# PORT=33000 (Admin과 다른 포트)
+
+# 3. Nginx 통합 설정
+# Admin + Platform location 블록 추가
+
+# ... (가이드 참조)
+```
 
 ## 📚 문서
 
@@ -325,10 +381,9 @@ npm run deploy:server
 - [백엔드 문서](./be/README.md)
 - [공통 패키지 문서](./packages/common/README.md)
 
-### 서버 배포 문서
-- [서버 기동 방법](./README-IITP-DABT-Platform-서버-기동-방법.md) ⭐ **필독**
-- [단일 서버 배포 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md)
-- [분리 서버 배포 가이드](./script/README-SERVER-DEPLOYMENT.md)
+### 서버 배포 문서 ⭐ **프로덕션 필독**
+- [Platform 단독 설치 가이드](./script/README-SERVER-DEPLOYMENT.md) ← Platform만 설치 시
+- [복합 서비스 설치 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md) ← Admin + Platform 공존 시
 
 ### 참고 자료
 - [API 스펙](./01.references/openapi-v0.0.3.yaml)
