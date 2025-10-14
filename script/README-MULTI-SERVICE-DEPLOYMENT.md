@@ -8,7 +8,7 @@
 > - **Admin 서비스**: `/adm`, `/adm/api` (포트 30000)
 > - **Platform 서비스**: `/hub`, `/hub/api` (포트 33000)
 > 
-> **Platform 단독 설치**는 [단독 설치 가이드](./README-SERVER-DEPLOYMENT.md) 참조
+> **Platform 단독 설치**는 [Platform 단독 설치 가이드](./README-SERVER-DEPLOYMENT.md) 참조
 >
 > **이 문서대로 순서대로 실행하면 기존 Admin 서비스에 영향 없이 Platform이 추가됩니다.**
 
@@ -118,12 +118,14 @@ Admin이 이미 설치되어 있으므로 대부분 완료된 상태입니다.
 
 ```bash
 # 확인만 수행
-node -v   # v22.x.x
-npm -v    # 9.x.x 이상
-pm2 -v    # 최신 버전
-nginx -t  # 설정 정상
-psql --version  # PostgreSQL 12.x 이상
+node -v   # v22.x.x 확인
+npm -v    # 9.x.x 이상 확인
+pm2 -v    # 최신 버전 확인
+nginx -t  # 설정 정상 확인
+psql --version  # PostgreSQL 12.x 이상 확인
 ```
+
+> **참고**: 만약 Node.js가 없거나 구버전이면 단독 설치 가이드의 [섹션 1.0 Node.js 설치](./README-SERVER-DEPLOYMENT.md#node.js-설치-아래-중-하나-선택) 참조
 
 ### 1.1 Platform 계정 및 디렉토리 구조
 
@@ -319,9 +321,9 @@ cd /home/iitp-plf/iitp-dabt-platform/source
 npm run build:server
 
 # 빌드 확인
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/be/dist/
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/backend/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/dist/
 ```
 
 ### 1.6 배포 (단일 서버)
@@ -330,13 +332,13 @@ ls -la /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/dist/
 cd /home/iitp-plf/iitp-dabt-platform/source
 
 # Backend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/be/* /var/www/iitp-dabt-platform/be/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-platform/be/
 
 # Frontend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/* /var/www/iitp-dabt-platform/fe/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
 
 # 공통 패키지 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/* /var/www/iitp-dabt-platform/packages/common/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
 
 # 운영 스크립트 배포
 cp -r script/server/* /var/www/iitp-dabt-platform/script/
@@ -608,7 +610,16 @@ sudo tail -f /var/log/nginx/error.log
 
 ### 2.1 빌드 서버 설정
 
-단독 설치 가이드의 섹션 2.1과 동일하게 진행하되, **Frontend 환경변수만 복합 서비스 기준**으로 설정합니다.
+단독 설치 가이드의 [섹션 2.1](./README-SERVER-DEPLOYMENT.md#21-빌드-서버-설정)과 동일하게 진행하되, **Frontend 환경변수만 복합 서비스 기준**으로 설정합니다.
+
+**빌드 서버 세팅 요약:**
+- 필수 패키지 설치 (git, curl, build-essential, rsync)
+- Node.js 22.x 설치 (nvm, snap, NodeSource 중 선택)
+- iitp-plf 사용자 및 디렉토리 생성
+- SSH 키 설정 (rsync용)
+- Git 클론 및 패키지 설치
+
+**자세한 내용은 단독 설치 가이드 참조**
 
 #### Frontend 환경변수 (복합 서비스 기준)
 
@@ -755,17 +766,17 @@ npm run build:server
 # Backend 배포
 rsync -av --delete \
   --exclude='node_modules' --exclude='.env' --exclude='logs' \
-  /home/iitp-plf/iitp-dabt-platform/deploy/be/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   /var/www/iitp-dabt-platform/be/
 
 # Frontend 배포
 rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   /var/www/iitp-dabt-platform/fe/
 
 # 공통 패키지 배포
 rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   /var/www/iitp-dabt-platform/packages/common/
 
 # Backend 의존성 업데이트 (package.json 변경 시)

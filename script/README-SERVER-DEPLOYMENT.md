@@ -10,9 +10,9 @@
 > - 이 문서의 모든 `/`를 원하는 경로로 치환 (예: `/` → `/hub`)
 > - 환경변수: `VITE_BASE=/hub/`, `VITE_API_BASE_URL=/hub`
 > - Nginx: `location /` → `location /hub/`, `location /api/` → `location /hub/api/`
-> - 예시: [복합 서비스 설치 가이드](./README-ONE-SERVER-BUILD-DEPLOY.md) 참조
+> - 예시: [복합 서비스 설치 가이드](./README-MULTI-SERVICE-DEPLOYMENT.md) 참조
 >
-> **이 문서대로 순서대로 실행하면 빌드 → 배포 → 실행이 완벽히 동작합니다.**
+> **이 문서대로 순서대로 실행하면 빌드 → 배포 → 실행 동작합니다.**
 
 ## 📋 목차
 
@@ -70,17 +70,127 @@
 
 ## 0. 개요 및 사전 요구사항
 
-### 0.1 서버 환경 선택
+### 0.1 배포 Flow 개요
+
+#### 전체 Flow (초기 설치)
+
+```mermaid
+graph TD
+    A[👨‍💻 개발자] --> B[📝 코드 작성/수정]
+    B --> C[📤 Git Push]
+    C --> D[🏗️ 빌드 서버 설정<br/>Node.js, Git, 계정 생성]
+    D --> E[📥 Git Clone<br/>소스 다운로드]
+    E --> F[⚙️ 환경변수 설정<br/>FE .env, BE .env]
+    F --> G[🔨 빌드 실행<br/>npm run build:server]
+    G --> H{서버 구성}
+    H -->|단일 서버| I[📋 로컬 복사<br/>deploy → /var/www]
+    H -->|서버 분리| J[📤 rsync 배포<br/>빌드 → 실행 서버]
+    I --> K[🚀 실행 서버 설정<br/>DB, Nginx, PM2]
+    J --> K
+    K --> L[▶️ Backend 시작<br/>PM2 start]
+    L --> M[🌐 서비스 운영]
+    
+    style A fill:#e1f5fe
+    style G fill:#fff3e0
+    style K fill:#f3e5f5
+    style M fill:#e8f5e8
+```
+
+#### 업데이트 배포 Flow (일상 운영)
+
+```mermaid
+graph LR
+    A[👨‍💻 코드 수정] --> B[📤 Git Push]
+    B --> C[🏗️ Git Pull<br/>빌드 서버]
+    C --> D[🔨 빌드<br/>build:server]
+    D --> E{배포 방식}
+    E -->|단일 서버| F[📋 로컬 복사]
+    E -->|서버 분리| G[📤 rsync]
+    F --> H[🔄 PM2 재시작<br/>Backend만]
+    G --> H
+    H --> I[✅ 배포 완료]
+    
+    style A fill:#e1f5fe
+    style D fill:#fff3e0
+    style H fill:#f3e5f5
+    style I fill:#e8f5e8
+```
+
+#### 상세 빌드 및 배포 과정
+
+```mermaid
+sequenceDiagram
+    participant Dev as 👨‍💻 개발자
+    participant Git as 📚 Git 저장소
+    participant Build as 🏗️ 빌드 서버
+    participant Deploy as 🚀 실행 서버
+    participant User as 🌐 사용자
+    
+    Dev->>Git: 1. 코드 Push
+    Git->>Build: 2. Git pull origin main
+    Build->>Build: 3. npm install (의존성 업데이트)
+    Build->>Build: 4. npm run build:common
+    Build->>Build: 5. npm run build:be
+    Build->>Build: 6. npm run build:fe (VITE_BASE 적용)
+    Build->>Build: 7. deploy/ 폴더에 복사<br/>(backend, frontend, common)
+    Build->>Deploy: 8. rsync 또는 복사<br/>(node_modules, .env 제외)
+    Deploy->>Deploy: 9. npm install --production<br/>(BE 의존성)
+    Deploy->>Deploy: 10. pm2 restart iitp-dabt-plf-be
+    User->>Deploy: 11. 웹 서비스 접속
+```
+
+#### 디렉토리 구조 및 배포 경로
+
+```mermaid
+graph TB
+    subgraph "🏗️ 빌드 서버"
+        A1[📁 소스<br/>/home/iitp-plf/.../source]
+        A2[🔨 빌드]
+        A3[📦 배포 폴더<br/>/home/iitp-plf/.../deploy/<br/>├─ backend/<br/>├─ frontend/<br/>└─ common/]
+    end
+    
+    subgraph "🚀 실행 서버"
+        B1[📁 Backend<br/>/var/www/.../be/]
+        B2[📁 Frontend<br/>/var/www/.../fe/]
+        B3[📁 Common<br/>/var/www/.../packages/common/]
+        B4[🔄 PM2 프로세스<br/>iitp-dabt-plf-be]
+        B5[⚡ Nginx<br/>포트 80/443]
+    end
+    
+    subgraph "🌐 사용자"
+        C1[💻 웹 브라우저]
+    end
+    
+    A1 --> A2
+    A2 --> A3
+    A3 -->|rsync<br/>또는 cp| B1
+    A3 -->|rsync<br/>또는 cp| B2
+    A3 -->|rsync<br/>또는 cp| B3
+    B1 --> B4
+    B3 --> B4
+    B4 --> B5
+    B2 --> B5
+    B5 -->|API: /api| B4
+    B5 -->|Static: /| B2
+    B5 --> C1
+    
+    style A1 fill:#e1f5fe
+    style A3 fill:#fff3e0
+    style B1 fill:#f3e5f5
+    style B2 fill:#f3e5f5
+    style B3 fill:#f3e5f5
+    style B4 fill:#e8f5e8
+    style B5 fill:#e8f5e8
+    style C1 fill:#fce4ec
+```
+
+### 0.2 서버 환경 선택
 
 **단일 서버 환경** (섹션 1):
 - 빌드 서버 = 실행 서버 (같은 서버에서 빌드와 실행)
-- 소규모 또는 개발/테스트 환경에 적합
-- 간단한 구성
 
 **서버 분리 환경** (섹션 2):
 - 빌드 서버 ≠ 실행 서버 (서버 분리)
-- 대규모 운영 환경에 적합
-- 빌드 부하와 실행 부하 분산
 
 ### 0.2 시스템 요구사항
 
@@ -112,15 +222,68 @@ sudo apt update && sudo apt upgrade -y
 
 # 필수 패키지 설치
 sudo apt install -y git curl unzip jq build-essential nginx
+```
 
-# Node.js 22.x 설치 (NodeSource)
+#### Node.js 설치 (아래 중 하나 선택)
+
+**방법 1: nvm 사용 (권장 - 버전 관리 용이)**
+```bash
+# nvm 설치
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+
+# Node.js 22 설치
+nvm install 22
+nvm use 22
+nvm alias default 22
+
+# 버전 확인
+node -v  # v22.x.x
+npm -v   # 9.x.x 이상
+```
+
+**방법 2: snap 사용 (가장 간단)**
+```bash
+sudo snap install node --classic --channel=22
+
+# 버전 확인
+node -v
+npm -v
+```
+
+**방법 3: NodeSource 사용 (전통적 방식)**
+```bash
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # 버전 확인
-node -v  # v22.x.x 확인
-npm -v   # 9.x.x 이상 확인
+node -v
+npm -v
+```
 
+**어느 방법을 선택하든 결과는 동일합니다.**
+
+**설치 확인 방법 (설치 방식별):**
+
+```bash
+# 공통 확인
+node -v  # v22.x.x
+npm -v   # 9.x.x 이상
+
+# nvm으로 설치한 경우
+nvm current  # v22.x.x
+nvm list     # 설치된 버전 목록
+
+# snap으로 설치한 경우
+snap list | grep node
+
+# NodeSource로 설치한 경우
+apt list --installed | grep nodejs
+```
+
+#### PM2 및 PostgreSQL 설치
+
+```bash
 # PM2 글로벌 설치
 sudo npm install -g pm2
 
@@ -383,13 +546,13 @@ cat /home/iitp-plf/iitp-dabt-platform/deploy/fe/buildInfo.json
 cd /home/iitp-plf/iitp-dabt-platform/source
 
 # Backend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/be/* /var/www/iitp-dabt-platform/be/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-platform/be/
 
 # Frontend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/* /var/www/iitp-dabt-platform/fe/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
 
 # 공통 패키지 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/* /var/www/iitp-dabt-platform/packages/common/
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
 
 # 운영 스크립트 배포
 cp -r script/server/* /var/www/iitp-dabt-platform/script/
@@ -584,14 +747,16 @@ sudo apt update && sudo apt upgrade -y
 
 # 필수 패키지 설치
 sudo apt install -y git curl build-essential rsync
+```
 
-# Node.js 22.x 설치
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
+**Node.js 설치 (아래 중 하나 선택):**
 
-# 버전 확인
-node -v
-npm -v
+섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (nvm, snap, NodeSource 중 선택)
+
+```bash
+# 설치 후 버전 확인
+node -v  # v22.x.x
+npm -v   # 9.x.x 이상
 ```
 
 #### 2.1.2 계정 및 디렉토리 생성
@@ -707,20 +872,28 @@ sudo apt update && sudo apt upgrade -y
 
 # 필수 패키지 설치
 sudo apt install -y curl nginx
+```
 
-# Node.js 22.x 설치
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
+**Node.js 설치 (아래 중 하나 선택):**
 
+섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (nvm, snap, NodeSource 중 선택)
+
+```bash
 # PM2 글로벌 설치
 sudo npm install -g pm2
 
-# PM2 시작 스크립트 등록
+# PM2 시작 스크립트 등록 (부팅 시 자동 시작)
 pm2 startup
-# 출력되는 명령어 실행
+# 출력되는 명령어 실행 (sudo env PATH=... 형태)
 
 # PostgreSQL 설치
 sudo apt install -y postgresql postgresql-contrib
+
+# 버전 확인
+node -v  # v22.x.x
+npm -v   # 9.x.x 이상
+pm2 -v
+psql --version
 ```
 
 #### 2.2.2 계정 및 디렉토리 생성
@@ -928,17 +1101,17 @@ npm run build:server
 cd /home/iitp-plf/iitp-dabt-platform/source
 rsync -av --delete \
   --exclude='node_modules' --exclude='.env' --exclude='logs' \
-  /home/iitp-plf/iitp-dabt-platform/deploy/be/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   /var/www/iitp-dabt-platform/be/
 
 # Frontend 배포
 rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   /var/www/iitp-dabt-platform/fe/
 
 # 공통 패키지 배포
 rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   /var/www/iitp-dabt-platform/packages/common/
 
 # Backend 의존성 업데이트 (package.json 변경 시)

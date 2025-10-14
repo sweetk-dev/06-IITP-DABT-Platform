@@ -21,11 +21,8 @@
     "deploy:server": "node script/server/deploy-server.js",
     "deploy:server:ops": "node script/server/deploy-server-ops.js",
     "start:server:be": "node script/server/start-server-be.js",
-    "start:server:fe": "node script/server/start-server-fe.js",
     "restart:server:be": "node script/server/restart-server-be.js",
-    "restart:server:fe": "node script/server/restart-server-fe.js",
-    "stop:server:be": "node script/server/stop-server-be.js",
-    "stop:server:fe": "node script/server/stop-server-fe.js"
+    "stop:server:be": "node script/server/stop-server-be.js"
   },
   "workspaces": [
     "packages/common",

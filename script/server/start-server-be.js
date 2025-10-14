@@ -88,7 +88,7 @@ function showVersionInfo() {
     console.log(`   🏗️  Backend: ${bePackageJson.version}`);
     
     // Common 패키지 버전 확인
-    const commonPackageJson = require(path.join(config.bePath, 'node_modules/@iitp-dabt/common/package.json'));
+    const commonPackageJson = require(path.join(config.bePath, 'node_modules/@iitp-dabt-platform/common/package.json'));
     console.log(`   📦 Common: ${commonPackageJson.version}`);
     
     // 빌드 정보 확인

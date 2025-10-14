@@ -339,7 +339,7 @@ npm run dev:fe  # Frontend만
 | 상황 | 가이드 | 경로 |
 |------|--------|------|
 | **Platform 단독 설치** | [단독 설치 가이드](./script/README-SERVER-DEPLOYMENT.md) | `/` (루트) |
-| **Admin + Platform 공존** | [복합 설치 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md) | `/hub` (서브패스) |
+| **Admin + Platform 공존** | [복합 서비스 가이드](./script/README-MULTI-SERVICE-DEPLOYMENT.md) | `/hub` (서브패스) |
 
 ### 배포 요약
 
@@ -383,7 +383,7 @@ vi .env  # VITE_BASE=/hub/ 변경
 
 ### 서버 배포 문서 ⭐ **프로덕션 필독**
 - [Platform 단독 설치 가이드](./script/README-SERVER-DEPLOYMENT.md) ← Platform만 설치 시
-- [복합 서비스 설치 가이드](./script/README-ONE-SERVER-BUILD-DEPLOY.md) ← Admin + Platform 공존 시
+- [복합 서비스 설치 가이드](./script/README-MULTI-SERVICE-DEPLOYMENT.md) ← Admin + Platform 공존 시
 
 ### 참고 자료
 - [API 스펙](./01.references/openapi-v0.0.3.yaml)
