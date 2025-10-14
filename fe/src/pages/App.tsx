@@ -111,7 +111,7 @@ export const ROUTE_CONFIGS: RouteConfig[] = [
   },
   {
     path: ROUTE_PATHS.SELF_CHECK_MORE,
-    label: '더보기',
+    label: '자립 지원 정보',
     component: 'SelfCheckMore',
     parent: 'SELF_CHECK_RESULT', // 실제 페이지 이동: 결과에서 더보기로
     breadcrumbParent: 'SELF_CHECK_RESULT',
