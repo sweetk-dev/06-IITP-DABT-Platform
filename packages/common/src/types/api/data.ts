@@ -24,16 +24,11 @@ export const DATA_LATEST_DEFAULTS = {
   MAX_LIMIT: 12
 } as const;
 
-// 레거시 호환성을 위한 별칭
-export type DataLatestReq = DataLatestQuery;
-
 export interface DataLatestItem {
   id: number;
   title: string;
   data_type: DataTypeCode;
 }
-
-export type DataLatestRes = DataLatestItem[];
 
 // ============================================================================
 // 자립테마 데이터 건수 API

@@ -5,7 +5,7 @@ import type {
   CommonVersionRes 
 } from './common.js';
 import type {
-  DataLatestRes,
+  DataLatestItem,
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
@@ -99,7 +99,7 @@ export const API_MAPPING = {
       params: 'void',
       query: 'DataLatestQuery'
     } as ApiRequest,
-    res: {} as DataLatestRes,
+    res: {} as DataLatestItem[],
     description: '최신 데이터 리스트 6개 조회',
     fullUrl: FULL_API_URLS.DATA.LATEST
   },

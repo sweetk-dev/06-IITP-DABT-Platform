@@ -1,6 +1,6 @@
 // 데이터 Repository - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
-  DataLatestRes,
+  DataLatestItem,
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
@@ -34,7 +34,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
     limit: number;
     orderBy: string;
     direction: 'ASC' | 'DESC';
-  }): Promise<DataLatestRes> {
+  }): Promise<DataLatestItem[]> {
     try {
       logger.debug('데이터 Repository - 최신 데이터 조회', { options });
       

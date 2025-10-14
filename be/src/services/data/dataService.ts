@@ -1,6 +1,6 @@
 // 데이터 서비스 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
-  DataLatestRes,
+  DataLatestItem,
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
@@ -26,7 +26,7 @@ import { createPaginationParams, createPaginationMeta } from '../../utils/pagina
 import { processSortOption, processSearchQuery, processFilterConditions } from '../../utils/response';
 
 // 최신 데이터 조회 서비스
-export async function getLatestData(query: DataLatestQuery = {}): Promise<DataLatestRes> {
+export async function getLatestData(query: DataLatestQuery = {}): Promise<DataLatestItem[]> {
   try {
     logger.debug('최신 데이터 조회 서비스 실행', { query });
     

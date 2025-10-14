@@ -3,7 +3,7 @@ import { apiClient } from '../client';
 import { 
   FULL_API_URLS,
   DataLatestQuery,
-  DataLatestRes,
+  DataLatestItem,
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchQuery,
@@ -23,7 +23,7 @@ export class DataService {
   /**
    * 최신 데이터 리스트 조회
    */
-  async getLatestData(query: DataLatestQuery = {}): Promise<DataLatestRes> {
+  async getLatestData(query: DataLatestQuery = {}): Promise<DataLatestItem[]> {
     return apiClient.get(`GET ${FULL_API_URLS.DATA.LATEST}`, { query });
   }
 
