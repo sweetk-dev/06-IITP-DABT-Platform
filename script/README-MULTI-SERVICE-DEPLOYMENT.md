@@ -314,19 +314,28 @@ export VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
 
 ### 1.5 빌드
 
+#### 1.5.1 전체 빌드 (기본, 권장)
+
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 전체 빌드
+# 전체 빌드 (common → be → fe 순서)
 npm run build:server
 
 # 빌드 확인
 ls -la /home/iitp-plf/iitp-dabt-platform/deploy/backend/dist/
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
 ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/dist/
 ```
 
+#### 1.5.2 개별 빌드 (옵션)
+
+**개별 빌드 방법 및 시나리오는 단독 설치 가이드 참조:**
+- [섹션 1.5.2 개별 빌드](./README-SERVER-DEPLOYMENT.md#152-개별-빌드-옵션)
+
 ### 1.6 배포 (단일 서버)
+
+#### 1.6.1 전체 배포 (기본, 권장)
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
@@ -337,7 +346,7 @@ cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-plat
 # Frontend 배포
 cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
 
-# 공통 패키지 배포
+# Common 패키지 배포
 cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
 
 # 운영 스크립트 배포
@@ -347,6 +356,11 @@ cp -r script/server/* /var/www/iitp-dabt-platform/script/
 ls -la /var/www/iitp-dabt-platform/be/
 ls -la /var/www/iitp-dabt-platform/fe/
 ```
+
+#### 1.6.2 개별 배포 (옵션)
+
+**개별 배포 방법 및 주의사항은 단독 설치 가이드 참조:**
+- [섹션 1.6.2 개별 배포](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션)
 
 ### 1.7 Backend 실행 환경 설정
 
@@ -756,25 +770,27 @@ npm install
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
+
+# 전체 빌드 (권장)
 npm run build:server
 ```
+
+**개별 빌드 옵션:** [섹션 1.5.2](#152-개별-빌드-옵션) 또는 [단독 설치 가이드 참조](./README-SERVER-DEPLOYMENT.md#152-개별-빌드-옵션)
 
 ### 3.5 배포
 
 #### 단일 서버:
 ```bash
-# Backend 배포
+# 전체 배포 (권장)
 rsync -av --delete \
   --exclude='node_modules' --exclude='.env' --exclude='logs' \
   /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   /var/www/iitp-dabt-platform/be/
 
-# Frontend 배포
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   /var/www/iitp-dabt-platform/fe/
 
-# 공통 패키지 배포
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   /var/www/iitp-dabt-platform/packages/common/
@@ -784,25 +800,44 @@ cd /var/www/iitp-dabt-platform/be
 npm install --production
 ```
 
+**개별 배포 옵션:** [섹션 1.6.2](#162-개별-배포-옵션) 또는 [단독 설치 가이드 참조](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션)
+
 #### 서버 분리:
 ```bash
 # 빌드 서버에서 실행
-node script/server/deploy-server.js
+
+# 방법 1: 전체 배포 (권장)
+npm run deploy:server
+
+# 방법 2: 개별 배포 (빠른 배포)
+npm run deploy:server:be       # Backend만
+npm run deploy:server:fe       # Frontend만
+npm run deploy:server:common   # Common만
+
+# 후속 조치: 섹션 3.6 참조
 ```
+
+**개별 배포 상세:** [섹션 1.6.2](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션) 참조
 
 ### 3.6 서비스 재시작 (Platform만)
 
+#### 전체 재시작 (권장)
+
 ```bash
-# Platform Backend만 재시작 (Admin 영향 없음)
-pm2 restart iitp-dabt-plf-be
+# Platform Backend 재시작
+npm run restart:server:be
 
-# 로그 확인
-pm2 logs iitp-dabt-plf-be --lines 50
+# Platform Frontend 재시작 (Nginx reload)
+npm run restart:server:fe
 
-# Admin 서비스 정상 확인
+# Admin 서비스 정상 확인 (영향 없어야 함)
 pm2 list | grep admin
 curl http://localhost/adm/api/common/health
 ```
+
+#### 개별 재시작
+
+**재시작 필요 시나리오 및 방법:** [섹션 3.6 개별 재시작](./README-SERVER-DEPLOYMENT.md#36-서비스-재시작) 참조
 
 ### 3.7 검증
 

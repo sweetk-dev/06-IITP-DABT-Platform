@@ -514,31 +514,83 @@ NPM_CONFIG_PRODUCTION=true
 
 ### 1.5 빌드
 
+#### 1.5.1 전체 빌드 (기본, 권장)
+
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 전체 빌드 (common → be → fe 순서로 빌드)
+# 전체 빌드 (common → be → fe 순서로 자동 빌드)
 npm run build:server
-
-# 또는 개별 빌드
-npm run build:server:common  # 공통 패키지만
-npm run build:server:be      # Backend만
-npm run build:server:fe      # Frontend만
 ```
+
+**빌드 과정:**
+1. Git pull (최신 코드)
+2. npm install (의존성 업데이트)
+3. Common 빌드
+4. Backend 빌드 (빌드 정보 자동 생성)
+5. Frontend 빌드 (환경변수 적용)
+6. deploy/ 폴더로 복사
 
 **빌드 확인:**
 ```bash
-# 빌드 결과물 확인
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/be/dist/
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/backend/dist/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/dist/
 
 # 빌드 정보 확인
-cat /home/iitp-plf/iitp-dabt-platform/deploy/be/buildInfo.json
-cat /home/iitp-plf/iitp-dabt-platform/deploy/fe/buildInfo.json
+cat /home/iitp-plf/iitp-dabt-platform/deploy/backend/build-info.json
 ```
 
+#### 1.5.2 개별 빌드 (옵션)
+
+**언제 사용하나?**
+- 특정 부분만 수정했을 때
+- 빠른 빌드가 필요할 때
+- 전체 빌드는 과할 때
+
+**⚠️ 주의**: 의존성이 있으므로 순서 중요!
+
+**Common만 빌드:**
+```bash
+npm run build:server:common
+
+# 확인
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/dist/
+```
+
+**Backend만 빌드:**
+```bash
+# Common이 먼저 빌드되어 있어야 함!
+npm run build:server:be
+
+# 확인
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/backend/dist/
+cat /home/iitp-plf/iitp-dabt-platform/deploy/backend/build-info.json
+```
+
+**Frontend만 빌드:**
+```bash
+# 환경변수 확인 필수! (fe/.env 또는 export)
+# Common이 먼저 빌드되어 있어야 함!
+npm run build:server:fe
+
+# 확인
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
+```
+
+**개별 빌드 시나리오 예시:**
+
+| 변경 내용 | 빌드 명령 | 이유 |
+|----------|----------|------|
+| BE 로직만 수정 | `build:server:be` | FE/Common 변경 없음 |
+| FE UI만 수정 | `build:server:fe` | BE/Common 변경 없음 |
+| Common만 수정 | `build:server:common` | 빠른 빌드 |
+| Common + BE | `build:server:common` → `build:server:be` | 순서 준수 |
+| 전체 수정 | `build:server` | 안전한 방법 |
+
 ### 1.6 배포 (단일 서버)
+
+#### 1.6.1 전체 배포 (기본, 권장)
 
 단일 서버에서는 빌드 결과를 실행 디렉토리로 복사합니다.
 
@@ -551,7 +603,7 @@ cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-plat
 # Frontend 배포
 cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
 
-# 공통 패키지 배포
+# Common 패키지 배포
 cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
 
 # 운영 스크립트 배포
@@ -565,6 +617,88 @@ ls -la /var/www/iitp-dabt-platform/fe/
 **중요**: 
 - Backend `.env` 파일은 덮어쓰지 않도록 주의 (이미 1.4.1에서 생성함)
 - `node_modules/`는 실행 서버에서 별도 설치 필요
+
+#### 1.6.2 개별 배포 (옵션)
+
+**언제 사용하나?**
+- 특정 부분만 수정했을 때
+- 빠른 배포가 필요할 때
+- 전체 배포는 과할 때
+
+**Common만 배포:**
+```bash
+# 배포 (단일 서버)
+cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* \
+      /var/www/iitp-dabt-platform/packages/common/
+
+# 또는 rsync 사용 (더 안전)
+rsync -av --delete \
+  /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
+  /var/www/iitp-dabt-platform/packages/common/
+
+# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+npm run deploy:server:common
+
+# 후속 조치:
+npm run restart:server:be  # BE 재시작 필수
+# FE는 경우에 따라 재빌드 (아래 표 참조)
+```
+
+**Backend만 배포:**
+```bash
+# 배포 (rsync - .env, logs 보존)
+rsync -av --delete \
+  --exclude='node_modules' --exclude='.env' --exclude='logs' \
+  /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
+  /var/www/iitp-dabt-platform/be/
+
+# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+npm run deploy:server:be
+
+# 의존성 설치 (package.json 변경 시)
+cd /var/www/iitp-dabt-platform/be
+npm install --production
+
+# 후속 조치:
+npm run restart:server:be  # BE 재시작 필수
+```
+
+**Frontend만 배포:**
+```bash
+# 배포
+rsync -av --delete \
+  /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
+  /var/www/iitp-dabt-platform/fe/
+
+# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+npm run deploy:server:fe
+
+# 후속 조치:
+npm run restart:server:fe  # Nginx reload
+```
+
+**Common만 배포 (타입/상수 변경 시):**
+```bash
+# Common 배포 (BE의 node_modules로 동기화)
+npm run deploy:server:common
+
+# 후속 조치:
+npm run restart:server:be  # BE 재시작 필수
+
+# ⚠️ 주의사항:
+# - Common이 FE 빌드에 영향을 주는 변경(예: 상수 값)이라면 FE 재빌드 필요
+# - 타입만 변경된 경우 BE 재시작만으로 충분
+```
+
+**개별 배포 시나리오 예시:**
+
+| 변경 내용 | 빌드 | 배포 | 후속 조치 |
+|----------|------|------|----------|
+| BE API만 수정 | `build:server:be` | BE만 배포 | `restart:server:be` |
+| FE UI만 수정 | `build:server:fe` | FE만 배포 | `restart:server:fe` |
+| Common 타입만 | `build:server:common` | Common만 배포 | `restart:server:be` |
+| Common 값 변경 | `build:server:common` → `build:server:fe` | 전체 배포 | 전체 재시작 |
+| 전체 수정 | `build:server` | 전체 배포 | 전체 재시작 |
 
 ### 1.7 Backend 실행 환경 설정
 
@@ -928,6 +1062,8 @@ sudo vi /var/www/iitp-dabt-platform/be/.env
 
 #### 2.3.1 빌드 (빌드 서버)
 
+**전체 빌드 (기본, 권장):**
+
 ```bash
 # 빌드 서버에서 실행
 cd /home/iitp-plf/iitp-dabt-platform/source
@@ -936,25 +1072,49 @@ cd /home/iitp-plf/iitp-dabt-platform/source
 npm run build:server
 
 # 빌드 확인
-ls -la /home/iitp-plf/iitp-dabt-platform/deploy/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/backend/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
+ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/
 ```
+
+**개별 빌드 (옵션):**
+- [섹션 1.5.2 개별 빌드](#152-개별-빌드-옵션) 참조
+- Common만, BE만, FE만 빌드 방법 및 시나리오
 
 #### 2.3.2 배포 (빌드 서버 → 실행 서버)
 
-**방법 1: 스크립트 사용 (권장)**
+**방법 1: 전체 배포 스크립트 (권장)**
 
 ```bash
 # 빌드 서버에서 실행
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 배포 스크립트 실행
-node script/server/deploy-server.js
+# 전체 배포
+npm run deploy:server
 
 # 운영 스크립트 배포 (최초 1회)
-node script/server/deploy-server-ops.js
+npm run deploy:server:ops
 ```
 
-**방법 2: 수동 rsync**
+**방법 2: 개별 배포 스크립트 (빠른 배포)**
+
+```bash
+# BE만 배포
+npm run deploy:server:be
+# 후속: npm run restart:server:be
+
+# FE만 배포
+npm run deploy:server:fe
+# 후속: npm run restart:server:fe
+
+# Common만 배포
+npm run deploy:server:common
+# 후속: npm run restart:server:be (FE는 경우에 따라)
+```
+
+**개별 배포 상세:** [섹션 1.6.2](#162-개별-배포-옵션) 참조
+
+**방법 3: 수동 rsync (상세 제어 필요 시)**
 
 ```bash
 # 빌드 서버에서 실행
@@ -962,17 +1122,17 @@ node script/server/deploy-server-ops.js
 # Backend 배포
 rsync -avz --delete \
   --exclude='node_modules' --exclude='.env' \
-  /home/iitp-plf/iitp-dabt-platform/deploy/be/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   iitp-plf@실행서버IP:/var/www/iitp-dabt-platform/be/
 
 # Frontend 배포
 rsync -avz --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/fe/dist/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   iitp-plf@실행서버IP:/var/www/iitp-dabt-platform/fe/
 
-# 공통 패키지 배포
+# Common 패키지 배포
 rsync -avz --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/packages/common/ \
+  /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   iitp-plf@실행서버IP:/var/www/iitp-dabt-platform/packages/common/
 
 # 운영 스크립트 배포
@@ -980,6 +1140,8 @@ rsync -avz \
   script/server/*.js script/server/.env \
   iitp-plf@실행서버IP:/var/www/iitp-dabt-platform/script/
 ```
+
+**개별 배포 옵션 및 후속 조치:** [섹션 1.6.2](#162-개별-배포-옵션) 참조
 
 ### 2.4 실행 서버에서 Backend 실행 준비
 
@@ -1076,40 +1238,44 @@ npm install
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 전체 빌드
+# 전체 빌드 (권장)
 npm run build:server
-
-# 또는 선택적 빌드
-npm run build:server:be  # Backend만
-npm run build:server:fe  # Frontend만
 ```
+
+**개별 빌드 옵션:**
+- [섹션 1.5.2 개별 빌드](#152-개별-빌드-옵션) 참조
+- BE만, FE만, Common만 빌드 방법 및 주의사항
 
 #### 빌드 서버 (서버 분리):
 ```bash
 # 빌드 서버에서 실행
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 전체 빌드
+# 전체 빌드 (권장)
 npm run build:server
 ```
+
+**개별 빌드 옵션:** [섹션 1.5.2](#152-개별-빌드-옵션) 참조
 
 ### 3.5 배포
 
 #### 단일 서버:
 ```bash
-# Backend 배포 (덮어쓰기, .env는 보존)
 cd /home/iitp-plf/iitp-dabt-platform/source
+
+# 전체 배포 (권장)
+# Backend
 rsync -av --delete \
   --exclude='node_modules' --exclude='.env' --exclude='logs' \
   /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   /var/www/iitp-dabt-platform/be/
 
-# Frontend 배포
+# Frontend
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   /var/www/iitp-dabt-platform/fe/
 
-# 공통 패키지 배포
+# Common
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   /var/www/iitp-dabt-platform/packages/common/
@@ -1119,31 +1285,60 @@ cd /var/www/iitp-dabt-platform/be
 npm install --production
 ```
 
+**개별 배포 옵션 및 스크립트:**
+- [섹션 1.6.2 개별 배포](#162-개별-배포-옵션) 참조
+- BE만, FE만, Common만 배포 방법
+- `npm run deploy:server:common` - Common 단독 배포 스크립트
+
 #### 서버 분리:
 ```bash
 # 빌드 서버에서 실행
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 자동 배포 스크립트
-node script/server/deploy-server.js
+# 전체 배포 (권장)
+npm run deploy:server
 
-# 또는 수동 rsync (섹션 2.3.2 참조)
+# 또는 개별 배포
+npm run deploy:server:common  # Common만 (섹션 1.6.2 참조)
 ```
 
 ### 3.6 서비스 재시작
 
+#### 전체 재시작 (권장)
+
 ```bash
-# Backend 재시작 (실행 서버)
-pm2 restart iitp-dabt-plf-be
+# Backend 재시작
+npm run restart:server:be
+
+# Frontend 재시작 (Nginx reload)
+npm run restart:server:fe
 
 # 로그 확인
 pm2 logs iitp-dabt-plf-be --lines 50
-
-# Frontend는 정적 파일이므로 재시작 불필요
-# Nginx 설정 변경 시만 reload
-# sudo nginx -t
-# sudo systemctl reload nginx
 ```
+
+#### 개별 재시작
+
+**Backend만:**
+```bash
+npm run restart:server:be
+# 또는: pm2 restart iitp-dabt-plf-be
+```
+
+**Frontend만:**
+```bash
+npm run restart:server:fe
+# 또는: sudo nginx -t && sudo systemctl reload nginx
+```
+
+**재시작 필요 시나리오:**
+
+| 배포 내용 | Backend 재시작 | Frontend 재시작 |
+|----------|--------------|----------------|
+| BE만 배포 | ✅ 필수 | ❌ 불필요 |
+| FE만 배포 | ❌ 불필요 | ✅ 필수 (Nginx reload) |
+| Common만 배포 | ✅ 필수 | ⚠️ 조건부 (섹션 1.6.2 참조) |
+| 전체 배포 | ✅ 필수 | ✅ 필수 |
 
 ### 3.7 검증
 

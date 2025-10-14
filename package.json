@@ -19,9 +19,13 @@
     "build:server:be": "node script/server/build-server-be.js",
     "build:server:fe": "node script/server/build-server-fe.js",
     "deploy:server": "node script/server/deploy-server.js",
+    "deploy:server:be": "node script/server/deploy-server-be.js",
+    "deploy:server:fe": "node script/server/deploy-server-fe.js",
+    "deploy:server:common": "node script/server/deploy-server-common.js",
     "deploy:server:ops": "node script/server/deploy-server-ops.js",
     "start:server:be": "node script/server/start-server-be.js",
     "restart:server:be": "node script/server/restart-server-be.js",
+    "restart:server:fe": "node script/server/restart-server-fe.js",
     "stop:server:be": "node script/server/stop-server-be.js"
   },
   "workspaces": [

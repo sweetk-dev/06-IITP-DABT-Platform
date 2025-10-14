@@ -124,7 +124,24 @@ async function copyFeToDeploy() {
   if (!fs.existsSync(deployFePath)) fs.mkdirSync(deployFePath, { recursive: true });
   const feDist = path.join(config.sourcePath, 'fe/dist');
   await ensureBuilt('Frontend', 'fe', 'fe/dist');
+  
+  // dist/ 폴더 복사
   await run('cp', ['-a', path.join(feDist, '.'), deployFePath], undefined);
+  
+  // package.json 복사 (버전 정보용)
+  const fePackageJson = path.join(config.sourcePath, 'fe/package.json');
+  if (fs.existsSync(fePackageJson)) {
+    fs.copyFileSync(fePackageJson, path.join(deployFePath, 'package.json'));
+    console.log('   📋 package.json 복사 완료');
+  }
+  
+  // build-info.json 복사 (빌드 시간 정보용)
+  const feBuildInfo = path.join(config.sourcePath, 'fe/build-info.json');
+  if (fs.existsSync(feBuildInfo)) {
+    fs.copyFileSync(feBuildInfo, path.join(deployFePath, 'build-info.json'));
+    console.log('   🔨 build-info.json 복사 완료');
+  }
+  
   console.log('✅ Frontend 복사 완료');
 }
 

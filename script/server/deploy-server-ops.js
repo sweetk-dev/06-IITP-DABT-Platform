@@ -63,6 +63,7 @@ const sameHost = hostsEqual(config.buildHost, config.prodHost) && config.buildUs
 const scriptFiles = [
   'script/server/start-server-be.js',
   'script/server/restart-server-be.js',
+  'script/server/restart-server-fe.js',
   'script/server/stop-server-be.js'
 ];
 
@@ -126,9 +127,11 @@ async function deployRuntimePackageJson() {
     scripts: {
       'start:be': 'node script/start-server-be.js',
       'restart:be': 'node script/restart-server-be.js',
+      'restart:fe': 'node script/restart-server-fe.js',
       'stop:be': 'node script/stop-server-be.js',
       'start:server:be': 'node script/start-server-be.js',
       'restart:server:be': 'node script/restart-server-be.js',
+      'restart:server:fe': 'node script/restart-server-fe.js',
       'stop:server:be': 'node script/stop-server-be.js'
     }
   }, null, 2) + '\n';
