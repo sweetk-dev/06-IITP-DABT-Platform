@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_BASE: string
   readonly VITE_API_BASE_URL: string
   readonly VITE_API_TIMEOUT: string
+  readonly VITE_API_DATA_PREVIEW_LIMIT: string
   readonly VITE_VISUAL_TOOL: string
   readonly VITE_EMPLOYMENT_SITE_URL: string
   readonly VITE_OPEN_API_CENTER_URL: string
