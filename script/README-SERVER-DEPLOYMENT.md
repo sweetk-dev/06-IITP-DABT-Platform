@@ -4,7 +4,7 @@
 
 > **중요**: Platform 서비스는 기존 Admin 서비스와 **동일 실행 서버에서 공존**합니다.
 > - **Admin 서비스**: `/adm`, `/adm/api` (포트 30000)
-> - **Platform 서비스**: `/plf`, `/plf/api` (포트 33000)
+> - **Platform 서비스**: `/hub`, `/hub/api` (포트 33000)
 
 ## 📋 목차
 0. [실제 배포 Flow](#0-실제-배포-flow)
@@ -163,8 +163,8 @@ cd ..
 
 # 방법 2 (대안): shell 환경변수 export
 # export VITE_PORT=5173
-# export VITE_BASE=/plf/
-# export VITE_API_BASE_URL=/plf
+# export VITE_BASE=/hub/
+# export VITE_API_BASE_URL=/hub
 # export VITE_API_TIMEOUT=10000
 # export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 # export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
@@ -184,15 +184,15 @@ npm run build:server
 > # 빌드 서버에서 (최초 1회)
 > cd /home/iitp-plf/iitp-dabt-platform/source/fe
 > cp env.sample .env
-> vi .env  # 프로덕션 값으로 수정
+> vi .env  # 프로덕션 값으로 수정 (기본: /hub)
 > ```
 >
 > **대안**: shell 환경변수 export
 > ```bash
-> # Platform이 /plf/에서 서빙되고 API가 /plf/api로 프록시되는 경우
-> export VITE_BASE=/plf/
-> export VITE_API_BASE_URL=/plf
-> # 주의: VITE_API_BASE_URL=/plf (not /plf/api)
+> # Platform이 /hub/에서 서빙되고 API가 /hub/api로 프록시되는 경우
+> export VITE_BASE=/hub/
+> export VITE_API_BASE_URL=/hub
+> # 주의: VITE_API_BASE_URL=/hub (not /hub/api)
 > # FE 코드가 FULL_API_URLS를 사용하여 /api/v1/...을 자동으로 추가함
 > ```
 
@@ -513,7 +513,7 @@ server {
     # ========================
     # [7] Platform API 프록시 (신규)
     # ========================
-    location /plf/api/ {
+    location /hub/api/ {
         proxy_pass http://iitp_dabt_platform_backend/api/;
         proxy_http_version 1.1;
         proxy_read_timeout 120s;
@@ -526,23 +526,23 @@ server {
     }
 
     # ========================
-    # [8] Platform FE Redirect (/plf → /plf/)
+    # [8] Platform FE Redirect (/hub → /hub/)
     # ========================
-    location = /plf {
-        return 301 /plf/;
+    location = /hub {
+        return 301 /hub/;
     }
 
     # ========================
     # [9] Platform FE 정적 자산 (images, fonts 등)
     # ========================
-    location ^~ /plf/assets/ {
+    location ^~ /hub/assets/ {
         alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
-    location ~* ^/plf/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
+    location ~* ^/hub/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
         alias /var/www/iitp-dabt-platform/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
@@ -552,11 +552,11 @@ server {
     # ========================
     # [10] Platform SPA Fallback (React, Vue, Vite)
     # ========================
-    location /plf/ {
+    location /hub/ {
         alias /var/www/iitp-dabt-platform/fe/dist/;
         index index.html;
         # 핵심: fallback 시 alias 경로 유지
-        try_files $uri $uri/ /plf/index.html;
+        try_files $uri $uri/ /hub/index.html;
     }
 
     # ========================
@@ -727,7 +727,7 @@ curl http://서버주소/adm/api/common/health
 
 # Platform 헬스체크
 curl http://localhost:33000/api/common/health
-curl http://서버주소/plf/api/common/health
+curl http://서버주소/hub/api/common/health
 ```
 
 ## ✅ 배포 체크리스트
@@ -754,7 +754,7 @@ curl http://서버주소/plf/api/common/health
 ```bash
 # Cron을 이용한 자동 배포 (선택사항)
 # 매일 오전 2시에 자동 빌드
-0 2 * * * cd /home/iitp-plf/iitp-dabt-platform/source && export VITE_BASE=/plf/ && export VITE_API_BASE_URL=/plf/api && npm run build:server
+0 2 * * * cd /home/iitp-plf/iitp-dabt-platform/source && export VITE_BASE=/hub/ && export VITE_API_BASE_URL=/hub && npm run build:server
 ```
 
 ### 백업

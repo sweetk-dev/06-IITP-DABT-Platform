@@ -5,7 +5,7 @@
 **전제 조건(요약)**:
 - 동일 서버에서 빌드와 배포 수행 (1대 서버)
 - 빌드/배포: `iitp-plf` 계정으로 실행
-- **기존 Admin 서비스와 공존**: Admin(`/adm`, `/adm/api`, 포트 30000)과 Platform(`/plf`, `/plf/api`, 포트 33000)
+- **기존 Admin 서비스와 공존**: Admin(`/adm`, `/adm/api`, 포트 30000)과 Platform(`/hub`, `/hub/api`, 포트 33000)
 - Nginx: 기존 설정에 Platform location 블록 추가
 
 ---
@@ -94,15 +94,15 @@ vi .env
 **방법 2: shell 환경변수 export (대안)**
 ```bash
 export VITE_PORT=5173
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf
+export VITE_BASE=/hub/
+export VITE_API_BASE_URL=/hub
 export VITE_API_TIMEOUT=10000
 export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
 export VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
 export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
-# 주의: VITE_API_BASE_URL=/plf (not /plf/api)
-# FE 코드가 /api/v1/...을 자동으로 추가하므로 baseUrl은 /plf만 설정
+# 주의: VITE_API_BASE_URL=/hub (not /hub/api)
+# FE 코드가 /api/v1/...을 자동으로 추가하므로 baseUrl은 /hub만 설정
 ```
 
 **중요**:
@@ -188,10 +188,10 @@ GIT_BRANCH=main
 
 필수 항목 예시 (fe/.env):
 ```bash
-# env.sample에 이미 설정되어 있음 (서버 주소만 수정)
+# env.sample에 이미 설정되어 있음 (기본: /hub, 서버 주소만 수정)
 VITE_PORT=5173
-VITE_BASE=/plf/
-VITE_API_BASE_URL=/plf
+VITE_BASE=/hub/
+VITE_API_BASE_URL=/hub
 VITE_API_TIMEOUT=10000
 VITE_VISUAL_TOOL=http://실제서버주소:포트/
 VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
@@ -216,8 +216,8 @@ cd /home/iitp-plf/iitp-dabt-platform/source
 
 # 방법 2 (대안): export 사용 (fe/.env가 없는 경우)
 # export VITE_PORT=5173
-# export VITE_BASE=/plf/
-# export VITE_API_BASE_URL=/plf
+# export VITE_BASE=/hub/
+# export VITE_API_BASE_URL=/hub
 # export VITE_API_TIMEOUT=10000
 # export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 # export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
@@ -449,7 +449,7 @@ server {
     # ========================
     # [7] Platform API 프록시 (신규)
     # ========================
-    location /plf/api/ {
+    location /hub/api/ {
         proxy_pass http://iitp_dabt_platform_backend/api/;
         proxy_http_version 1.1;
         proxy_read_timeout 120s;
@@ -462,23 +462,23 @@ server {
     }
 
     # ========================
-    # [8] Platform FE Redirect (/plf → /plf/)
+    # [8] Platform FE Redirect (/hub → /hub/)
     # ========================
-    location = /plf {
-        return 301 /plf/;
+    location = /hub {
+        return 301 /hub/;
     }
 
     # ========================
     # [9] Platform FE 정적 자산 (images, fonts 등)
     # ========================
-    location ^~ /plf/assets/ {
+    location ^~ /hub/assets/ {
         alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
-    location ~* ^/plf/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
+    location ~* ^/hub/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
         alias /var/www/iitp-dabt-platform/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
@@ -488,11 +488,11 @@ server {
     # ========================
     # [10] Platform SPA Fallback (React, Vue, Vite)
     # ========================
-    location /plf/ {
+    location /hub/ {
         alias /var/www/iitp-dabt-platform/fe/dist/;
         index index.html;
         # 핵심: fallback 시 alias 경로 유지
-        try_files $uri $uri/ /plf/index.html;
+        try_files $uri $uri/ /hub/index.html;
     }
 
     # ========================
@@ -539,7 +539,7 @@ pm2 logs iitp-dabt-plf-be --lines 100
 curl -i http://127.0.0.1:33000/api/common/health
 
 # Nginx 경유
-curl -i http://127.0.0.1/plf/api/common/health
+curl -i http://127.0.0.1/hub/api/common/health
 ```
 
 ---
@@ -548,7 +548,7 @@ curl -i http://127.0.0.1/plf/api/common/health
 
 브라우저 접속:
 ```
-http://<서버_IP_또는_도메인>/plf/
+http://<서버_IP_또는_도메인>/hub/
 ```
 
 정적 파일 확인:
@@ -569,7 +569,7 @@ ls -l /var/www/iitp-dabt-platform/fe/dist
 - 배포 스크립트는 `node_modules/`, `.env`, `.env*`를 보존합니다.
 - `@iitp-dabt-platform/common`은 `/var/www/iitp-dabt-platform/packages/common`으로 동기화되며, BE의 `node_modules/@iitp-dabt-platform/common`은 해당 경로를 가리키는 symlink일 수 있습니다.
 - 포트 충돌 시 33000 사용 중인 프로세스 확인: `ss -tlpn | grep :33000 || true`
-- Nginx 프록시 경로 주의: `location /plf/api/` 블록에서 `proxy_pass .../api/;`처럼 끝 슬래시가 꼭 있어야 `/plf/api/* → /api/*`로 정확히 매핑됩니다.
+- Nginx 프록시 경로 주의: `location /hub/api/` 블록에서 `proxy_pass .../api/;`처럼 끝 슬래시가 꼭 있어야 `/hub/api/* → /api/*`로 정확히 매핑됩니다.
 
 ---
 
@@ -617,12 +617,12 @@ curl http://localhost:33000/api/common/health
 curl http://서버주소/adm/api/common/health
 
 # Platform
-curl http://서버주소/plf/api/common/health
+curl http://서버주소/hub/api/common/health
 ```
 
 ---
 
-이 문서 순서대로 수행하면 단일 서버 환경에서 빌드 → 배포 → 기동까지 원활히 진행되며, Admin(`/adm`)과 Platform(`/plf`)이 정상 동작합니다.
+이 문서 순서대로 수행하면 단일 서버 환경에서 빌드 → 배포 → 기동까지 원활히 진행되며, Admin(`/adm`)과 Platform(`/hub`)이 정상 동작합니다.
 
 **IITP DABT Platform Team** © 2025
 

@@ -329,7 +329,7 @@ cd /home/iitp-plf/iitp-dabt-platform/source/fe
 cp env.sample .env
 vi .env
 
-# env.sample에 프로덕션 빌드용 설정이 기본값으로 되어 있음
+# env.sample에 프로덕션 빌드용 설정이 기본값으로 되어 있음 (기본: /hub)
 # 필요 시 서버 주소만 수정:
 # VITE_VISUAL_TOOL=http://실제서버주소:포트/
 # VITE_OPEN_API_CENTER_URL=http://실제서버주소/adm/
@@ -341,8 +341,8 @@ vi .env
 ```bash
 # 빌드 전 환경변수 export (모든 변수 설정)
 export VITE_PORT=5173
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf
+export VITE_BASE=/hub/
+export VITE_API_BASE_URL=/hub
 export VITE_API_TIMEOUT=10000
 export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
@@ -358,15 +358,15 @@ npm run build
 - ✅ **대안**: shell 환경변수 export
 - ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요 (이미 빌드된 정적 파일)
 - ✅ Vite가 빌드 시 환경변수를 코드에 하드코딩하므로 런타임 변경 불가
-- 🔧 `VITE_API_BASE_URL=/plf` (not `/plf/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
+- 🔧 `VITE_API_BASE_URL=/hub` (not `/hub/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
 
 #### 환경변수 목록
 
 | 변수명 | 설명 | 로컬 개발 | 프로덕션 | 사용 위치 |
 |--------|------|-----------|---------|----------|
 | `VITE_PORT` | 개발 서버 포트 | `5173` | `5173` | vite.config.ts |
-| `VITE_BASE` | 베이스 경로 | `/` | `/plf/` | vite.config.ts |
-| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/plf` | api/client.ts |
+| `VITE_BASE` | 베이스 경로 | `/` | `/hub/` | vite.config.ts |
+| `VITE_API_BASE_URL` | API 베이스 URL | `http://localhost:33000` | `/hub` | api/client.ts |
 | `VITE_API_TIMEOUT` | API 타임아웃 (ms) | `10000` | `10000` | api/client.ts |
 | `VITE_VISUAL_TOOL` | 시각화 도구 URL | `http://localhost:3000/` | `http://서버:포트/` | DataDetail.tsx |
 | `VITE_EMPLOYMENT_SITE_URL` | 구인구직 사이트 URL | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | Home.tsx |

@@ -4,7 +4,7 @@
 
 > **중요**: 이 Platform 서비스는 기존 Admin 서비스와 **동일 서버에서 공존**합니다.
 > - **Admin 서비스**: `/adm`, `/adm/api` (포트 30000)
-> - **Platform 서비스**: `/plf`, `/plf/api` (포트 33000)
+> - **Platform 서비스**: `/hub`, `/hub/api` (포트 33000)
 
 ## 📋 사전 요구사항
 
@@ -146,8 +146,8 @@ vi .env
 ```bash
 # 빌드 전 환경변수 export (모든 변수 설정)
 export VITE_PORT=5173
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf
+export VITE_BASE=/hub/
+export VITE_API_BASE_URL=/hub
 export VITE_API_TIMEOUT=10000
 export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
@@ -160,7 +160,7 @@ export VITE_OPEN_API_CENTER_ABOUT_URL=http://실제서버주소/adm/about
 - ✅ **대안**: shell 환경변수 export
 - ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요 (이미 빌드된 정적 파일)
 - ✅ Vite가 빌드 시 환경변수를 코드에 하드코딩하므로 런타임 변경 불가
-- 🔧 `VITE_API_BASE_URL=/plf` (not `/plf/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
+- 🔧 `VITE_API_BASE_URL=/hub` (not `/hub/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
 
 ## 🚀 4. 서버 실행
 
@@ -204,8 +204,8 @@ cp env.sample .env
 vi .env  # 프로덕션 값으로 수정
 
 # 방법 2 (대안): export 사용
-# export VITE_BASE=/plf/
-# export VITE_API_BASE_URL=/plf
+# export VITE_BASE=/hub/
+# export VITE_API_BASE_URL=/hub
 
 # 빌드 및 미리보기
 npm run build
@@ -218,8 +218,8 @@ npm run preview
 - **Frontend**: `http://localhost:5173` (개발) 또는 `http://localhost:4173` (프로덕션 프리뷰)
 
 ### 프로덕션 서버 접속
-- **Platform Frontend**: `http://서버주소/plf/`
-- **Platform API**: `http://서버주소/plf/api`
+- **Platform Frontend**: `http://서버주소/hub/`
+- **Platform API**: `http://서버주소/hub/api`
 - **Admin Frontend**: `http://서버주소/adm/` (기존 서비스)
 - **Admin API**: `http://서버주소/adm/api` (기존 서비스)
 
@@ -230,7 +230,7 @@ npm run preview
 curl http://localhost:33000/api/common/health
 
 # Backend 헬스 체크 (Nginx 경유)
-curl http://서버주소/plf/api/common/health
+curl http://서버주소/hub/api/common/health
 
 # 버전 정보 확인
 curl http://localhost:33000/api/common/version
@@ -263,8 +263,8 @@ npm run deploy:server:ops
 ### 권장 실행 순서
 ```bash
 # 1) 빌드 서버: 전체 빌드
-export VITE_BASE=/plf/
-export VITE_API_BASE_URL=/plf/api
+export VITE_BASE=/hub/
+export VITE_API_BASE_URL=/hub
 npm run build:server
 
 # 2) (최초 1회 또는 스크립트 변경 시) 운영 스크립트 배포
@@ -307,8 +307,8 @@ export GIT_BRANCH=main
 # cd ..
 
 # 방법 2 (대안): shell 환경변수 export
-# export VITE_BASE=/plf/
-# export VITE_API_BASE_URL=/plf
+# export VITE_BASE=/hub/
+# export VITE_API_BASE_URL=/hub
 # export VITE_VISUAL_TOOL=http://실제서버주소:포트/
 # export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
 
@@ -640,7 +640,7 @@ server {
     # ========================
     # [7] Platform API 프록시 (신규)
     # ========================
-    location /plf/api/ {
+    location /hub/api/ {
         proxy_pass http://iitp_dabt_platform_backend/api/;
         proxy_http_version 1.1;
         proxy_read_timeout 120s;
@@ -653,23 +653,23 @@ server {
     }
 
     # ========================
-    # [8] Platform FE Redirect (/plf → /plf/)
+    # [8] Platform FE Redirect (/hub → /hub/)
     # ========================
-    location = /plf {
-        return 301 /plf/;
+    location = /hub {
+        return 301 /hub/;
     }
 
     # ========================
     # [9] Platform FE 정적 자산 (images, fonts 등)
     # ========================
-    location ^~ /plf/assets/ {
+    location ^~ /hub/assets/ {
         alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
-    location ~* ^/plf/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
+    location ~* ^/hub/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
         alias /var/www/iitp-dabt-platform/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
@@ -679,11 +679,11 @@ server {
     # ========================
     # [10] Platform SPA Fallback (React, Vue, Vite)
     # ========================
-    location /plf/ {
+    location /hub/ {
         alias /var/www/iitp-dabt-platform/fe/dist/;
         index index.html;
         # 핵심: fallback 시 alias 경로 유지
-        try_files $uri $uri/ /plf/index.html;
+        try_files $uri $uri/ /hub/index.html;
     }
 
     # ========================

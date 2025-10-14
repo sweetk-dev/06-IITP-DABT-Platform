@@ -6,6 +6,10 @@ IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and
 
 장애인 자립 생활 지원을 위한 빅데이터 플랫폼으로, 데이터 탐색, 자가진단, 정책 추천 등의 기능을 제공합니다.
 
+> **서비스 경로**: `/hub` (1서버 여러 서비스 공존 시)
+> - Platform 서비스: `/hub`, `/hub/api` (포트 33000)
+> - Admin 서비스: `/adm`, `/adm/api` (포트 30000)
+
 ## 🎯 핵심 특징
 
 - **완전한 모듈화**: `@iitp-dabt-platform/common` 패키지를 통한 FE/BE 공통 타입 및 상수 관리
@@ -289,13 +293,13 @@ npm run preview
 # 1. Frontend 빌드 환경변수 설정 (빌드 서버, 최초 1회)
 cd fe
 cp env.sample .env
-vi .env  # 필요 시 서버 주소 수정 (env.sample에 프로덕션 값 기본 설정됨)
+vi .env  # 필요 시 서버 주소 수정 (기본값: /hub)
 cd ..
 
 # 또는 shell export 사용 (대안) - 모든 변수 설정 필요
 # export VITE_PORT=5173
-# export VITE_BASE=/plf/
-# export VITE_API_BASE_URL=/plf
+# export VITE_BASE=/hub/
+# export VITE_API_BASE_URL=/hub
 # export VITE_API_TIMEOUT=10000
 # export VITE_VISUAL_TOOL=http://서버:포트/
 # export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
