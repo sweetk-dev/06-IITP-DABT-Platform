@@ -27,9 +27,6 @@ export const SELF_CHECK_RECOMMENDATIONS_DEFAULTS = {
   MAX_LIMIT: 10
 } as const;
 
-// 레거시 호환성을 위한 별칭
-export type SelfCheckRecommendationsReq = SelfCheckRecommendationsQuery;
-
 export interface SelfCheckPolicyItem {
   policy_id: number;
   category: string;
@@ -42,8 +39,6 @@ export interface SelfCheckPolicyItem {
   fin_cond?: string;
   link?: string;
 }
-
-export type SelfCheckRecommendationsRes = SelfCheckPolicyItem[];
 
 // ============================================================================
 // 자립 지원 정책 리스트 API
@@ -65,9 +60,6 @@ export const SELF_CHECK_POLICIES_DEFAULTS = {
   PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
 } as const;
 
-// 레거시 호환성을 위한 별칭
-export type SelfCheckPoliciesReq = SelfCheckPoliciesQuery;
-
 export type SelfCheckPoliciesRes = PaginationRes<SelfCheckPolicyItem>;
 
 // ============================================================================
@@ -85,9 +77,6 @@ export const SELF_CHECK_PROVIDERS_DEFAULTS = {
   PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
   PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
 } as const;
-
-// 레거시 호환성을 위한 별칭
-export type SelfCheckProvidersReq = SelfCheckProvidersQuery;
 
 export interface SelfCheckProviderItem {
   provider_id: number;
@@ -115,9 +104,6 @@ export const SELF_CHECK_FACILITIES_DEFAULTS = {
   PAGE: PAGINATION_CONSTANTS.DEFAULT_PAGE,
   PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE
 } as const;
-
-// 레거시 호환성을 위한 별칭
-export type SelfCheckFacilitiesReq = SelfCheckFacilitiesQuery;
 
 export interface SelfCheckFacilityItem {
   facility_id: number;

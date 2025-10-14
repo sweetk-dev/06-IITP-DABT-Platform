@@ -4,9 +4,9 @@ import {
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
-  DataThemesRes,
+  DataThemeItem,
   DataThemeItemsRes,
-  DataTypesRes,
+  DataTypeItem,
   DataTypeItemsRes,
   DataDetailRes,
   DataPreviewRes,
@@ -162,7 +162,7 @@ export async function searchData(query: DataSearchQuery): Promise<DataSearchRes>
 }
 
 // 테마 메타데이터 조회 서비스
-export async function getThemes(): Promise<DataThemesRes> {
+export async function getThemes(): Promise<DataThemeItem[]> {
   try {
     logger.debug('테마 메타데이터 조회 서비스 실행');
     
@@ -249,7 +249,7 @@ export async function getThemeItems(theme: string, query: DataThemeItemsQuery = 
 }
 
 // 데이터 유형 메타데이터 조회 서비스
-export async function getTypes(): Promise<DataTypesRes> {
+export async function getTypes(): Promise<DataTypeItem[]> {
   try {
     logger.debug('데이터 유형 메타데이터 조회 서비스 실행');
     

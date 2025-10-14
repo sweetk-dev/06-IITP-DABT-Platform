@@ -8,8 +8,8 @@ import {
   DataTypeCountsRes,
   DataSearchQuery,
   DataSearchRes,
-  DataThemesRes,
-  DataTypesRes,
+  DataThemeItem,
+  DataTypeItem,
   DataThemeItemsQuery,
   DataThemeItemsRes,
   DataTypeItemsQuery,
@@ -51,7 +51,7 @@ export class DataService {
   /**
    * 자립 테마 메타데이터 전체 조회
    */
-  async getThemes(): Promise<DataThemesRes> {
+  async getThemes(): Promise<DataThemeItem[]> {
     return apiClient.get(`GET ${FULL_API_URLS.DATA.THEMES}`);
   }
 
@@ -72,7 +72,7 @@ export class DataService {
   /**
    * 데이터 유형 메타데이터 전체 조회
    */
-  async getTypes(): Promise<DataTypesRes> {
+  async getTypes(): Promise<DataTypeItem[]> {
     return apiClient.get(`GET ${FULL_API_URLS.DATA.TYPES}`);
   }
 

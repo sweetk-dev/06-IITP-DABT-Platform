@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { selfCheckService } from '../services';
 import { ApiState } from '../types';
 import { 
-  SelfCheckRecommendationsReq,
-  SelfCheckPoliciesReq,
-  SelfCheckProvidersReq,
-  SelfCheckFacilitiesReq,
+  SelfCheckRecommendationsQuery,
+  SelfCheckPoliciesQuery,
+  SelfCheckProvidersQuery,
+  SelfCheckFacilitiesQuery,
   SELF_CHECK_RECOMMENDATIONS_DEFAULTS,
   SELF_CHECK_POLICIES_DEFAULTS,
   SELF_CHECK_PROVIDERS_DEFAULTS,
@@ -20,7 +20,7 @@ import {
 /**
  * 추천 정책 리스트 조회 훅
  */
-export function useRecommendations(params: SelfCheckRecommendationsReq = {}, immediate: boolean = true) {
+export function useRecommendations(params: SelfCheckRecommendationsQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -62,7 +62,7 @@ export function useRecommendations(params: SelfCheckRecommendationsReq = {}, imm
 /**
  * 자립 지원 정책 리스트 조회 훅
  */
-export function usePolicies(params: SelfCheckPoliciesReq = {}, immediate: boolean = true) {
+export function usePolicies(params: SelfCheckPoliciesQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -105,7 +105,7 @@ export function usePolicies(params: SelfCheckPoliciesReq = {}, immediate: boolea
 /**
  * 자립 지원 기관 리스트 조회 훅
  */
-export function useProviders(params: SelfCheckProvidersReq = {}, immediate: boolean = true) {
+export function useProviders(params: SelfCheckProvidersQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,
@@ -148,7 +148,7 @@ export function useProviders(params: SelfCheckProvidersReq = {}, immediate: bool
 /**
  * 자립 지원 시설 리스트 조회 훅
  */
-export function useFacilities(params: SelfCheckFacilitiesReq = {}, immediate: boolean = true) {
+export function useFacilities(params: SelfCheckFacilitiesQuery = {}, immediate: boolean = true) {
   const [state, setState] = useState<ApiState<any>>({
     data: null,
     loading: false,

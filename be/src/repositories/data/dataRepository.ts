@@ -4,9 +4,9 @@ import {
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
-  DataThemesRes,
+  DataThemeItem,
   DataThemeItemsRes,
-  DataTypesRes,
+  DataTypeItem,
   DataTypeItemsRes,
   DataDetailRes,
   DataPreviewRes,
@@ -208,7 +208,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
   }
 
   // 테마 리스트 조회
-  async getThemes(): Promise<DataThemesRes> {
+  async getThemes(): Promise<DataThemeItem[]> {
     try {
       logger.debug('데이터 Repository - 테마 리스트 조회');
       
@@ -302,7 +302,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
   }
 
   // 데이터 유형 리스트 조회
-  async getTypes(): Promise<DataTypesRes> {
+  async getTypes(): Promise<DataTypeItem[]> {
     try {
       logger.debug('데이터 Repository - 데이터 유형 리스트 조회');
       

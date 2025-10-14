@@ -1,6 +1,6 @@
 // 자가진단 서비스 - 완벽한 모듈화 (common 패키지 완전 활용)
 import { 
-  SelfCheckRecommendationsRes,
+  SelfCheckPolicyItem,
   SelfCheckPoliciesRes,
   SelfCheckProvidersRes,
   SelfCheckFacilitiesRes,
@@ -19,7 +19,7 @@ import { createPaginationParams, createPaginationMeta } from '../../utils/pagina
 import { processFilterConditions } from '../../utils/response';
 
 // 추천 정책 조회 서비스
-export async function getRecommendations(query: SelfCheckRecommendationsQuery = {}): Promise<SelfCheckRecommendationsRes> {
+export async function getRecommendations(query: SelfCheckRecommendationsQuery = {}): Promise<SelfCheckPolicyItem[]> {
   try {
     logger.debug('추천 정책 조회 서비스 실행', { query });
     

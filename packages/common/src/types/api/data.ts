@@ -65,9 +65,6 @@ export const DATA_SEARCH_DEFAULTS = {
   SORT: SORT_CONSTANTS.DEFAULT
 } as const;
 
-// 레거시 호환성을 위한 별칭
-export type DataSearchReq = DataSearchQuery;
-
 export interface DataSearchItem {
   id: number;
   title: string;
@@ -94,8 +91,6 @@ export interface DataThemeItem {
   total_count: number;
 }
 
-export type DataThemesRes = DataThemeItem[];
-
 // ============================================================================
 // 자립 테마별 리스트 API
 // ============================================================================
@@ -119,9 +114,6 @@ export const DATA_THEME_ITEMS_DEFAULTS = {
   SORT: SORT_CONSTANTS.DEFAULT
 } as const;
 
-// 레거시 호환성을 위한 별칭
-export type DataThemeItemsReq = DataThemeItemsQuery;
-
 export type DataThemeItemsRes = PaginationRes<DataSearchItem>;
 
 // ============================================================================
@@ -134,8 +126,6 @@ export interface DataTypeItem {
   description: string;
   total_count: number;
 }
-
-export type DataTypesRes = DataTypeItem[];
 
 // ============================================================================
 // 데이터 유형별 리스트 API
@@ -159,9 +149,6 @@ export const DATA_TYPE_ITEMS_DEFAULTS = {
   PAGE_SIZE: PAGINATION_CONSTANTS.DEFAULT_PAGE_SIZE,
   SORT: SORT_CONSTANTS.DEFAULT
 } as const;
-
-// 레거시 호환성을 위한 별칭
-export type DataTypeItemsReq = DataTypeItemsQuery;
 
 export type DataTypeItemsRes = PaginationRes<DataSearchItem>;
 

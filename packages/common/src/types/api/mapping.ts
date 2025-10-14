@@ -9,8 +9,8 @@ import type {
   DataThemeCountsRes,
   DataTypeCountsRes,
   DataSearchRes,
-  DataThemesRes,
-  DataTypesRes,
+  DataThemeItem,
+  DataTypeItem,
   DataThemeItemsRes,
   DataTypeItemsRes,
   DataDetailRes,
@@ -18,7 +18,7 @@ import type {
 } from './data.js';
 import type {
   SelfCheckRecommendationsQuery,
-  SelfCheckRecommendationsRes,
+  SelfCheckPolicyItem,
   SelfCheckPoliciesQuery,
   SelfCheckPoliciesRes,
   SelfCheckProvidersQuery,
@@ -139,7 +139,7 @@ export const API_MAPPING = {
       params: 'void',
       query: 'void'
     } as ApiRequest,
-    res: {} as DataThemesRes,
+    res: {} as DataThemeItem[],
     description: '자립 테마 리스트 전체 조회',
     fullUrl: FULL_API_URLS.DATA.THEMES
   },
@@ -149,7 +149,7 @@ export const API_MAPPING = {
       params: 'void',
       query: 'void'
     } as ApiRequest,
-    res: {} as DataTypesRes,
+    res: {} as DataTypeItem[],
     description: '데이터 유형 리스트 전체 조회',
     fullUrl: FULL_API_URLS.DATA.TYPES
   },
@@ -223,7 +223,7 @@ export const API_MAPPING = {
       params: 'void',
       query: 'SelfCheckRecommendationsQuery'
     } as ApiRequest,
-    res: {} as SelfCheckRecommendationsRes,
+    res: {} as SelfCheckPolicyItem[],
     description: '추천 정책 리스트 조회',
     fullUrl: FULL_API_URLS.SELF_CHK.RECOMMENDATIONS
   },

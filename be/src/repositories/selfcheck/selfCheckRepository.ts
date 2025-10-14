@@ -1,6 +1,6 @@
 // 자가진단 Repository - 완벽한 모듈화
 import { 
-  SelfCheckRecommendationsRes,
+  SelfCheckPolicyItem,
   SelfCheckPoliciesRes,
   SelfCheckProvidersRes,
   SelfCheckFacilitiesRes,
@@ -52,7 +52,7 @@ class SelfCheckRepository {
   async getRecommendations(options: {
     filterConditions: Record<string, any>;
     limit: number;
-  }): Promise<SelfCheckRecommendationsRes> {
+  }): Promise<SelfCheckPolicyItem[]> {
     try {
       logger.debug('자가진단 Repository - 추천 정책 조회', { options });
       

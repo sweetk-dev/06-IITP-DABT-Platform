@@ -3,7 +3,7 @@ import { apiClient } from '../client';
 import { 
   FULL_API_URLS,
   SelfCheckRecommendationsQuery,
-  SelfCheckRecommendationsRes,
+  SelfCheckPolicyItem,
   SelfCheckPoliciesQuery,
   SelfCheckPoliciesRes,
   SelfCheckProvidersQuery,
@@ -16,7 +16,7 @@ export class SelfCheckService {
   /**
    * 추천 정책 리스트 조회
    */
-  async getRecommendations(query: SelfCheckRecommendationsQuery): Promise<SelfCheckRecommendationsRes> {
+  async getRecommendations(query: SelfCheckRecommendationsQuery): Promise<SelfCheckPolicyItem[]> {
     return apiClient.get(`GET ${FULL_API_URLS.SELF_CHK.RECOMMENDATIONS}`, { query });
   }
 

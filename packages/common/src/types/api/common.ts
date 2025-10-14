@@ -27,9 +27,6 @@ export interface CommonHealthQuery {
   // 현재는 파라미터 없음
 }
 
-// 레거시 호환성을 위한 별칭
-export type CommonHealthReq = CommonHealthQuery;
-
 export interface CommonHealthRes {
   status: 'ok' | 'error';
   timestamp: string;
@@ -45,14 +42,8 @@ export interface CommonVersionQuery {
   // 현재는 파라미터 없음
 }
 
-// 레거시 호환성을 위한 별칭
-export type CommonVersionReq = CommonVersionQuery;
-
 export interface CommonVersionRes {
   version?: string;
   buildDate?: string;
   environment: string;
-}
-
-// VersionRes 타입 (FE 호환성)
-export type VersionRes = CommonVersionRes; 
+} 
