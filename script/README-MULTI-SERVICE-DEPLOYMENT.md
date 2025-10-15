@@ -335,27 +335,41 @@ ls -la /home/iitp-plf/iitp-dabt-platform/deploy/common/dist/
 
 ### 1.6 배포 (단일 서버)
 
-#### 1.6.1 전체 배포 (기본, 권장)
+#### 1.6.1 전체 배포 (기본, 권장) ⭐
+
+**배포 스크립트를 사용하면 모든 것이 자동으로 처리됩니다!**
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# Backend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-platform/be/
-
-# Frontend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
-
-# Common 패키지 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
-
-# 운영 스크립트 배포
-cp -r script/server/* /var/www/iitp-dabt-platform/script/
-
-# 권한 확인
-ls -la /var/www/iitp-dabt-platform/be/
-ls -la /var/www/iitp-dabt-platform/fe/
+# 전체 배포 (Common + Backend + Frontend)
+npm run deploy:server
 ```
+
+**스크립트가 자동으로 처리하는 것들:**
+- ✅ 단일 서버 환경 자동 감지 (localhost)
+- ✅ rsync로 안전한 배포 (.env, node_modules, logs 자동 제외)
+- ✅ 파일/디렉토리 권한 자동 설정 (755/644)
+- ✅ Common → `/var/www/iitp-dabt-platform/packages/common/`
+- ✅ Backend → `/var/www/iitp-dabt-platform/be/`
+- ✅ Frontend → `/var/www/iitp-dabt-platform/fe/`
+- ✅ 버전 정보 자동 출력
+
+**중요**: 
+- Backend `.env` 파일은 스크립트가 자동으로 보존 (덮어쓰지 않음)
+- `node_modules/`는 실행 서버에서 별도 설치 필요
+
+**운영 스크립트 배포 (최초 1회 필수):**
+
+자세한 설명은 단독 설치 가이드 참조:
+- [운영 스크립트 배포](./README-SERVER-DEPLOYMENT.md#운영-스크립트-배포-최초-1회-필수)
+
+```bash
+# 운영 관리 스크립트 배포
+npm run deploy:server:ops
+```
+
+> 💡 **요약**: PM2 시작/재시작/중지 스크립트를 실행 서버에 배포합니다 (최초 1회 또는 스크립트 수정 시)
 
 #### 1.6.2 개별 배포 (옵션)
 

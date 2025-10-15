@@ -660,33 +660,75 @@ ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
 
 ### 1.6 배포 (단일 서버)
 
-#### 1.6.1 전체 배포 (기본, 권장)
+#### 1.6.1 전체 배포 (기본, 권장) ⭐
 
-단일 서버에서는 빌드 결과를 실행 디렉토리로 복사합니다.
+**배포 스크립트를 사용하면 모든 것이 자동으로 처리됩니다!**
 
 ```bash
 cd /home/iitp-plf/iitp-dabt-platform/source
 
-# Backend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/backend/* /var/www/iitp-dabt-platform/be/
+# 전체 배포 (Common + Backend + Frontend)
+npm run deploy:server
+```
 
-# Frontend 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/frontend/* /var/www/iitp-dabt-platform/fe/
+**스크립트가 자동으로 처리하는 것들:**
+- ✅ 단일 서버 환경 자동 감지 (localhost)
+- ✅ rsync로 안전한 배포 (.env, node_modules, logs 자동 제외)
+- ✅ 파일/디렉토리 권한 자동 설정 (755/644)
+- ✅ Common → `/var/www/iitp-dabt-platform/packages/common/`
+- ✅ Backend → `/var/www/iitp-dabt-platform/be/`
+- ✅ Frontend → `/var/www/iitp-dabt-platform/fe/`
+- ✅ 버전 정보 자동 출력
 
-# Common 패키지 배포
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* /var/www/iitp-dabt-platform/packages/common/
-
-# 운영 스크립트 배포
-cp -r script/server/* /var/www/iitp-dabt-platform/script/
-
-# 권한 확인
-ls -la /var/www/iitp-dabt-platform/be/
-ls -la /var/www/iitp-dabt-platform/fe/
+**배포 후 자동으로 표시되는 정보:**
+```
+🎉 서버용 전체 배포 완료!
+📋 배포된 서비스:
+   Backend: localhost:/var/www/iitp-dabt-platform/be
+   Frontend: localhost:/var/www/iitp-dabt-platform/fe
 ```
 
 **중요**: 
-- Backend `.env` 파일은 덮어쓰지 않도록 주의 (이미 1.4.1에서 생성함)
+- Backend `.env` 파일은 스크립트가 자동으로 보존 (덮어쓰지 않음)
 - `node_modules/`는 실행 서버에서 별도 설치 필요
+
+**운영 스크립트 배포 (최초 1회 필수):**
+
+```bash
+# 운영 관리 스크립트 배포
+npm run deploy:server:ops
+```
+
+**배포되는 항목:**
+- `start-server-be.js`: Backend PM2 시작
+- `restart-server-be.js`: Backend PM2 재시작
+- `restart-server-fe.js`: Nginx reload (Frontend 재배포 후)
+- `stop-server-be.js`: Backend PM2 중지
+- `package.json`: npm run 별칭 제공
+
+**배포 위치:**
+- 스크립트: `/var/www/iitp-dabt-platform/script/`
+- package.json: `/var/www/iitp-dabt-platform/package.json`
+
+**언제 실행하나?**
+- ✅ **최초 설치 시 (1회 필수)**
+- ✅ start/restart/stop 스크립트가 수정되었을 때
+- ❌ 일반적인 코드 배포 시에는 불필요
+
+**배포 후 사용 예:**
+```bash
+cd /var/www/iitp-dabt-platform
+
+# npm run 별칭 사용 (편리함)
+npm run restart:server:be
+npm run restart:server:fe
+
+# 또는 직접 실행
+node script/restart-server-be.js
+node script/restart-server-fe.js
+```
+
+> 💡 **참고**: `npm run deploy:server`는 BE/FE/Common 코드만 배포하며, 운영 스크립트는 포함하지 않습니다.
 
 #### 1.6.2 개별 배포 (옵션)
 
@@ -695,18 +737,11 @@ ls -la /var/www/iitp-dabt-platform/fe/
 - 빠른 배포가 필요할 때
 - 전체 배포는 과할 때
 
-**Common만 배포:**
+**Common만 배포:** ⭐ 권장
 ```bash
-# 배포 (단일 서버)
-cp -r /home/iitp-plf/iitp-dabt-platform/deploy/common/* \
-      /var/www/iitp-dabt-platform/packages/common/
+cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 또는 rsync 사용 (더 안전)
-rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
-  /var/www/iitp-dabt-platform/packages/common/
-
-# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+# 스크립트 사용 (단일 서버 + 서버 분리 모두 지원)
 npm run deploy:server:common
 
 # 후속 조치:
@@ -714,18 +749,14 @@ npm run restart:server:be  # BE 재시작 필수
 # FE는 경우에 따라 재빌드 (아래 표 참조)
 ```
 
-**Backend만 배포:**
+**Backend만 배포:** ⭐ 권장
 ```bash
-# 배포 (rsync - .env, logs 보존)
-rsync -av --delete \
-  --exclude='node_modules' --exclude='.env' --exclude='logs' \
-  /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
-  /var/www/iitp-dabt-platform/be/
+cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+# 스크립트 사용 (단일 서버 + 서버 분리 모두 지원)
 npm run deploy:server:be
 
-# 의존성 설치 (package.json 변경 시)
+# 의존성 설치 (package.json 변경 시만)
 cd /var/www/iitp-dabt-platform/be
 npm install --production
 
@@ -733,31 +764,15 @@ npm install --production
 npm run restart:server:be  # BE 재시작 필수
 ```
 
-**Frontend만 배포:**
+**Frontend만 배포:** ⭐ 권장
 ```bash
-# 배포
-rsync -av --delete \
-  /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
-  /var/www/iitp-dabt-platform/fe/
+cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 또는 스크립트 사용 (단일 서버 + 서버 분리 모두 지원) ⭐ 권장
+# 스크립트 사용 (단일 서버 + 서버 분리 모두 지원)
 npm run deploy:server:fe
 
 # 후속 조치:
 npm run restart:server:fe  # Nginx reload
-```
-
-**Common만 배포 (타입/상수 변경 시):**
-```bash
-# Common 배포 (BE의 node_modules로 동기화)
-npm run deploy:server:common
-
-# 후속 조치:
-npm run restart:server:be  # BE 재시작 필수
-
-# ⚠️ 주의사항:
-# - Common이 FE 빌드에 영향을 주는 변경(예: 상수 값)이라면 FE 재빌드 필요
-# - 타입만 변경된 경우 BE 재시작만으로 충분
 ```
 
 **개별 배포 시나리오 예시:**
@@ -1165,6 +1180,8 @@ npm run deploy:server
 # 운영 스크립트 배포 (최초 1회)
 npm run deploy:server:ops
 ```
+
+> 💡 **운영 스크립트 배포 상세 설명**: [섹션 1.6.1 운영 스크립트 배포](#운영-스크립트-배포-최초-1회-필수) 참조
 
 **방법 2: 개별 배포 스크립트 (빠른 배포)**
 

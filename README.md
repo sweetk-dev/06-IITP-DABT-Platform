@@ -355,7 +355,15 @@ vi .env  # VITE_BASE=/ 확인
 
 # 3. 빌드 및 배포
 npm run build:server
-# ... (가이드 참조)
+npm run deploy:server
+
+# 4. 운영 스크립트 배포 (최초 1회)
+npm run deploy:server:ops
+
+# 5. 서비스 시작
+cd /var/www/iitp-dabt-platform/be
+npm install --production
+pm2 start dist/server.js --name iitp-dabt-plf-be
 ```
 
 **복합 설치 (추천 가이드 참조):**
@@ -368,7 +376,14 @@ vi .env  # VITE_BASE=/hub/ 변경
 # 2. Backend .env 설정 (실행 서버)
 # PORT=33000 (Admin과 다른 포트)
 
-# 3. Nginx 통합 설정
+# 3. 빌드 및 배포
+npm run build:server
+npm run deploy:server
+
+# 4. 운영 스크립트 배포 (최초 1회)
+npm run deploy:server:ops
+
+# 5. Nginx 통합 설정
 # Admin + Platform location 블록 추가
 
 # ... (가이드 참조)
