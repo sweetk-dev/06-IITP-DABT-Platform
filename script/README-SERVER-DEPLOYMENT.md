@@ -756,13 +756,20 @@ cd /home/iitp-plf/iitp-dabt-platform/source
 # 스크립트 사용 (단일 서버 + 서버 분리 모두 지원)
 npm run deploy:server:be
 
-# 의존성 설치 (package.json 변경 시만)
-cd /var/www/iitp-dabt-platform/be
-npm install --production
-
-# 후속 조치:
-npm run restart:server:be  # BE 재시작 필수
+# 후속 조치: Backend 재시작 (자동으로 의존성 설치됨)
+npm run restart:server:be
+# → 자동으로 npm install --omit=dev 실행 ✅
+# → 자동으로 PM2 restart 실행 ✅
 ```
+
+**의존성 설치 관련:**
+- ✅ **자동 방식 (권장)**: `npm run restart:server:be` 실행 시 자동으로 의존성 설치
+- ⚙️ **수동 방식 (필요 시)**: 
+  ```bash
+  cd /var/www/iitp-dabt-platform/be
+  npm install --production  # 또는 --omit=dev
+  pm2 restart iitp-dabt-plf-be
+  ```
 
 **Frontend만 배포:** ⭐ 권장
 ```bash
@@ -771,9 +778,13 @@ cd /home/iitp-plf/iitp-dabt-platform/source
 # 스크립트 사용 (단일 서버 + 서버 분리 모두 지원)
 npm run deploy:server:fe
 
-# 후속 조치:
-npm run restart:server:fe  # Nginx reload
+# 후속 조치: Frontend 재시작 (Nginx reload만)
+npm run restart:server:fe
+# → Nginx 설정 테스트 ✅
+# → Nginx reload (무중단 재시작) ✅
 ```
+
+> 💡 **Frontend는 의존성 설치 불필요**: 빌드된 정적 파일만 배포되므로 `npm install`이 필요 없습니다.
 
 **개별 배포 시나리오 예시:**
 
@@ -787,12 +798,39 @@ npm run restart:server:fe  # Nginx reload
 
 ### 1.7 Backend 실행 환경 설정
 
+#### 자동 방식 (권장) ⭐
+
+Backend 시작/재시작 스크립트가 **자동으로 의존성을 설치**합니다:
+
+```bash
+# 방법 1: npm run 사용 (최초 배포 후)
+cd /var/www/iitp-dabt-platform
+npm run start:server:be
+# → 자동으로 npm install --omit=dev 실행 ✅
+
+# 방법 2: 직접 실행
+cd /var/www/iitp-dabt-platform
+node script/start-server-be.js
+# → 자동으로 npm install --omit=dev 실행 ✅
+```
+
+**스크립트가 자동으로 처리하는 것들:**
+- ✅ 버전 정보 출력 (Backend, Common, 빌드 시간)
+- ✅ 의존성 자동 설치 (`npm install --omit=dev`)
+- ✅ PM2로 서버 시작
+
+#### 수동 방식 (필요 시)
+
+스크립트를 사용하지 않고 직접 설치하려면:
+
 ```bash
 # Backend 디렉토리로 이동
 cd /var/www/iitp-dabt-platform/be
 
 # 의존성 설치 (프로덕션 모드)
 npm install --production
+# 또는
+npm install --omit=dev
 
 # @iitp-dabt-platform/common 심볼릭 링크 확인
 ls -la node_modules/@iitp-dabt-platform/common
@@ -803,13 +841,20 @@ ls -la .env
 
 # 로그 디렉토리 생성
 mkdir -p logs
+
+# PM2로 직접 시작
+pm2 start dist/server.js --name iitp-dabt-plf-be
 ```
+
+> 💡 **Frontend는 의존성 설치 불필요**: Frontend는 빌드된 정적 파일(HTML/CSS/JS)이므로 `npm install`이 필요 없습니다. Nginx가 직접 제공합니다.
 
 ### 1.8 Nginx 설정 (루트 경로)
 
+#### Step 1: Nginx 설정 파일 생성 (sites-available)
+
 ```bash
-# Nginx 설정 파일 생성
-sudo vi /etc/nginx/conf.d/iitp-dabt-platform.conf
+# sites-available에 설정 파일 생성 (Ubuntu/Debian 표준 방식)
+sudo vi /etc/nginx/sites-available/iitp-dabt-platform
 ```
 
 내용:
@@ -869,12 +914,23 @@ server {
 }
 ```
 
-**설정 검증 및 적용:**
+#### Step 2: 심볼릭 링크 생성 및 활성화
+
 ```bash
 # 기존 default 설정 비활성화 (중복 방지)
 sudo rm -f /etc/nginx/sites-enabled/default
 
-# 설정 테스트
+# sites-enabled에 심볼릭 링크 생성 (서버 재부팅 후에도 유지됨)
+sudo ln -s /etc/nginx/sites-available/iitp-dabt-platform /etc/nginx/sites-enabled/
+
+# 심볼릭 링크 확인
+ls -la /etc/nginx/sites-enabled/
+```
+
+#### Step 3: 설정 검증 및 적용
+
+```bash
+# 설정 파일 문법 테스트
 sudo nginx -t
 
 # Nginx 재시작
@@ -882,12 +938,22 @@ sudo systemctl restart nginx
 
 # 상태 확인
 sudo systemctl status nginx
+
+# 재부팅 후 자동 시작 확인
+sudo systemctl is-enabled nginx
+# → enabled 출력되어야 함
 ```
 
-### 1.9 서비스 시작
+> 💡 **sites-available vs conf.d 차이**:
+> - `sites-available/`: 설정 파일 저장소 (비활성 상태)
+> - `sites-enabled/`: 활성화된 설정 (심볼릭 링크)
+> - 재부팅 후에도 심볼릭 링크가 유지되어 자동으로 적용됩니다
+
+### 1.9 서비스 시작 및 자동 시작 설정
 
 #### Backend 시작 (PM2)
 
+**Step 1: PM2로 Backend 시작**
 ```bash
 cd /var/www/iitp-dabt-platform/be
 
@@ -898,12 +964,38 @@ pm2 start dist/server.js --name iitp-dabt-plf-be
 pm2 list
 pm2 logs iitp-dabt-plf-be --lines 50
 
-# PM2 설정 저장 (재부팅 후에도 자동 시작)
-pm2 save
-
 # 헬스체크
 curl http://localhost:33000/api/common/health
 ```
+
+**Step 2: 재부팅 후 자동 시작 설정 (필수)**
+
+```bash
+# 1. PM2 startup 스크립트 생성 (iitp-plf 계정에서 실행)
+pm2 startup
+
+# 2. 출력된 명령어를 복사하여 실행 (sudo 포함)
+# 예시 출력:
+# sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u iitp-plf --hp /home/iitp-plf
+# → 위 명령어를 그대로 복사해서 실행
+
+# 3. 현재 PM2 프로세스 목록 저장
+pm2 save
+
+# 4. systemd 서비스 상태 확인
+sudo systemctl status pm2-iitp-plf
+# → active (exited) 상태여야 함
+
+# 5. 재부팅 후 자동 시작 확인
+sudo systemctl is-enabled pm2-iitp-plf
+# → enabled 출력되어야 함
+```
+
+> ⚠️ **중요**: 
+> - `pm2 startup`은 **iitp-plf 계정**에서 실행해야 합니다
+> - 출력된 sudo 명령어를 반드시 실행해야 systemd 서비스가 등록됩니다
+> - `pm2 save`를 실행해야 현재 프로세스가 저장됩니다
+> - 이 설정 후에는 서버 재부팅 시 자동으로 Backend가 시작됩니다
 
 **기대 출력:**
 ```json
@@ -922,6 +1014,8 @@ curl -I http://localhost/
 
 ### 1.10 검증
 
+#### 기본 검증
+
 ```bash
 # Backend 헬스체크
 curl http://localhost:33000/api/common/health
@@ -936,19 +1030,52 @@ curl -I http://localhost/
 # PM2 상태
 pm2 list
 
-# Nginx 로그
-sudo tail -f /var/log/nginx/access.log
-sudo tail -f /var/log/nginx/error.log
+# Nginx 상태
+sudo systemctl status nginx
 
 # Backend 로그
-pm2 logs iitp-dabt-plf-be --lines 100
+pm2 logs iitp-dabt-plf-be --lines 50
 ```
 
 **성공 확인:**
 - ✅ Backend 헬스체크: HTTP 200, `{"status":"healthy"}`
 - ✅ Frontend: HTTP 200, HTML 응답
 - ✅ PM2: `iitp-dabt-plf-be` 상태 `online`
-- ✅ Nginx: 에러 로그 없음
+- ✅ Nginx: `active (running)` 상태
+
+#### 재부팅 후 자동 시작 검증 (필수)
+
+```bash
+# 시스템 재부팅
+sudo reboot
+
+# 재부팅 후 로그인하여 확인
+
+# 1. Nginx 자동 시작 확인
+sudo systemctl status nginx
+# → active (running) 상태여야 함
+
+# 2. PM2 자동 시작 확인
+pm2 list
+# → iitp-dabt-plf-be가 online 상태여야 함
+
+# 3. Backend 헬스체크
+curl http://localhost:33000/api/common/health
+curl http://localhost/api/common/health
+
+# 4. Frontend 접속
+curl -I http://localhost/
+```
+
+**재부팅 후 성공 확인:**
+- ✅ Nginx: `active (running)` - 자동 시작됨
+- ✅ PM2: `iitp-dabt-plf-be` 상태 `online` - 자동 시작됨
+- ✅ Backend 헬스체크: HTTP 200
+- ✅ Frontend: HTTP 200
+
+> 💡 **재부팅 후 자동 시작이 안 되면**:
+> - Nginx: `sudo systemctl enable nginx` 실행
+> - PM2: 섹션 1.9 Step 2의 `pm2 startup` + `pm2 save` 재실행
 
 ---
 

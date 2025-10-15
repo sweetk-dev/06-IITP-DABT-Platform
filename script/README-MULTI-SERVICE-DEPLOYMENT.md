@@ -398,12 +398,15 @@ mkdir -p logs
 
 **중요**: 기존 Admin 설정에 Platform 설정을 **추가**합니다.
 
+#### Step 1: Nginx 설정 파일 확인 및 편집
+
 ```bash
 # 기존 Nginx 설정 확인
-sudo cat /etc/nginx/conf.d/*.conf
+sudo cat /etc/nginx/sites-available/*
 
-# 통합 설정 파일 편집 (또는 새 파일 생성)
-sudo vi /etc/nginx/conf.d/iitp-services.conf
+# 기존 설정 파일 편집 (Admin 설정이 있는 경우)
+# 또는 새 통합 설정 파일 생성 (sites-available)
+sudo vi /etc/nginx/sites-available/iitp-services
 ```
 
 내용 (Admin + Platform 통합):
@@ -552,9 +555,23 @@ server {
 }
 ```
 
-**설정 검증 및 적용:**
+#### Step 2: 심볼릭 링크 생성 및 활성화
+
 ```bash
-# 설정 테스트
+# 기존 default 설정 비활성화 (필요 시)
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# sites-enabled에 심볼릭 링크 생성 (서버 재부팅 후에도 유지됨)
+sudo ln -s /etc/nginx/sites-available/iitp-services /etc/nginx/sites-enabled/
+
+# 심볼릭 링크 확인
+ls -la /etc/nginx/sites-enabled/
+```
+
+#### Step 3: 설정 검증 및 적용
+
+```bash
+# 설정 파일 문법 테스트
 sudo nginx -t
 
 # Admin 서비스 영향 최소화 - Reload 사용 (재시작 대신)
@@ -563,13 +580,19 @@ sudo systemctl reload nginx
 # 상태 확인
 sudo systemctl status nginx
 
+# 재부팅 후 자동 시작 확인
+sudo systemctl is-enabled nginx
+# → enabled 출력되어야 함
+
 # Admin 서비스 정상 동작 확인
 curl -I http://localhost/adm/
 ```
 
-### 1.9 서비스 시작
+### 1.9 서비스 시작 및 자동 시작 설정
 
 #### Platform Backend 시작
+
+**Step 1: PM2로 Platform Backend 시작**
 
 ```bash
 cd /var/www/iitp-dabt-platform/be
@@ -583,12 +606,29 @@ pm2 list
 # Platform 로그 확인
 pm2 logs iitp-dabt-plf-be --lines 50
 
-# PM2 설정 저장
-pm2 save
-
 # Platform 헬스체크
 curl http://localhost:33000/api/common/health
 ```
+
+**Step 2: 재부팅 후 자동 시작 설정 (필수)**
+
+```bash
+# 1. PM2 설정 저장 (Admin + Platform 모두 저장)
+pm2 save
+
+# 2. systemd 서비스 상태 확인
+sudo systemctl status pm2-iitp-plf
+# → active (exited) 상태여야 함
+
+# 3. 재부팅 후 자동 시작 확인
+sudo systemctl is-enabled pm2-iitp-plf
+# → enabled 출력되어야 함
+```
+
+> ⚠️ **Admin이 이미 설치되어 있는 경우**:
+> - PM2 startup은 이미 설정되어 있으므로 다시 실행할 필요 없음
+> - `pm2 save`만 실행하여 Platform Backend를 추가로 저장
+> - 재부팅 시 Admin + Platform Backend가 모두 자동 시작됨
 
 #### 서비스 목록 확인
 
