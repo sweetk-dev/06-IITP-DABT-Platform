@@ -226,7 +226,34 @@ sudo apt install -y git curl unzip jq build-essential nginx
 
 #### Node.js 설치 (아래 중 하나 선택)
 
-**방법 1: nvm 사용 (권장 - 버전 관리 용이)**
+> **⭐ 프로덕션 서버 권장: NodeSource (방법 1)**
+> - 시스템 레벨 설치로 운영 안정성 우수
+> - 여러 관리자가 동일한 환경 사용 가능
+> - PM2, sudo 등 관리 도구와 호환성 최고
+
+**방법 1: NodeSource 사용 (프로덕션 권장) ⭐**
+```bash
+# 비대화형 모드로 설치 (대화형 프롬프트 방지)
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo DEBIAN_FRONTEND=noninteractive bash -
+sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+
+# 버전 확인
+node -v  # v22.x.x
+npm -v   # 9.x.x 이상
+```
+
+> **💡 Tip**: `DEBIAN_FRONTEND=noninteractive`는 설치 중 대화형 화면을 완전히 비활성화합니다. 자동화 스크립트에 필수입니다.
+
+**방법 2: snap 사용 (간단, 자동 업데이트)**
+```bash
+sudo snap install node --classic --channel=22
+
+# 버전 확인
+node -v
+npm -v
+```
+
+**방법 3: nvm 사용 (개발 환경 또는 버전 관리 필요 시)**
 ```bash
 # nvm 설치
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -242,26 +269,49 @@ node -v  # v22.x.x
 npm -v   # 9.x.x 이상
 ```
 
-**방법 2: snap 사용 (가장 간단)**
-```bash
-sudo snap install node --classic --channel=22
+> **⚠️ nvm에서 다른 방법으로 전환하려면?**
+> 
+> nvm으로 설치했다가 NodeSource 등으로 전환하려면 nvm을 완전히 제거해야 합니다:
+> ```bash
+> # 1. nvm 비활성화 및 Node.js 삭제
+> nvm deactivate
+> nvm uninstall 22  # 설치된 모든 버전 삭제
+> 
+> # 2. nvm 디렉토리 삭제
+> rm -rf ~/.nvm
+> 
+> # 3. 모든 셸 설정 파일에서 nvm 관련 라인 삭제
+> # nvm 설정이 있는 파일 찾기
+> grep -l "NVM_DIR" ~/.bashrc ~/.profile ~/.bash_profile ~/.zshrc 2>/dev/null
+> 
+> # 발견된 각 파일 편집 (예시)
+> vi ~/.bashrc
+> vi ~/.profile
+> # 아래 라인들 삭제:
+> # export NVM_DIR="$HOME/.nvm"
+> # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+> # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+> 
+> # 4. ⭐ 완전히 로그아웃 후 재로그인 (필수!)
+> exit
+> # SSH 재접속 또는 콘솔 재로그인
+> 
+> # 5. 완전히 제거 확인
+> nvm --version  # command not found
+> which node  # 아무것도 나오지 않아야 함
+> 
+> # 6. 이제 NodeSource 등 다른 방법으로 설치
+> ```
+> 
+> **중요:** `source ~/.bashrc`만으로는 불충분합니다! nvm 설정이 여러 파일(~/.profile, ~/.bash_profile 등)에 있을 수 있어 **완전한 재로그인이 필수**입니다.
 
-# 버전 확인
-node -v
-npm -v
-```
+**비교:**
 
-**방법 3: NodeSource 사용 (전통적 방식)**
-```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# 버전 확인
-node -v
-npm -v
-```
-
-**어느 방법을 선택하든 결과는 동일합니다.**
+| 방법 | 설치 위치 | 장점 | 단점 | 용도 |
+|------|-----------|------|------|------|
+| **NodeSource** | `/usr/bin/` | 시스템 레벨, 안정적, sudo 호환 | 버전 전환 불편 | **프로덕션** ⭐ |
+| snap | `/snap/bin/` | 자동 업데이트, 간단 | 업데이트 제어 어려움 | 간편 설치 |
+| nvm | `~/.nvm/` | 버전 관리 편리 | sudo 미호환, 사용자별 설정 | 개발 환경 |
 
 **설치 확인 방법 (설치 방식별):**
 
@@ -283,14 +333,34 @@ apt list --installed | grep nodejs
 
 #### PM2 및 PostgreSQL 설치
 
+**PM2 설치 (Node.js 설치 방법에 따라 다름):**
+
 ```bash
-# PM2 글로벌 설치
+# NodeSource 또는 snap으로 설치한 경우 (권장)
 sudo npm install -g pm2
 
-# PM2 시작 스크립트 등록 (부팅 시 자동 시작)
-pm2 startup
-# 출력되는 명령어 실행 (sudo env PATH=... 형태)
+# nvm으로 설치한 경우
+npm install -g pm2
 
+# 설치 확인
+pm2 --version
+which pm2
+```
+
+**PM2 시작 스크립트 등록 (부팅 시 자동 시작):**
+
+```bash
+# PM2 startup 명령 실행 (사용자에 맞는 명령어 출력됨)
+pm2 startup
+
+# 출력되는 명령어를 복사해서 실행 (예시)
+# sudo env PATH=$PATH:/home/iitp-plf/.nvm/versions/node/v22.x.x/bin ...
+# 위 명령어가 자동으로 올바른 경로를 포함하므로 그대로 실행하면 됩니다.
+```
+
+**PostgreSQL 및 Nginx 확인:**
+
+```bash
 # PostgreSQL 설치 (이미 설치되어 있으면 생략)
 sudo apt install -y postgresql postgresql-contrib
 
@@ -302,7 +372,7 @@ sudo nginx -t
 ### 1.1 운영 계정 및 디렉토리 구조 생성
 
 ```bash
-# iitp-plf 사용자 생성
+# iitp-plf 사용자 생성 , 이미 서비스 계정이 있으면 스킵
 sudo useradd -m -s /bin/bash iitp-plf
 sudo passwd iitp-plf
 
@@ -885,7 +955,7 @@ sudo apt install -y git curl build-essential rsync
 
 **Node.js 설치 (아래 중 하나 선택):**
 
-섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (nvm, snap, NodeSource 중 선택)
+섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (**프로덕션: NodeSource 권장**, snap, nvm 중 선택)
 
 ```bash
 # 설치 후 버전 확인
@@ -1010,7 +1080,7 @@ sudo apt install -y curl nginx
 
 **Node.js 설치 (아래 중 하나 선택):**
 
-섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (nvm, snap, NodeSource 중 선택)
+섹션 1.0의 [Node.js 설치 방법](#nodejs-설치-아래-중-하나-선택) 참조 (**프로덕션: NodeSource 권장**, snap, nvm 중 선택)
 
 ```bash
 # PM2 글로벌 설치

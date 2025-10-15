@@ -17,9 +17,6 @@
   "dependencies": {
     "qs": "^6.11.2"
   },
-  "peerDependencies": {
-    "typescript": "^5.4.0"
-  },
   "devDependencies": {
     "@types/qs": "^6.9.11"
   },

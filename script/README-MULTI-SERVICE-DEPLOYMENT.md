@@ -628,12 +628,12 @@ sudo tail -f /var/log/nginx/error.log
 
 **빌드 서버 세팅 요약:**
 - 필수 패키지 설치 (git, curl, build-essential, rsync)
-- Node.js 22.x 설치 (nvm, snap, NodeSource 중 선택)
+- Node.js 22.x 설치 (NodeSource, snap, nvm 중 선택 - **프로덕션은 NodeSource 권장**)
 - iitp-plf 사용자 및 디렉토리 생성
 - SSH 키 설정 (rsync용)
 - Git 클론 및 패키지 설치
 
-**자세한 내용은 단독 설치 가이드 참조**
+**자세한 내용은 단독 설치 가이드 참조** ([Node.js 설치 방법 비교](./README-SERVER-DEPLOYMENT.md#nodejs-설치-아래-중-하나-선택))
 
 #### Frontend 환경변수 (복합 서비스 기준)
 

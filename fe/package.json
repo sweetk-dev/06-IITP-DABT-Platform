@@ -9,11 +9,7 @@
     "react-router-dom": "^6.27.0",
     "@iitp-dabt-platform/common": "file:../packages/common"
   },
-  "peerDependencies": {
-    "typescript": "^5.4.0"
-  },
   "devDependencies": {
-    "@types/node": "^20.14.2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.0",

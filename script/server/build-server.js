@@ -150,7 +150,8 @@ async function gitPull() {
 // 루트에서 도구체인 설치 (rimraf/tsc/vite 등)
 async function installToolchainAtRoot() {
   console.log('🧰 루트 도구체인 설치 (dev 포함) 중...');
-  await run('npm', ['ci', '--include=dev'], gitConfig.sourcePath);
+  // Workspace 환경에서는 npm install 사용 (npm ci는 lockfile 엄격 검증)
+  await run('npm', ['install', '--include=dev'], gitConfig.sourcePath);
   console.log('✅ 루트 도구체인 설치 완료');
 }
 
