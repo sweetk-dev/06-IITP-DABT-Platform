@@ -93,7 +93,6 @@ async function rsyncLocal(src, dest) {
   const args = [
     '-avz',
     '--delete',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r',
     `${src}`,
     `${dest}`
   ];
@@ -104,8 +103,7 @@ async function rsyncLocal(src, dest) {
 async function rsyncRemote(srcUserHost, srcPath, destUserHost, destPath, port) {
   const baseArgs = [
     '-avz',
-    '--delete',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r'
+    '--delete'
   ];
   if (process.env.RSYNC_CHOWN) baseArgs.push(`--chown=${process.env.RSYNC_CHOWN}`);
   const args = [...baseArgs, '-e', `ssh -p ${port}`, `${srcUserHost}:${srcPath}`, `${destUserHost}:${destPath}`];

@@ -93,7 +93,6 @@ async function rsyncLocal(src, dest) {
   const args = [
     '-avz',
     '--delete',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r',
     `${src}`,
     `${dest}`
   ];
@@ -104,8 +103,7 @@ async function rsyncLocal(src, dest) {
 async function rsyncRemote(srcUserHost, srcPath, destUserHost, destPath, port) {
   const baseArgs = [
     '-avz',
-    '--delete',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r'
+    '--delete'
   ];
   if (process.env.RSYNC_CHOWN) baseArgs.push(`--chown=${process.env.RSYNC_CHOWN}`);
   const args = [...baseArgs, '-e', `ssh -p ${port}`, `${srcUserHost}:${srcPath}`, `${destUserHost}:${destPath}`];
@@ -142,7 +140,8 @@ async function deployFrontend() {
 async function fixPermissions() {
   const sshBase = ['-p', `${deployConfig.productionServer.port}`, `${deployConfig.productionServer.user}@${deployConfig.productionServer.host}`];
   const fePath = deployConfig.productionServer.fePath;
-  const cmd = `find ${fePath} -type d -exec chmod 755 {} \\; && find ${fePath} -type f -exec chmod 644 {} \\;`;
+  // node_modules, logs 제외하고 권한 설정
+  const cmd = `find ${fePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type d -exec chmod 755 {} \\; && find ${fePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type f -exec chmod 644 {} \\;`;
   
   if (sameHost) {
     await run('bash', ['-lc', cmd]);

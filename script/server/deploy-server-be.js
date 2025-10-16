@@ -97,7 +97,6 @@ async function rsyncLocal(src, dest) {
     '--exclude', '.env',
     '--exclude', '.env*',
     '--exclude', 'logs/',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r',
     `${src}`,
     `${dest}`
   ];
@@ -112,8 +111,7 @@ async function rsyncRemote(srcUserHost, srcPath, destUserHost, destPath, port) {
     '--exclude', 'node_modules/',
     '--exclude', '.env',
     '--exclude', '.env*',
-    '--exclude', 'logs/',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r'
+    '--exclude', 'logs/'
   ];
   if (process.env.RSYNC_CHOWN) baseArgs.push(`--chown=${process.env.RSYNC_CHOWN}`);
   const args = [...baseArgs, '-e', `ssh -p ${port}`, `${srcUserHost}:${srcPath}`, `${destUserHost}:${destPath}`];
@@ -151,7 +149,8 @@ async function fixPermissions() {
   const sshBase = ['-p', `${deployConfig.productionServer.port}`, `${deployConfig.productionServer.user}@${deployConfig.productionServer.host}`];
   const bePath = deployConfig.productionServer.bePath;
   const ensureLogs = `mkdir -p ${bePath}/logs`;
-  const chmodAll = `find ${bePath} -type d -exec chmod 755 {} \\; && find ${bePath} -type f -exec chmod 644 {} \\;`;
+  // node_modules, logs 제외하고 권한 설정
+  const chmodAll = `find ${bePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type d -exec chmod 755 {} \\; && find ${bePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type f -exec chmod 644 {} \\;`;
   const relaxLogs = `chmod 755 ${bePath}/logs || true`;
   const cmd = `${ensureLogs} && ${chmodAll} && ${relaxLogs}`;
   

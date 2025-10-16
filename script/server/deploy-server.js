@@ -133,7 +133,7 @@ async function rsyncLocal(src, dest) {
     '--exclude', 'node_modules/',
     '--exclude', '.env',
     '--exclude', '.env*',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r',
+    '--exclude', 'logs/',
     `${src}`,
     `${dest}`
   ];
@@ -142,14 +142,13 @@ async function rsyncLocal(src, dest) {
 }
 
 async function rsyncRemote(srcUserHost, srcPath, destUserHost, destPath, port) {
-  // 퍼미션 기본값: 디렉터리 755, 파일 644
   const baseArgs = [
     '-avz',
     '--delete',
     '--exclude', 'node_modules/',
     '--exclude', '.env',
     '--exclude', '.env*',
-    '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r'
+    '--exclude', 'logs/'
   ];
   // 필요 시 소유자 지정(옵션)
   if (process.env.RSYNC_CHOWN) baseArgs.push(`--chown=${process.env.RSYNC_CHOWN}`);
@@ -259,13 +258,14 @@ async function main() {
 async function fixPermissionsFrontend() {
   const sshBase = ['-p', `${deployConfig.productionServer.port}`, `${deployConfig.productionServer.user}@${deployConfig.productionServer.host}`];
   const fePath = deployConfig.productionServer.fePath;
-  const cmd = `find ${fePath} -type d -exec chmod 755 {} \\; && find ${fePath} -type f -exec chmod 644 {} \\;`;
+  // node_modules, logs 제외하고 권한 설정
+  const cmd = `find ${fePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type d -exec chmod 755 {} \\; && find ${fePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type f -exec chmod 644 {} \\;`;
   if (sameHost) {
     await run('bash', ['-lc', cmd]);
   } else {
     await run('ssh', [...sshBase, cmd]);
   }
-  console.log('🔐 Frontend 퍼미션 정리 완료 (755/644)');
+  console.log('🔐 Frontend 퍼미션 정리 완료 (755/644, node_modules/logs 제외)');
 }
 
 // 권한 정리: Backend (logs 등 쓰기 경로 포함)
@@ -273,7 +273,8 @@ async function fixPermissionsBackend() {
   const sshBase = ['-p', `${deployConfig.productionServer.port}`, `${deployConfig.productionServer.user}@${deployConfig.productionServer.host}`];
   const bePath = deployConfig.productionServer.bePath;
   const ensureLogs = `mkdir -p ${bePath}/logs`;
-  const chmodAll = `find ${bePath} -type d -exec chmod 755 {} \\; && find ${bePath} -type f -exec chmod 644 {} \\;`;
+  // node_modules, logs 제외하고 권한 설정
+  const chmodAll = `find ${bePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type d -exec chmod 755 {} \\; && find ${bePath} -path '*/node_modules' -prune -o -path '*/logs' -prune -o -type f -exec chmod 644 {} \\;`;
   const relaxLogs = `chmod 755 ${bePath}/logs || true`;
   const cmd = `${ensureLogs} && ${chmodAll} && ${relaxLogs}`;
   if (sameHost) {
