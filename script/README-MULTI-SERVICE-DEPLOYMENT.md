@@ -851,45 +851,66 @@ npm run build:server
 
 ### 3.5 배포
 
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
+
 #### 단일 서버:
 ```bash
-# 전체 배포 (권장)
+cd /home/iitp-plf/iitp-dabt-platform/source
+
+# 전체 배포 (권장) ⭐
+npm run deploy:server
+
+# 또는 개별 배포
+npm run deploy:server:be      # Backend만
+npm run deploy:server:fe      # Frontend만
+npm run deploy:server:common  # Common만
+```
+
+**스크립트가 자동으로 처리:**
+- ✅ rsync로 안전한 배포 (node_modules, .env, logs 자동 제외)
+- ✅ 파일 권한 자동 설정
+- ✅ 버전 정보 자동 출력
+
+**수동 배포 (비권장):**
+```bash
+# Backend
 rsync -av --delete \
   --exclude='node_modules' --exclude='.env' --exclude='logs' \
   /home/iitp-plf/iitp-dabt-platform/deploy/backend/ \
   /var/www/iitp-dabt-platform/be/
 
+# Frontend
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/frontend/ \
   /var/www/iitp-dabt-platform/fe/
 
+# Common
 rsync -av --delete \
   /home/iitp-plf/iitp-dabt-platform/deploy/common/ \
   /var/www/iitp-dabt-platform/packages/common/
-
-# Backend 의존성 업데이트 (package.json 변경 시)
-cd /var/www/iitp-dabt-platform/be
-npm install --production
 ```
 
-**개별 배포 옵션:** [섹션 1.6.2](#162-개별-배포-옵션) 또는 [단독 설치 가이드 참조](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션)
+**상세 옵션:** [섹션 1.6.2](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션) 참조
 
 #### 서버 분리:
 ```bash
 # 빌드 서버에서 실행
+cd /home/iitp-plf/iitp-dabt-platform/source
 
-# 방법 1: 전체 배포 (권장)
+# 전체 배포 (권장) ⭐
 npm run deploy:server
 
-# 방법 2: 개별 배포 (빠른 배포)
-npm run deploy:server:be       # Backend만
-npm run deploy:server:fe       # Frontend만
-npm run deploy:server:common   # Common만
+# 또는 개별 배포
+npm run deploy:server:be      # Backend만
+npm run deploy:server:fe      # Frontend만
+npm run deploy:server:common  # Common만
 
 # 후속 조치: 섹션 3.6 참조
 ```
 
-**개별 배포 상세:** [섹션 1.6.2](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션) 참조
+**주의사항:** Admin 서비스가 실행 중이므로 영향 최소화 필요
+
+**상세 옵션:** [섹션 1.6.2](./README-SERVER-DEPLOYMENT.md#162-개별-배포-옵션) 참조
 
 ### 3.6 서비스 재시작 (Platform만)
 

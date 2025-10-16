@@ -343,51 +343,42 @@ npm run dev:fe  # Frontend만
 
 ### 배포 요약
 
-**단독 설치 (추천 가이드 참조):**
+#### 초기 설치 (최초 1회)
+
+**빌드 및 배포:**
 ```bash
-# 1. Frontend .env 설정 (빌드 서버)
-cd fe
-cp env.sample .env
-vi .env  # VITE_BASE=/ 확인
-
-# 2. Backend .env 설정 (실행 서버)
-# /var/www/iitp-dabt-platform/be/.env 생성
-
-# 3. 빌드 및 배포
-npm run build:server
-npm run deploy:server
-
-# 4. 운영 스크립트 배포 (최초 1회)
-npm run deploy:server:ops
-
-# 5. 서비스 시작
-cd /var/www/iitp-dabt-platform/be
-npm install --production
-pm2 start dist/server.js --name iitp-dabt-plf-be
+npm run build:server        # 전체 빌드
+npm run deploy:server       # 전체 배포
+npm run deploy:server:ops   # 운영 스크립트 배포 (최초 1회)
 ```
 
-**복합 설치 (추천 가이드 참조):**
+**상세 가이드 (필독!):**
+- [Platform 단독 설치 가이드](./script/README-SERVER-DEPLOYMENT.md) ← 전체 설치 프로세스
+- [복합 서비스 설치 가이드](./script/README-MULTI-SERVICE-DEPLOYMENT.md) ← Admin과 공존 시
+
+---
+
+#### 업데이트 배포 (일상 운영) ⭐
+
+**전체 배포:**
 ```bash
-# 1. Frontend .env 설정 (빌드 서버)
-cd fe
-cp env.sample .env
-vi .env  # VITE_BASE=/hub/ 변경
-
-# 2. Backend .env 설정 (실행 서버)
-# PORT=33000 (Admin과 다른 포트)
-
-# 3. 빌드 및 배포
-npm run build:server
-npm run deploy:server
-
-# 4. 운영 스크립트 배포 (최초 1회)
-npm run deploy:server:ops
-
-# 5. Nginx 통합 설정
-# Admin + Platform location 블록 추가
-
-# ... (가이드 참조)
+git pull
+npm run build:server        # 전체 빌드
+npm run deploy:server       # 전체 배포
+npm run restart:server:be   # Backend 재시작
+npm run restart:server:fe   # Frontend 재시작 (Nginx reload)
 ```
+
+**개별 배포 (빠른 배포):**
+```bash
+git pull
+npm run build:server:be     # Backend만 빌드
+npm run deploy:server:be    # Backend만 배포
+npm run restart:server:be   # Backend 재시작
+```
+
+**상세 가이드:**
+- [섹션 3: 업데이트 배포](./script/README-SERVER-DEPLOYMENT.md#3-업데이트-배포-일상-운영) ← 전체/개별 배포 옵션 및 시나리오
 
 ## 📚 문서
 
