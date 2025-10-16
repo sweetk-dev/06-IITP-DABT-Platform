@@ -417,7 +417,11 @@ export function useDataPreview(id: number, immediate: boolean = true) {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const data = await dataService.getDataPreview(id);
+      // 환경 변수에서 limit 가져오기
+      const previewLimit = Number(import.meta.env.VITE_API_DATA_PREVIEW_LIMIT);
+      const query = previewLimit > 0 ? { limit: previewLimit } : {};
+      
+      const data = await dataService.getDataPreview(id, query);
       setState({ data, loading: false, error: null });
       setHasExecuted(true);
     } catch (error) {
