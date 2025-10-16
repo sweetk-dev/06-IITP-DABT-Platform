@@ -210,7 +210,7 @@ async function main() {
     console.log('   # 또는: pm2 restart iitp-dabt-plf-be');
     console.log('');
     console.log('3. 헬스체크:');
-    console.log('   curl http://localhost:33000/api/common/health');
+    console.log('   curl http://localhost:33000/api/v1/health');
     
   } catch (error) {
     console.error('❌ Backend 배포 실패:', error.message);

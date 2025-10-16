@@ -1010,7 +1010,7 @@ pm2 list
 pm2 logs iitp-dabt-plf-be --lines 50
 
 # 헬스체크
-curl http://localhost:33000/api/common/health
+curl http://localhost:33000/api/v1/health
 ```
 
 **Step 2: 재부팅 후 자동 시작 설정 (필수)**
@@ -1065,11 +1065,11 @@ curl -I http://localhost/
 
 ```bash
 # Backend 헬스체크
-curl http://localhost:33000/api/common/health
-curl http://localhost/api/common/health  # Nginx 경유
+curl http://localhost:33000/api/v1/health
+curl http://localhost/api/v1/health  # Nginx 경유
 
 # Backend 버전 확인
-curl http://localhost:33000/api/common/version
+curl http://localhost:33000/api/v1/version
 
 # Frontend 접속
 curl -I http://localhost/
@@ -1107,8 +1107,8 @@ pm2 list
 # → iitp-dabt-plf-be가 online 상태여야 함
 
 # 3. Backend 헬스체크
-curl http://localhost:33000/api/common/health
-curl http://localhost/api/common/health
+curl http://localhost:33000/api/v1/health
+curl http://localhost/api/v1/health
 
 # 4. Frontend 접속
 curl -I http://localhost/
@@ -1447,7 +1447,7 @@ mkdir -p logs
 
 ```bash
 # 현재 버전 확인
-curl http://localhost:33000/api/common/version
+curl http://localhost:33000/api/v1/version
 
 # 서비스 상태 확인
 pm2 list
@@ -1612,11 +1612,11 @@ npm run restart:server:fe
 
 ```bash
 # 버전 확인 (변경되었는지 확인)
-curl http://localhost:33000/api/common/version
+curl http://localhost:33000/api/v1/version
 
 # 헬스체크
-curl http://localhost:33000/api/common/health
-curl http://localhost/api/common/health
+curl http://localhost:33000/api/v1/health
+curl http://localhost/api/v1/health
 
 # PM2 상태
 pm2 list
@@ -1878,7 +1878,7 @@ sudo tail -f /var/log/nginx/error.log
 ```bash
 # Backend 상태 확인
 pm2 list
-curl http://localhost:33000/api/common/health
+curl http://localhost:33000/api/v1/health
 
 # Backend가 죽었으면 재시작
 pm2 restart iitp-dabt-plf-be

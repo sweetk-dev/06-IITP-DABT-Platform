@@ -45,5 +45,6 @@ export interface CommonVersionQuery {
 export interface CommonVersionRes {
   version?: string;
   buildDate?: string;
+  buildNumber?: string;
   environment: string;
 } 

@@ -625,7 +625,7 @@ pm2 list
 pm2 logs iitp-dabt-plf-be --lines 50
 
 # Platform 헬스체크
-curl http://localhost:33000/api/common/health
+curl http://localhost:33000/api/v1/health
 ```
 
 **Step 2: 재부팅 후 자동 시작 설정 (필수)**
@@ -666,12 +666,12 @@ sudo netstat -tlnp | grep :33000  # Platform
 
 ```bash
 # Admin 서비스 정상 동작 확인 (영향 없어야 함)
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 curl http://localhost/adm/
 
 # Platform 서비스 확인
-curl http://localhost:33000/api/common/health  # 직접
-curl http://localhost/hub/api/common/health    # Nginx 경유
+curl http://localhost:33000/api/v1/health  # 직접
+curl http://localhost/hub/api/v1/health    # Nginx 경유
 curl http://localhost/hub/                     # Frontend
 
 # PM2 상태
@@ -798,11 +798,11 @@ npm run build:server
 ```bash
 # Admin 서비스 상태 확인 (영향 없어야 함)
 pm2 list | grep admin
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 
 # Platform 현재 버전 확인
-curl http://localhost:33000/api/common/version
-curl http://localhost/hub/api/common/version
+curl http://localhost:33000/api/v1/version
+curl http://localhost/hub/api/v1/version
 
 # Platform 서비스 상태
 pm2 list | grep plf
@@ -904,7 +904,7 @@ npm run restart:server:fe
 
 # Admin 서비스 정상 확인 (영향 없어야 함)
 pm2 list | grep admin
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 ```
 
 #### 개별 재시작
@@ -915,14 +915,14 @@ curl http://localhost/adm/api/common/health
 
 ```bash
 # Platform 버전 확인 (변경되었는지)
-curl http://localhost/hub/api/common/version
+curl http://localhost/hub/api/v1/version
 
 # Platform 헬스체크
-curl http://localhost:33000/api/common/health
-curl http://localhost/hub/api/common/health
+curl http://localhost:33000/api/v1/health
+curl http://localhost/hub/api/v1/health
 
 # Admin 서비스 영향 확인 (정상이어야 함)
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 curl http://localhost/adm/
 
 # PM2 상태 (두 서비스 모두 online)
@@ -945,7 +945,7 @@ pm2 restart iitp-dabt-plf-be
 
 # Admin 서비스 영향 확인
 pm2 list
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 ```
 
 ---
@@ -958,7 +958,7 @@ curl http://localhost/adm/api/common/health
 ```bash
 # 상태 확인
 pm2 list | grep admin
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 
 # 로그 확인
 pm2 logs <admin-app-name>
@@ -971,7 +971,7 @@ pm2 restart <admin-app-name>
 ```bash
 # 상태 확인
 pm2 list | grep plf
-curl http://localhost/hub/api/common/health
+curl http://localhost/hub/api/v1/health
 
 # 로그 확인
 pm2 logs iitp-dabt-plf-be
@@ -1043,7 +1043,7 @@ df -h
 ```bash
 # Admin 상태 확인
 pm2 list | grep admin
-curl http://localhost/adm/api/common/health
+curl http://localhost/adm/api/v1/health
 
 # Nginx 설정 확인 (location 블록 충돌 확인)
 sudo nginx -t

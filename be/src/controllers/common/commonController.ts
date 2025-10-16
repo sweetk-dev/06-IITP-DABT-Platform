@@ -52,7 +52,8 @@ export async function getVersion(req: Request, res: Response): Promise<void> {
     let buildNumber: string | undefined;
     
     try {
-      const buildInfoPath = join(__dirname, '../build-info.json');
+      // controllers/common/ → dist/ (2단계 위)
+      const buildInfoPath = join(__dirname, '../../build-info.json');
       const buildInfo = JSON.parse(readFileSync(buildInfoPath, 'utf8'));
       
       version = buildInfo.version;
@@ -61,14 +62,18 @@ export async function getVersion(req: Request, res: Response): Promise<void> {
       
       logger.debug('빌드 정보 파일에서 데이터 로드', { buildInfo });
     } catch (error) {
-      logger.error('빌드 정보 파일을 읽을 수 없습니다. 빌드가 필요합니다.', { 
+      logger.warn('빌드 정보 파일을 읽을 수 없습니다.', { 
         error: error instanceof Error ? error.message : String(error) 
       });
       
-      // 빌드 정보가 없으면 명확하게 null/undefined로 처리
-      version = undefined;
-      buildDate = undefined;
-      buildNumber = undefined;
+      // 빌드 정보가 없으면 package.json에서 읽기
+      try {
+        const packageJsonPath = join(__dirname, '../../package.json');
+        const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+        version = packageJson.version;
+      } catch (pkgError) {
+        logger.error('package.json도 읽을 수 없습니다.', { pkgError });
+      }
     }
     
     // 환경 정보는 런타임에 결정 (빌드 시점이 아님)
@@ -77,6 +82,7 @@ export async function getVersion(req: Request, res: Response): Promise<void> {
     const result: CommonVersionRes = {
       version,
       buildDate,
+      buildNumber,
       environment,
     };
     
