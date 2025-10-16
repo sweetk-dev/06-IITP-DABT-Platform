@@ -122,12 +122,19 @@ function showBuildSummary() {
 async function copyFeToDeploy() {
   console.log('📁 Frontend 배포 폴더로 복사 중...');
   const deployFePath = path.join(config.deployPath, 'frontend');
-  if (!fs.existsSync(deployFePath)) fs.mkdirSync(deployFePath, { recursive: true });
+  
+  // 기존 deploy/frontend 폴더 완전 삭제 (이전 빌드 잔재 제거)
+  if (fs.existsSync(deployFePath)) {
+    console.log('   🗑️  기존 deploy/frontend 폴더 삭제 중...');
+    await run('rm', ['-rf', deployFePath], undefined);
+  }
+  
+  fs.mkdirSync(deployFePath, { recursive: true });
   const feDist = path.join(config.sourcePath, 'fe/dist');
   await ensureBuilt('Frontend', 'fe', 'fe/dist');
   
-  // dist/ 폴더 복사
-  await run('cp', ['-a', path.join(feDist, '.'), deployFePath], undefined);
+  // dist/ 폴더 채로 복사 (Admin과 동일한 구조)
+  await run('cp', ['-a', feDist, deployFePath], undefined);
   
   // package.json 복사 (버전 정보용)
   const fePackageJson = path.join(config.sourcePath, 'fe/package.json');

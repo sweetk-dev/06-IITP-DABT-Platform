@@ -524,14 +524,14 @@ server {
     # [9] Platform FE 정적 자산 (신규)
     # ========================
     location ^~ /hub/assets/ {
-        alias /var/www/iitp-dabt-platform/fe/assets/;
+        alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
     }
 
     location ~* ^/hub/([^/]+\.(?:png|jpg|jpeg|gif|svg|ico|woff2?|js|css|map))$ {
-        alias /var/www/iitp-dabt-platform/fe/$1;
+        alias /var/www/iitp-dabt-platform/fe/dist/$1;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
@@ -541,7 +541,7 @@ server {
     # [10] Platform SPA Fallback (신규)
     # ========================
     location /hub/ {
-        alias /var/www/iitp-dabt-platform/fe/;
+        alias /var/www/iitp-dabt-platform/fe/dist/;
         index index.html;
         try_files $uri $uri/ /hub/index.html;
     }
@@ -558,10 +558,20 @@ server {
 #### Step 2: 설정 검증 및 적용
 
 ```bash
-# 기존 default 설정과 충돌 확인
-sudo nginx -t
-# 만약 "conflicting server name" 또는 "duplicate default server" 에러 발생 시:
+# 기존 default 설정 처리 (Admin 설치 시 이미 처리되었을 수 있음)
+ls -la /etc/nginx/sites-enabled/
+
+# Case 1: default 파일이 존재하는 경우 - 제거
 sudo rm -f /etc/nginx/sites-enabled/default
+
+# Case 2: default 파일이 없는데 nginx.conf가 직접 참조하는 경우
+# 에러: open() "/etc/nginx/sites-enabled/default" failed (2: No such file or directory)
+# 확인:
+sudo cat /etc/nginx/nginx.conf | grep -n "sites-enabled"
+# 해결: nginx.conf에서 해당 라인을 주석 처리 또는 와일드카드로 변경
+# include /etc/nginx/sites-enabled/default; → 주석 처리
+# 또는
+# include /etc/nginx/sites-enabled/*; 로 변경
 
 # 설정 파일 문법 테스트
 sudo nginx -t
@@ -585,10 +595,16 @@ curl -I http://localhost/adm/
 > - `/etc/nginx/nginx.conf`에서 `include /etc/nginx/conf.d/*.conf;`로 자동 로드
 > - 재부팅 후에도 자동으로 유지됨
 >
-> ⚠️ **sites-enabled/default 제거 이유**:
-> - Nginx는 `conf.d/*.conf`와 `sites-enabled/*` **둘 다** 로드합니다
-> - 기본 설치 시 `sites-enabled/default`도 `listen 80 default_server;`를 사용합니다
-> - 우리 설정과 충돌하므로 제거 필요합니다 (Admin이 이미 제거했다면 불필요)
+> ⚠️ **sites-enabled/default 관련 주의사항**:
+> - Admin 설치 시 이미 제거되었을 수 있습니다
+> - 제거되지 않았다면 우리 설정과 충돌하므로 제거 필요합니다
+>
+> ⚠️ **만약 "No such file or directory" 에러가 발생하면**:
+> - 일부 시스템의 `nginx.conf`는 특정 파일을 직접 참조합니다
+> - `sudo vi /etc/nginx/nginx.conf` 실행
+> - `include /etc/nginx/sites-enabled/default;` 같은 라인을 찾아서:
+>   - 주석 처리: `# include /etc/nginx/sites-enabled/default;`
+>   - 또는 와일드카드로 변경: `include /etc/nginx/sites-enabled/*;`
 
 ### 1.9 서비스 시작 및 자동 시작 설정
 

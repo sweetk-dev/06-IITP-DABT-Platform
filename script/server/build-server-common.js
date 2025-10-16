@@ -101,7 +101,14 @@ function showBuildSummary() {
 async function copyCommonToDeploy() {
   console.log('📁 Common 배포 폴더로 복사 중...');
   const deployCommonPath = path.join(config.deployPath, 'common');
-  if (!fs.existsSync(deployCommonPath)) fs.mkdirSync(deployCommonPath, { recursive: true });
+  
+  // 기존 deploy/common 폴더 삭제 (깨끗한 빌드 보장)
+  if (fs.existsSync(deployCommonPath)) {
+    console.log('   🗑️  기존 deploy/common 삭제 중...');
+    await run('rm', ['-rf', deployCommonPath], undefined);
+  }
+  
+  fs.mkdirSync(deployCommonPath, { recursive: true });
   const commonDist = path.join(config.sourcePath, 'packages/common/dist');
   await ensureBuilt('Common', 'packages/common', 'packages/common/dist');
   await run('cp', ['-a', path.join(commonDist, '.'), deployCommonPath], undefined);

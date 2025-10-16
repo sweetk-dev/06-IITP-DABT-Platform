@@ -870,7 +870,7 @@ server {
     listen [::]:80 default_server;
     server_name _;  # 실제 도메인으로 변경 가능
 
-    root /var/www/iitp-dabt-platform/fe;
+    root /var/www/iitp-dabt-platform/fe/dist;
     index index.html;
 
     # ========================
@@ -892,7 +892,7 @@ server {
     # [2] Frontend 정적 자산
     # ========================
     location /assets/ {
-        alias /var/www/iitp-dabt-platform/fe/assets/;
+        alias /var/www/iitp-dabt-platform/fe/dist/assets/;
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
@@ -917,12 +917,29 @@ server {
 #### Step 2: 설정 검증 및 적용
 
 ```bash
-# 기존 default 설정과 충돌 확인
-sudo nginx -t
-# 만약 "conflicting server name" 또는 "duplicate default server" 에러 발생 시:
+# 기존 default 설정 처리
+# nginx.conf가 sites-enabled/default를 직접 참조하는 경우가 있어 확인 필요
+sudo cat /etc/nginx/nginx.conf | grep -n "sites-enabled"
+
+# Case 1: 파일이 존재하고 충돌하는 경우
+ls -la /etc/nginx/sites-enabled/default
 sudo rm -f /etc/nginx/sites-enabled/default
 
+# Case 2: 파일이 없는데 nginx.conf가 직접 참조하는 경우
+# 에러: open() "/etc/nginx/sites-enabled/default" failed (2: No such file or directory)
+# 해결: 빈 파일 생성 또는 nginx.conf 수정
+sudo touch /etc/nginx/sites-enabled/default
+# 또는
+# sudo vi /etc/nginx/nginx.conf
+# → include /etc/nginx/sites-enabled/default; 라인을 주석 처리 또는 삭제
+
 # 설정 파일 문법 테스트
+sudo nginx -t
+
+# 성공하면 실제 충돌하는 파일 제거
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# 재확인
 sudo nginx -t
 
 # Nginx 재시작
@@ -941,10 +958,17 @@ sudo systemctl is-enabled nginx
 > - `/etc/nginx/nginx.conf`에서 `include /etc/nginx/conf.d/*.conf;`로 자동 로드
 > - 재부팅 후에도 자동으로 유지됨
 >
-> ⚠️ **sites-enabled/default 제거 이유**:
+> ⚠️ **sites-enabled/default 관련 주의사항**:
 > - Nginx는 `conf.d/*.conf`와 `sites-enabled/*` **둘 다** 로드합니다
 > - 기본 설치 시 `sites-enabled/default`도 `listen 80 default_server;`를 사용합니다
-> - 우리 설정과 충돌하므로 제거 필요합니다
+> - **우리 설정과 충돌하므로 제거 필요합니다**
+>
+> ⚠️ **만약 "No such file or directory" 에러가 발생하면**:
+> - 일부 시스템의 `nginx.conf`는 특정 파일을 직접 참조합니다
+> - `sudo cat /etc/nginx/nginx.conf | grep -n default` 실행
+> - `include /etc/nginx/sites-enabled/default;` 같은 라인이 있으면:
+>   - 해당 라인을 주석 처리: `# include /etc/nginx/sites-enabled/default;`
+>   - 또는 와일드카드로 변경: `include /etc/nginx/sites-enabled/*;`
 
 ### 1.9 서비스 시작 및 자동 시작 설정
 
@@ -1725,13 +1749,90 @@ npm install --production
 sudo chown -R iitp-plf:iitp-plf /var/www/iitp-dabt-platform/be
 ```
 
+#### Frontend 403 Forbidden 에러
+
+**증상**: 브라우저에서 `http://server-ip/` 접속 시 403 Forbidden 에러
+
+**원인**: Nginx가 파일을 읽을 수 없음 (권한 문제)
+
+```bash
+# 1. Nginx 에러 로그에서 정확한 원인 확인 (가장 중요!)
+sudo tail -20 /var/log/nginx/error.log
+# 에러 예시:
+# - "Permission denied" → 파일 권한 문제
+# - "index.html is forbidden" → 디렉토리 권한 문제
+
+# 2. Frontend 파일 존재 및 권한 확인
+ls -la /var/www/iitp-dabt-platform/fe/dist/index.html
+# 기대: -rw-r--r-- (644) 또는 -rwxr-xr-x (755)
+
+# 3. 디렉토리 권한 확인
+ls -ld /var/www/
+ls -ld /var/www/iitp-dabt-platform/
+ls -ld /var/www/iitp-dabt-platform/fe/
+ls -ld /var/www/iitp-dabt-platform/fe/dist/
+# 기대: drwxr-xr-x (755) - nginx가 디렉토리에 진입할 수 있어야 함
+
+# 4. Nginx 실행 사용자 확인
+ps aux | grep nginx
+# 일반적으로 www-data 또는 nginx
+```
+
+**해결 방법:**
+
+```bash
+# Case 1: 파일이 없는 경우
+cd ~/iitp-dabt-platform/source
+npm run deploy:server
+
+# Case 2: 파일 권한 문제
+# 옵션 A: nginx 사용자(www-data)에게 소유권 부여
+sudo chown -R www-data:www-data /var/www/iitp-dabt-platform/fe
+sudo chmod -R 755 /var/www/iitp-dabt-platform/fe
+
+# 옵션 B: iitp-plf 소유로 유지하되 읽기 권한 부여 (권장)
+sudo chmod -R 755 /var/www/iitp-dabt-platform/fe
+sudo chown -R iitp-plf:iitp-plf /var/www/iitp-dabt-platform/fe
+
+# Case 3: 상위 디렉토리 실행 권한 없음
+sudo chmod 755 /var/www/iitp-dabt-platform/
+sudo chmod 755 /var/www/
+
+# Case 4: SELinux 차단 (RHEL/CentOS/Rocky Linux)
+getenforce  # Enforcing이면 SELinux 활성화
+sudo chcon -R -t httpd_sys_content_t /var/www/iitp-dabt-platform/fe/
+# 또는 영구적으로 비활성화 (보안상 비권장)
+# sudo setenforce 0
+
+# 5. Nginx 재시작
+sudo systemctl restart nginx
+
+# 6. 접속 재시도
+curl -I http://localhost/
+# 기대: HTTP/1.1 200 OK
+
+# 7. 여전히 403이면 Nginx 에러 로그 재확인
+sudo tail -20 /var/log/nginx/error.log
+```
+
 #### Frontend 404 에러
+
+**증상**: 특정 페이지 접속 시 404 에러 (메인 페이지는 정상)
+
 ```bash
 # Nginx 설정 확인
 sudo nginx -t
 
+# SPA fallback 설정 확인
+sudo cat /etc/nginx/conf.d/iitp-dabt-platform.conf | grep "try_files"
+# 기대: try_files $uri $uri/ /index.html;
+
+# root 경로 확인
+sudo cat /etc/nginx/conf.d/iitp-dabt-platform.conf | grep "root"
+# 기대: root /var/www/iitp-dabt-platform/fe/dist;
+
 # index.html 존재 확인
-ls -la /var/www/iitp-dabt-platform/fe/index.html
+ls -la /var/www/iitp-dabt-platform/fe/dist/index.html
 
 # Nginx 재시작
 sudo systemctl restart nginx

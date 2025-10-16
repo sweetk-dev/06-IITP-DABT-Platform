@@ -122,7 +122,14 @@ function showBuildSummary() {
 async function copyBeToDeploy() {
   console.log('📁 Backend 배포 폴더로 복사 중...');
   const deployBePath = path.join(config.deployPath, 'backend');
-  if (!fs.existsSync(deployBePath)) fs.mkdirSync(deployBePath, { recursive: true });
+  
+  // 기존 deploy/backend 폴더 삭제 (깨끗한 빌드 보장)
+  if (fs.existsSync(deployBePath)) {
+    console.log('   🗑️  기존 deploy/backend 삭제 중...');
+    await run('rm', ['-rf', deployBePath], undefined);
+  }
+  
+  fs.mkdirSync(deployBePath, { recursive: true });
   const beDist = path.join(config.sourcePath, 'be/dist');
   const bePkgJson = path.join(config.sourcePath, 'be/package.json');
   const bePkgLock = path.join(config.sourcePath, 'be/package-lock.json');
