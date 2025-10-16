@@ -850,11 +850,11 @@ pm2 start dist/server.js --name iitp-dabt-plf-be
 
 ### 1.8 Nginx 설정 (루트 경로)
 
-#### Step 1: Nginx 설정 파일 생성 (sites-available)
+#### Step 1: Nginx 설정 파일 생성
 
 ```bash
-# sites-available에 설정 파일 생성 (Ubuntu/Debian 표준 방식)
-sudo vi /etc/nginx/sites-available/iitp-dabt-platform
+# conf.d에 설정 파일 생성 (.conf 확장자 필수)
+sudo vi /etc/nginx/conf.d/iitp-dabt-platform.conf
 ```
 
 내용:
@@ -914,22 +914,14 @@ server {
 }
 ```
 
-#### Step 2: 심볼릭 링크 생성 및 활성화
+#### Step 2: 설정 검증 및 적용
 
 ```bash
-# 기존 default 설정 비활성화 (중복 방지)
+# 기존 default 설정과 충돌 확인
+sudo nginx -t
+# 만약 "conflicting server name" 또는 "duplicate default server" 에러 발생 시:
 sudo rm -f /etc/nginx/sites-enabled/default
 
-# sites-enabled에 심볼릭 링크 생성 (서버 재부팅 후에도 유지됨)
-sudo ln -s /etc/nginx/sites-available/iitp-dabt-platform /etc/nginx/sites-enabled/
-
-# 심볼릭 링크 확인
-ls -la /etc/nginx/sites-enabled/
-```
-
-#### Step 3: 설정 검증 및 적용
-
-```bash
 # 설정 파일 문법 테스트
 sudo nginx -t
 
@@ -944,10 +936,15 @@ sudo systemctl is-enabled nginx
 # → enabled 출력되어야 함
 ```
 
-> 💡 **sites-available vs conf.d 차이**:
-> - `sites-available/`: 설정 파일 저장소 (비활성 상태)
-> - `sites-enabled/`: 활성화된 설정 (심볼릭 링크)
-> - 재부팅 후에도 심볼릭 링크가 유지되어 자동으로 적용됩니다
+> 💡 **conf.d 방식의 장점**:
+> - 파일 생성만으로 자동 적용 (심볼릭 링크 불필요)
+> - `/etc/nginx/nginx.conf`에서 `include /etc/nginx/conf.d/*.conf;`로 자동 로드
+> - 재부팅 후에도 자동으로 유지됨
+>
+> ⚠️ **sites-enabled/default 제거 이유**:
+> - Nginx는 `conf.d/*.conf`와 `sites-enabled/*` **둘 다** 로드합니다
+> - 기본 설치 시 `sites-enabled/default`도 `listen 80 default_server;`를 사용합니다
+> - 우리 설정과 충돌하므로 제거 필요합니다
 
 ### 1.9 서비스 시작 및 자동 시작 설정
 

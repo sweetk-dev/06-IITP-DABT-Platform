@@ -402,11 +402,11 @@ mkdir -p logs
 
 ```bash
 # 기존 Nginx 설정 확인
-sudo cat /etc/nginx/sites-available/*
+sudo cat /etc/nginx/conf.d/*.conf
 
 # 기존 설정 파일 편집 (Admin 설정이 있는 경우)
-# 또는 새 통합 설정 파일 생성 (sites-available)
-sudo vi /etc/nginx/sites-available/iitp-services
+# 또는 새 통합 설정 파일 생성
+sudo vi /etc/nginx/conf.d/iitp-services.conf
 ```
 
 내용 (Admin + Platform 통합):
@@ -555,22 +555,14 @@ server {
 }
 ```
 
-#### Step 2: 심볼릭 링크 생성 및 활성화
+#### Step 2: 설정 검증 및 적용
 
 ```bash
-# 기존 default 설정 비활성화 (필요 시)
+# 기존 default 설정과 충돌 확인
+sudo nginx -t
+# 만약 "conflicting server name" 또는 "duplicate default server" 에러 발생 시:
 sudo rm -f /etc/nginx/sites-enabled/default
 
-# sites-enabled에 심볼릭 링크 생성 (서버 재부팅 후에도 유지됨)
-sudo ln -s /etc/nginx/sites-available/iitp-services /etc/nginx/sites-enabled/
-
-# 심볼릭 링크 확인
-ls -la /etc/nginx/sites-enabled/
-```
-
-#### Step 3: 설정 검증 및 적용
-
-```bash
 # 설정 파일 문법 테스트
 sudo nginx -t
 
@@ -587,6 +579,16 @@ sudo systemctl is-enabled nginx
 # Admin 서비스 정상 동작 확인
 curl -I http://localhost/adm/
 ```
+
+> 💡 **conf.d 방식의 장점**:
+> - 파일 생성만으로 자동 적용 (심볼릭 링크 불필요)
+> - `/etc/nginx/nginx.conf`에서 `include /etc/nginx/conf.d/*.conf;`로 자동 로드
+> - 재부팅 후에도 자동으로 유지됨
+>
+> ⚠️ **sites-enabled/default 제거 이유**:
+> - Nginx는 `conf.d/*.conf`와 `sites-enabled/*` **둘 다** 로드합니다
+> - 기본 설치 시 `sites-enabled/default`도 `listen 80 default_server;`를 사용합니다
+> - 우리 설정과 충돌하므로 제거 필요합니다 (Admin이 이미 제거했다면 불필요)
 
 ### 1.9 서비스 시작 및 자동 시작 설정
 
