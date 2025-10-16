@@ -265,13 +265,13 @@ export async function getDataPreview(req: Request, res: Response): Promise<void>
   try {
     // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
     const { id } = req.convertedParams || req.params;
-    const { page, pageSize } = req.query;
+    const { limit, offset } = req.query;
     
-    logger.debug('데이터 미리보기 조회 요청 처리 시작', { id, page, pageSize });
+    logger.debug('데이터 미리보기 조회 요청 처리 시작', { id, limit, offset });
     
     const result = await dataService.getDataPreview(id, {
-      limit: pageSize ? Number(pageSize) : undefined,
-      offset: page ? Number(page) * (pageSize ? Number(pageSize) : 10) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
     });
     
     createSuccessResponse(res, result, 200);

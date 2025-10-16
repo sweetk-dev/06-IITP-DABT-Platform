@@ -30,12 +30,17 @@ class OpenApiClient {
           baseURL: config.baseURL,
         });
 
-        // 인증 헤더 추가
-        if (env.OPEN_API_AUTH_KEY) {
+        // 인증 헤더 추가 (동적 헤더 이름 지원)
+        if (env.OPEN_API_AUTH_HEADER && env.OPEN_API_AUTH_KEY) {
+          // OPEN_API_AUTH_HEADER에 지정된 헤더 이름으로 설정
+          config.headers[env.OPEN_API_AUTH_HEADER] = env.OPEN_API_AUTH_KEY;
+          logger.debug('OpenAPI 인증 헤더 추가', { 
+            header: env.OPEN_API_AUTH_HEADER 
+          });
+        } else if (env.OPEN_API_AUTH_KEY) {
+          // 하위 호환: HEADER 미지정 시 기본값 사용
           config.headers['X-API-Key'] = env.OPEN_API_AUTH_KEY;
-        }
-        if (env.OPEN_API_AUTH_SECRET) {
-          config.headers['X-API-Secret'] = env.OPEN_API_AUTH_SECRET;
+          logger.debug('OpenAPI 인증 헤더 추가 (기본값)', { header: 'X-API-Key' });
         }
 
         return config;
@@ -68,16 +73,19 @@ class OpenApiClient {
     );
   }
 
-  // URL에서 페이지 크기 치환
-  private replacePageSize(url: string): string {
-    return url.replace(/\{\{P_SIZE\}\}/g, env.OPEN_API_PAGE_SIZE.toString());
+  // URL에서 템플릿 변수 치환
+  private replaceTemplateVars(url: string, pageSize?: number): string {
+    // {{P_SIZE}} 치환: query.limit 우선, 없으면 env.OPEN_API_PAGE_SIZE 사용
+    const size = pageSize || env.OPEN_API_PAGE_SIZE;
+    return url.replace(/\{\{P_SIZE\}\}/g, size.toString());
   }
 
-  // GET 요청
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  // GET 요청 (pageSize 파라미터 지원)
+  async get<T = any>(url: string, config?: AxiosRequestConfig & { pageSize?: number }): Promise<T> {
     try {
-      const processedUrl = this.replacePageSize(url);
-      const response: AxiosResponse<T> = await this.client.get(processedUrl, config);
+      const { pageSize, ...axiosConfig } = config || {};
+      const processedUrl = this.replaceTemplateVars(url, pageSize);
+      const response: AxiosResponse<T> = await this.client.get(processedUrl, axiosConfig);
       return response.data;
     } catch (error) {
       logger.error('OpenAPI GET 요청 실패', { url, error });
@@ -86,10 +94,11 @@ class OpenApiClient {
   }
 
   // POST 요청
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig & { pageSize?: number }): Promise<T> {
     try {
-      const processedUrl = this.replacePageSize(url);
-      const response: AxiosResponse<T> = await this.client.post(processedUrl, data, config);
+      const { pageSize, ...axiosConfig } = config || {};
+      const processedUrl = this.replaceTemplateVars(url, pageSize);
+      const response: AxiosResponse<T> = await this.client.post(processedUrl, data, axiosConfig);
       return response.data;
     } catch (error) {
       logger.error('OpenAPI POST 요청 실패', { url, data, error });
@@ -98,10 +107,11 @@ class OpenApiClient {
   }
 
   // PUT 요청
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig & { pageSize?: number }): Promise<T> {
     try {
-      const processedUrl = this.replacePageSize(url);
-      const response: AxiosResponse<T> = await this.client.put(processedUrl, data, config);
+      const { pageSize, ...axiosConfig } = config || {};
+      const processedUrl = this.replaceTemplateVars(url, pageSize);
+      const response: AxiosResponse<T> = await this.client.put(processedUrl, data, axiosConfig);
       return response.data;
     } catch (error) {
       logger.error('OpenAPI PUT 요청 실패', { url, data, error });
@@ -110,10 +120,11 @@ class OpenApiClient {
   }
 
   // DELETE 요청
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T = any>(url: string, config?: AxiosRequestConfig & { pageSize?: number }): Promise<T> {
     try {
-      const processedUrl = this.replacePageSize(url);
-      const response: AxiosResponse<T> = await this.client.delete(processedUrl, config);
+      const { pageSize, ...axiosConfig } = config || {};
+      const processedUrl = this.replaceTemplateVars(url, pageSize);
+      const response: AxiosResponse<T> = await this.client.delete(processedUrl, axiosConfig);
       return response.data;
     } catch (error) {
       logger.error('OpenAPI DELETE 요청 실패', { url, error });
@@ -185,14 +196,27 @@ class OpenApiService {
       
       const startTime = Date.now();
       
-      // OpenAPI URL 호출
-      const data = await this.client.get(openApiUrl, {
-        params: query,
+      // URL에 이미 query string이 포함되어 있고 {{P_SIZE}} 템플릿이 있음
+      // query.limit이 있으면 {{P_SIZE}}를 query.limit으로 치환
+      // 없으면 env.OPEN_API_PAGE_SIZE로 치환 (client.get에서 자동 처리)
+      const pageSize = query?.limit || undefined;
+      
+      logger.debug('OpenAPI URL 치환', { 
+        originalUrl: openApiUrl, 
+        pageSize: pageSize || env.OPEN_API_PAGE_SIZE,
+        query 
       });
+      
+      // OpenAPI URL 호출
+      // - baseURL + openApiUrl 자동 합쳐짐
+      // - {{P_SIZE}} 치환됨 (pageSize 파라미터 사용)
+      // - URL에 이미 query string이 있으므로 추가 params 전달하지 않음
+      const data = await this.client.get(openApiUrl, { pageSize });
       
       const duration = Date.now() - startTime;
       logger.info('OpenAPI 데이터 미리보기 조회 완료', {
         openApiUrl,
+        pageSize,
         duration: `${duration}ms`,
       });
       

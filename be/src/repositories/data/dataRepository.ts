@@ -20,6 +20,7 @@ import { BaseRepository } from '../base/BaseRepository';
 import { DataSummaryInfo } from '../../models/data/DataSummaryInfo';
 import { SelfDiagDataCategory } from '../../models/data/SelfDiagDataCategory';
 import { logger } from '../../config/logger';
+import { openApiService } from '../../services/openapi';
 import { getSequelize } from '../../config/database';
 import { Op } from 'sequelize';
 
@@ -450,7 +451,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
     try {
       logger.debug('데이터 Repository - 데이터 미리보기 조회', { id, query });
       
-      // 데이터 상세 정보 조회
+      // 데이터 상세 정보 조회 (open_api_url 필요)
       const item = await this.findOne({
         where: {
           data_id: id,
@@ -464,16 +465,14 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         throw new Error('데이터를 찾을 수 없습니다.');
       }
 
-      // OpenAPI 호출은 별도 서비스에서 처리
-      // 여기서는 기본 응답 구조만 반환
-      return {
-        data: [],
-        meta: {
-          totalItems: 0,
-          page: query.page || 0,
-          pageSize: query.pageSize || 20,
-        },
-      };
+      if (!item.open_api_url) {
+        throw new Error('OpenAPI URL이 설정되지 않았습니다.');
+      }
+
+      // OpenAPI 서비스를 통해 실제 데이터 조회
+      const result = await openApiService.getDataPreview(item.open_api_url, query);
+      
+      return result;
     } catch (error) {
       logger.error('데이터 Repository - 데이터 미리보기 조회 오류', { error });
       throw error;

@@ -25,8 +25,9 @@ const envSchema = z.object({
   
   // OpenAPI 서버 설정
   OPEN_API_SERVER_URL: z.string().default('https://api.example.com'),
-  OPEN_API_AUTH_KEY: z.string().optional(),
-  OPEN_API_AUTH_SECRET: z.string().optional(),
+  OPEN_API_AUTH_HEADER: z.string().optional(), // 인증 헤더 이름 (예: Authorization, X-API-Key)
+  OPEN_API_AUTH_KEY: z.string().optional(),    // 인증 키 값
+  OPEN_API_AUTH_SECRET: z.string().optional(), // (사용되지 않음, 하위 호환용)
   OPEN_API_PAGE_SIZE: z.string().transform(Number).default('100'),
   OPEN_API_TIMEOUT: z.string().transform(Number).default('30000'),
   
