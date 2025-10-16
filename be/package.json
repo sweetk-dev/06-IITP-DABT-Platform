@@ -2,7 +2,6 @@
   "name": "iitp-dabt-platform-be",
   "version": "1.0.0",
   "description": "IITP 장애인 데이터 플랫폼 Backend - 완벽한 모듈화",
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

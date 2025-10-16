@@ -2,6 +2,14 @@
 
 본 문서는 **Platform 서비스만 단독으로 설치**하는 경우의 완전한 가이드입니다.
 
+> **👤 실행 계정 안내**
+> 
+> 작업 단계마다 필요한 계정이 다릅니다:
+> - **`root` 또는 sudo 권한 계정**: 시스템 설정 (Node.js, Nginx, PostgreSQL, 계정 생성)
+> - **`iitp-plf` (운영 계정)**: 빌드, 배포, 서비스 시작 등 일상 작업
+> 
+> 각 섹션 상단에 👤 **실행 계정** 표시가 있습니다. 확인하고 진행하세요!
+
 > **📌 배포 경로 설정**
 > 
 > 이 가이드는 **Platform 단독 설치** 기준입니다 (서비스 경로: `/`)
@@ -216,6 +224,8 @@ graph TB
 
 ### 1.0 서버 기본 세팅
 
+> 👤 **실행 계정**: `root` 또는 sudo 권한이 있는 계정
+
 ```bash
 # Ubuntu 20.04+ 기준
 sudo apt update && sudo apt upgrade -y
@@ -371,6 +381,8 @@ sudo nginx -t
 
 ### 1.1 운영 계정 및 디렉토리 구조 생성
 
+> 👤 **실행 계정**: `root` 또는 sudo 권한이 있는 계정
+
 ```bash
 # iitp-plf 사용자 생성 , 이미 서비스 계정이 있으면 스킵
 sudo useradd -m -s /bin/bash iitp-plf
@@ -430,8 +442,10 @@ sudo systemctl restart postgresql
 
 ### 1.3 프로젝트 클론 및 초기 설정
 
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
+
 ```bash
-# iitp-plf 사용자로 전환
+# iitp-plf 사용자로 전환 (root 또는 sudo 권한 계정에서)
 sudo -iu iitp-plf
 
 # Git에서 소스 다운로드
@@ -453,6 +467,8 @@ ls -la fe/node_modules/
 ```
 
 ### 1.4 환경변수 설정
+
+> 👤 **실행 계정**: `root` 또는 sudo 권한이 있는 계정 (서버 디렉토리 접근용)
 
 #### 1.4.1 Backend 환경변수 (실행 서버용)
 
@@ -584,6 +600,8 @@ NPM_CONFIG_PRODUCTION=true
 
 ### 1.5 빌드
 
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
+
 #### 1.5.1 전체 빌드 (기본, 권장)
 
 ```bash
@@ -659,6 +677,8 @@ ls -la /home/iitp-plf/iitp-dabt-platform/deploy/frontend/
 | 전체 수정 | `build:server` | 안전한 방법 |
 
 ### 1.6 배포 (단일 서버)
+
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
 
 #### 1.6.1 전체 배포 (기본, 권장) ⭐
 
@@ -850,6 +870,8 @@ pm2 start dist/server.js --name iitp-dabt-plf-be
 
 ### 1.8 Nginx 설정 (루트 경로)
 
+> 👤 **실행 계정**: `root` 또는 sudo 권한이 있는 계정
+
 #### Step 1: Nginx 설정 파일 생성
 
 ```bash
@@ -972,6 +994,8 @@ sudo systemctl is-enabled nginx
 
 ### 1.9 서비스 시작 및 자동 시작 설정
 
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
+
 #### Backend 시작 (PM2)
 
 **Step 1: PM2로 Backend 시작**
@@ -1034,6 +1058,8 @@ curl -I http://localhost/
 ```
 
 ### 1.10 검증
+
+> 👤 **실행 계정**: `iitp-plf` (운영 계정) 또는 모든 계정
 
 #### 기본 검증
 
@@ -1414,6 +1440,8 @@ mkdir -p logs
 ## 3. 업데이트 배포 (일상 운영)
 
 > **전제조건**: 섹션 1 또는 2의 초기 설치가 완료된 상태
+> 
+> 👤 **실행 계정**: `iitp-plf` (운영 계정)
 
 ### 3.1 사전 확인 및 백업
 
@@ -1538,6 +1566,11 @@ npm run deploy:server:common  # Common만 (섹션 1.6.2 참조)
 ```
 
 ### 3.6 서비스 재시작
+
+> ⚠️ **전제 조건**: 
+> - **PM2 자동 시작이 이미 설정되어 있어야 합니다** (초기 설치 시 설정됨)
+> - 설정 확인: `sudo systemctl status pm2-iitp-plf`
+> - 미설정 시: [섹션 1.9 Step 2](#19-서비스-시작-및-자동-시작-설정) 참조하여 `pm2 startup` + `pm2 save` 실행
 
 #### 전체 재시작 (권장)
 
