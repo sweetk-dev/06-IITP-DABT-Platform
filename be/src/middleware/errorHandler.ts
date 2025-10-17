@@ -35,15 +35,35 @@ export function createError(
 }
 
 // 에러 응답 생성 함수
-export function createErrorResponse(error: ApiError): ErrorResponse {
+export function createErrorResponse(error: ApiError, includeStack: boolean = false): ErrorResponse {
   const errorMeta = ErrorMetaMap[error.code || ErrorCode.UNKNOWN_ERROR];
+  
+  // OpenAPI 에러인 경우 정제된 메시지만 추출
+  let clientMessage = error.message || errorMeta?.message || '알 수 없는 오류가 발생했습니다.';
+  let clientDetails: any = undefined;
+  
+  // OpenAPI 에러가 있는 경우 (error.openApiError)
+  if ((error as any).openApiError) {
+    const openApiError = (error as any).openApiError;
+    // ErrInfoDto 구조에서 안전하게 추출
+    if (openApiError.error) {
+      clientMessage = openApiError.error.message || clientMessage;
+      // details는 민감한 정보 제외 (code만 전달)
+      clientDetails = { code: openApiError.error.code };
+    }
+  }
+  
+  // 개발 모드에서만 stack 포함 (선택적)
+  if (includeStack && clientDetails) {
+    clientDetails.stack = error.stack;
+  }
   
   return {
     success: false,
     error: {
       code: (error.code || ErrorCode.UNKNOWN_ERROR).toString(),
-      message: error.details?.message || error.message || errorMeta?.message || '알 수 없는 오류가 발생했습니다.',
-      details: error.details,
+      message: clientMessage,
+      details: clientDetails,  // stack 등 민감 정보 제외 (프로덕션)
     },
   };
 }
@@ -60,14 +80,15 @@ export function errorHandler(
     return next(error);
   }
 
-  // 에러 로깅
+  // 에러 로깅 (stack은 로그에만 남김, 클라이언트에는 전달 안 함)
   logger.error('API 요청 처리 중 오류 발생', {
     method: req.method,
     url: req.originalUrl,
     error: error.message,
-    stack: error.stack,
+    stack: error.stack,  // ← 로그에만 남김
     code: error.code,
     statusCode: error.statusCode,
+    openApiError: (error as any).openApiError,  // OpenAPI 원본 에러
     userAgent: req.get('User-Agent'),
     ip: req.ip,
   });
@@ -75,8 +96,8 @@ export function errorHandler(
   // 기본 상태 코드 설정
   const statusCode = error.statusCode || 500;
   
-  // 에러 응답 생성
-  const errorResponse = createErrorResponse(error);
+  // 에러 응답 생성 (stack 제외, 정제된 메시지만)
+  const errorResponse = createErrorResponse(error, false);
 
   // 응답 전송
   res.status(statusCode).json(errorResponse);

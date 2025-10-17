@@ -1,6 +1,6 @@
 // 요청/응답 로깅 미들웨어 - 완벽한 모듈화
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../config/logger';
+import { logger, accessLogger } from '../config/logger';
 import { env } from '../config/env';
 
 // 요청 로깅 미들웨어
@@ -16,10 +16,8 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     method: req.method,
     url: req.originalUrl,
     query: req.query,
-    body: req.method !== 'GET' ? req.body : undefined,
     userAgent: req.get('User-Agent'),
     ip: req.ip,
-    timestamp: new Date().toISOString(),
   });
 
   // 응답 완료 시 로그
@@ -35,7 +33,17 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     const responseLog = `[ACCESS] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${responseTime}ms`;
     console.log(`${statusColor}${responseLog}\x1b[0m`);
     
-    // 응답 완료 로그
+    // Access 로그 파일에 기록 (access_yyyy-mm-dd.log)
+    accessLogger.info('API Access', {
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: res.statusCode,
+      responseTime: `${responseTime}ms`,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip,
+    });
+    
+    // 응답 완료 로그 (app_yyyy-mm-dd.log)
     logger.info('API 요청 완료', {
       method: req.method,
       url: req.originalUrl,
@@ -43,7 +51,6 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
       responseTime: `${responseTime}ms`,
       userAgent: req.get('User-Agent'),
       ip: req.ip,
-      timestamp: new Date().toISOString(),
     });
 
     // 성능 메트릭 로그 (느린 요청)
@@ -67,14 +74,28 @@ export function errorLogger(
   res: Response,
   next: NextFunction
 ): void {
+  const statusCode = (error as any).statusCode || 500;
+  
+  // Access 로그 파일에도 에러 기록
+  accessLogger.error('API Error', {
+    method: req.method,
+    url: req.originalUrl,
+    statusCode,
+    error: error.message,
+    userAgent: req.get('User-Agent'),
+    ip: req.ip,
+  });
+  
+  // App 로그에 상세 에러 기록
   logger.error('API 요청 처리 중 오류 발생', {
     method: req.method,
     url: req.originalUrl,
     error: error.message,
     stack: error.stack,
+    statusCode: statusCode,
+    openApiError: (error as any).openApiError,
     userAgent: req.get('User-Agent'),
     ip: req.ip,
-    timestamp: new Date().toISOString(),
   });
 
   next(error);
