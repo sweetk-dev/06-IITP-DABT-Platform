@@ -250,20 +250,108 @@ class OpenApiService {
       // OpenAPI URL 호출
       // - {{P_SIZE}} 템플릿이 있으면 → pageSize로 치환
       // - 템플릿이 없으면 → DB URL 그대로 사용 (params 추가 안 함)
-      const data = await this.client.get(openApiUrl, { 
+      const rawData = await this.client.get(openApiUrl, { 
         pageSize,  // {{P_SIZE}} 치환용 (템플릿 없으면 치환 안 됨)
       });
       
       const duration = Date.now() - startTime;
       
+      // OpenAPI 응답 unwrap: { success: true, data: {...}, status: "OK" } → data 추출
+      const data = rawData?.data || rawData;
+      
+      // OpenAPI 응답 구조 파악
+      // 1) { content: [...] } → content 배열
+      // 2) { items: [...] } → items 배열
+      // 3) [...] → 직접 배열
+      const hasContentArray = data?.content && Array.isArray(data.content);
+      const hasItemsArray = data?.items && Array.isArray(data.items);
+      
+      // OpenAPI 응답 데이터 크기 확인
+      const originalSize = Array.isArray(data) 
+        ? data.length 
+        : (hasContentArray ? data.content.length : (hasItemsArray ? data.items.length : 'N/A'));
+      
+      // limit 처리: OpenAPI가 템플릿을 지원하지 않아서 많은 데이터를 반환한 경우
+      // 1) FE가 limit 보냈으면 그만큼 자르기
+      // 2) FE가 limit 안 보냈으면 env.OPEN_API_PAGE_SIZE 만큼 자르기
+      // 3) items 구조인 경우: 템플릿 여부와 무관하게 항상 limit 적용 (limit < 20이면 +20)
+      
+      // pageSize = query?.limit || env.OPEN_API_PAGE_SIZE (이미 계산됨)
+      let requestedLimit = pageSize;
+      
+      // items 구조인 경우: limit < 20이면 +20 (템플릿 여부 무관)
+      if (hasItemsArray && requestedLimit < 20) {
+        requestedLimit = 20;
+        logger.info('OpenAPI items 구조 감지: limit 자동 증가', {
+          originalLimit: pageSize,
+          adjustedLimit: requestedLimit,
+        });
+      }
+      
+      let limitedData = data;
+      
+      // items 구조는 템플릿 여부와 무관하게 항상 BE에서 limit 적용
+      if (hasItemsArray) {
+        limitedData = data.items.slice(0, requestedLimit);
+        logger.debug('items 구조 limit 적용', {
+          hasTemplate,
+          requestedLimit,
+          originalSize: data.items.length,
+          slicedSize: limitedData.length,
+        });
+      }
+      // content 구조 또는 직접 배열: 템플릿 없을 때만 BE에서 limit 적용
+      else if (!hasTemplate) {
+        // Case 1: 응답이 직접 배열 형식 [{}, {}, ...]
+        if (Array.isArray(data)) {
+          limitedData = data.slice(0, requestedLimit);
+        }
+        // Case 2: 응답이 PageRes 형식 { content: [], page: 1, size: 10, total: 100 }
+        // → content 배열만 잘라서 반환 (PageRes 구조 제거, content만 전달)
+        else if (hasContentArray) {
+          limitedData = data.content.slice(0, requestedLimit);
+        }
+      }
+      // 템플릿이 있고 content 구조인 경우: OpenAPI가 이미 limit 적용했으므로 content만 추출
+      else if (hasTemplate && hasContentArray) {
+        limitedData = data.content;
+      }
+      
+      // 최종 반환 데이터 검증: 배열이 아니면 빈 배열 반환
+      if (!Array.isArray(limitedData)) {
+        logger.warn('OpenAPI 응답이 배열이 아닙니다. 빈 배열을 반환합니다.', {
+          openApiUrl,
+          dataType: typeof limitedData,
+          hasContent: hasContentArray,
+          hasItems: hasItemsArray,
+        });
+        return [];
+      }
+      
+      const finalSize = limitedData.length;
+      
+      // OpenAPI 응답 구조 식별
+      const responseStructure = hasItemsArray ? 'items' : (hasContentArray ? 'content' : 'array');
+      
+      // limit 적용 여부 계산
+      // - items 구조: 항상 BE에서 limit 적용
+      // - content/array: 템플릿 없을 때만 BE에서 limit 적용
+      const limitApplied = hasItemsArray || (!hasTemplate && originalSize !== finalSize);
+      
       logger.info('OpenAPI 데이터 미리보기 조회 완료', {
         originalUrl: openApiUrl,
         finalUrl: replacedUrl,  // 치환된 URL (템플릿 없으면 원본과 동일)
         duration: `${duration}ms`,
-        dataSize: Array.isArray(data) ? data.length : (data?.content?.length || 'N/A'),
+        responseStructure,  // OpenAPI 응답 구조 (items/content/array)
+        hasTemplate,  // URL에 {{P_SIZE}} 템플릿 존재 여부
+        originalSize,  // OpenAPI에서 받은 원본 크기
+        finalSize,     // FE로 전달하는 최종 크기
+        limitApplied,  // limit 적용 여부
+        limitSource: query?.limit ? 'FE request' : 'BE default',  // limit 출처
+        limitValue: hasItemsArray && requestedLimit !== pageSize ? requestedLimit : pageSize,  // 실제 적용된 limit 값
       });
       
-      return data;
+      return limitedData;
     } catch (error) {
       logger.error('OpenAPI 데이터 미리보기 조회 실패', { 
         openApiUrl,

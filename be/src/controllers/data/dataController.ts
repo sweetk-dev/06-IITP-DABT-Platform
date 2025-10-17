@@ -264,13 +264,15 @@ export async function getDataDetail(req: Request, res: Response): Promise<void> 
 export async function getDataPreview(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.convertedParams || req.params;
-    const { limit, offset } = req.query;
+    
+    // Zod에서 이미 string → number 변환됨
+    const { limit, offset } = req.query as { limit?: number; offset?: number };
     
     logger.debug('데이터 미리보기 조회 요청', { id, limit, offset });
     
     const result = await dataService.getDataPreview(id, {
-      limit: limit ? Number(limit) : undefined,
-      offset: offset ? Number(offset) : undefined,
+      limit,
+      offset,
     });
     
     // OpenAPI 원본 응답 그대로 전달 (pass-through)

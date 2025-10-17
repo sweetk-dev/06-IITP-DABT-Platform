@@ -114,6 +114,12 @@ export const commonSchemas = {
     page: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.DEFAULT_PAGE)).optional(),
     pageSize: z.string().transform(Number).pipe(z.number().min(PAGINATION_CONSTANTS.MIN_PAGE_SIZE).max(PAGINATION_CONSTANTS.MAX_PAGE_SIZE)).optional(),
   }),
+
+  // 데이터 미리보기 쿼리
+  previewQuery: z.object({
+    limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional(),
+    offset: z.string().transform(Number).pipe(z.number().min(0)).optional(),
+  }),
 };
 
 // 검증 헬퍼 함수들

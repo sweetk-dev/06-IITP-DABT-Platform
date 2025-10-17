@@ -174,7 +174,7 @@ router.get(
   paramConverter, // 파라미터 변환 미들웨어 먼저 실행
   validateRequest({
     params: commonSchemas.idParam,
-    query: commonSchemas.paginationQuery.pick({ page: true, pageSize: true }).optional(),
+    query: commonSchemas.previewQuery,
   }),
   asyncHandler(dataController.getDataPreview)
 );
