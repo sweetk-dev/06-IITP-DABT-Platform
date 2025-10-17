@@ -181,6 +181,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_type',
           'self_rlty_type',
           'category',
+          'data_keywords',  // ✅ 추가
           'sys_tbl_id',
           'src_org_name',
           'src_latest_chn_dt',
@@ -195,6 +196,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           data_type: item.data_type as DataTypeCode,
           self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
+          data_keywords: item.data_keywords || undefined,  // ✅ 추가
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
@@ -275,6 +277,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_type',
           'self_rlty_type',
           'category',
+          'data_keywords',  // ✅ 추가
           'sys_tbl_id',
           'src_org_name',
           'src_latest_chn_dt',
@@ -289,6 +292,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           data_type: item.data_type as DataTypeCode,
           self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
+          data_keywords: item.data_keywords || undefined,  // ✅ 추가
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
@@ -362,6 +366,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'data_type',
           'self_rlty_type',
           'category',
+          'data_keywords',  // ✅ 추가
           'sys_tbl_id',
           'src_org_name',
           'src_latest_chn_dt',
@@ -376,6 +381,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           data_type: item.data_type as DataTypeCode,
           self_rlty_type: item.self_rlty_type as SelfRltyTypeCode | undefined,
           category: item.category || undefined,
+          data_keywords: item.data_keywords || undefined,  // ✅ 추가
           sys_tbl_id: item.sys_tbl_id,
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
