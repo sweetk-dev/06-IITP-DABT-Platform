@@ -20,7 +20,7 @@ import { BaseRepository } from '../base/BaseRepository';
 import { DataSummaryInfo } from '../../models/data/DataSummaryInfo';
 import { SelfDiagDataCategory } from '../../models/data/SelfDiagDataCategory';
 import { logger } from '../../config/logger';
-import { openApiService } from '../../services/openapi';
+import { openApiService } from '../../services/openapi/openApiService';
 import { getSequelize } from '../../config/database';
 import { Op } from 'sequelize';
 
@@ -449,7 +449,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
   // 데이터 미리보기 조회
   async getDataPreview(id: number, query: any): Promise<DataPreviewRes> {
     try {
-      logger.debug('데이터 Repository - 데이터 미리보기 조회', { id, query });
+      logger.debug('데이터 Repository - 데이터 미리보기 조회 시작', { id, query });
       
       // 데이터 상세 정보 조회 (open_api_url 필요)
       const item = await this.findOne({
@@ -458,23 +458,47 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           status: 'A',
           del_yn: 'N',
         },
-        attributes: ['open_api_url'],
+        attributes: ['data_id', 'title', 'open_api_url'],  // title도 로깅용으로 조회
       });
 
       if (!item) {
-        throw new Error('데이터를 찾을 수 없습니다.');
+        const notFoundError = new Error('데이터를 찾을 수 없습니다.') as any;
+        notFoundError.statusCode = 404;
+        throw notFoundError;
       }
 
       if (!item.open_api_url) {
-        throw new Error('OpenAPI URL이 설정되지 않았습니다.');
+        logger.warn('OpenAPI URL이 DB에 설정되지 않음', { 
+          data_id: item.data_id, 
+          title: item.title 
+        });
+        const configError = new Error('OpenAPI URL이 설정되지 않았습니다.') as any;
+        configError.statusCode = 500;
+        throw configError;
       }
+
+      // DB에서 조회한 URL 로깅
+      logger.info('DB에서 OpenAPI URL 조회 완료', {
+        data_id: item.data_id,
+        title: item.title,
+        open_api_url: item.open_api_url,  // ← DB 원본 URL
+        hasTemplate: item.open_api_url.includes('{{P_SIZE}}'),
+        query
+      });
 
       // OpenAPI 서비스를 통해 실제 데이터 조회
       const result = await openApiService.getDataPreview(item.open_api_url, query);
       
       return result;
     } catch (error) {
-      logger.error('데이터 Repository - 데이터 미리보기 조회 오류', { error });
+      // OpenAPI 에러는 그대로 전달 (statusCode, openApiError 보존)
+      // DB 조회 에러만 로깅 추가
+      if (!(error as any).openApiError) {
+        logger.error('데이터 Repository - 데이터 미리보기 조회 오류', { 
+          id, 
+          error: error instanceof Error ? error.message : String(error) 
+        });
+      }
       throw error;
     }
   }

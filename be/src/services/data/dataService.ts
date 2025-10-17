@@ -360,23 +360,22 @@ export async function getDataDetail(id: number): Promise<DataDetailRes> {
 
 // 데이터 미리보기 조회 서비스
 export async function getDataPreview(id: number, query: DataPreviewQuery = {}): Promise<DataPreviewRes> {
+  const startTime = Date.now();
+  
   try {
     logger.debug('데이터 미리보기 조회 서비스 실행', { id, query });
-    
-    const startTime = Date.now();
     
     // 데이터 미리보기 조회
     const result = await dataRepository.getDataPreview(id, query);
     
     const duration = Date.now() - startTime;
-    logger.info('데이터 미리보기 조회 서비스 완료', { 
-      id, 
-      duration: `${duration}ms` 
-    });
+    logger.info('데이터 미리보기 조회 완료', { id, duration: `${duration}ms` });
     
     return result;
   } catch (error) {
-    logger.error('데이터 미리보기 조회 서비스 오류', { error });
+    // 에러는 Repository/OpenAPI에서 이미 로깅됨, 그대로 전달
+    const duration = Date.now() - startTime;
+    logger.debug('데이터 미리보기 조회 실패', { id, duration: `${duration}ms` });
     throw error;
   }
 }

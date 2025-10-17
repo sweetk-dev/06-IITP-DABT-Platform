@@ -263,22 +263,21 @@ export async function getDataDetail(req: Request, res: Response): Promise<void> 
 // 데이터 미리보기 조회 컨트롤러
 export async function getDataPreview(req: Request, res: Response): Promise<void> {
   try {
-    // paramConverter에서 변환된 파라미터 사용 (타입 안전성 보장)
     const { id } = req.convertedParams || req.params;
     const { limit, offset } = req.query;
     
-    logger.debug('데이터 미리보기 조회 요청 처리 시작', { id, limit, offset });
+    logger.debug('데이터 미리보기 조회 요청', { id, limit, offset });
     
     const result = await dataService.getDataPreview(id, {
       limit: limit ? Number(limit) : undefined,
       offset: offset ? Number(offset) : undefined,
     });
     
+    // OpenAPI 원본 응답 그대로 전달 (pass-through)
     createSuccessResponse(res, result, 200);
-    
-    logger.debug('데이터 미리보기 조회 요청 처리 완료', { result });
   } catch (error) {
-    logger.error('데이터 미리보기 조회 요청 처리 중 오류 발생', { error });
+    // 에러는 이미 하위 레이어에서 로깅됨
+    // errorHandler 미들웨어가 처리
     throw error;
   }
 }
