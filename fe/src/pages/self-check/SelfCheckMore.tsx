@@ -208,22 +208,13 @@ export function SelfCheckMore() {
   // Provider 메타 정보 렌더링
   const renderProviderMeta = (item: any, index: number) => (
     <DataMeta id={`self-check-more-row-${index + 1}-meta`}>
-      {item.service_name && (
-        <MetaItem
-          label="서비스명"
-          value={item.service_name}
-          labelId={`self-check-more-row-${index + 1}-meta-service-label`}
-          valueId={`self-check-more-row-${index + 1}-meta-service-value`}
-          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
-        />
-      )}
       {item.phone && (
         <MetaItem
           label="전화번호"
           value={item.phone}
           labelId={`self-check-more-row-${index + 1}-meta-phone-label`}
           valueId={`self-check-more-row-${index + 1}-meta-phone-value`}
-          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-1`}
         />
       )}
       {item.address && (
@@ -232,7 +223,7 @@ export function SelfCheckMore() {
           value={item.address}
           labelId={`self-check-more-row-${index + 1}-meta-address-label`}
           valueId={`self-check-more-row-${index + 1}-meta-address-value`}
-          separatorId={`self-check-more-row-${index + 1}-meta-separator-3`}
+          separatorId={`self-check-more-row-${index + 1}-meta-separator-2`}
         />
       )}
     </DataMeta>
@@ -303,9 +294,15 @@ export function SelfCheckMore() {
     </>
   );
 
-  // Provider 태그 렌더링 (현재 정의 없음)
+  // Provider 태그 렌더링
   const renderProviderTags = (item: any, index: number) => (
-    <></>
+    <>
+      {item.service_name && (
+        <Tag id={`self-check-more-row-${index + 1}-tag-service-name`}>
+          {item.service_name}
+        </Tag>
+      )}
+    </>
   );
 
   // Facility 태그 렌더링 (현재 정의 없음)
