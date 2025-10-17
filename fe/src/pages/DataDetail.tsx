@@ -5,7 +5,6 @@ import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
 import { Tag } from '../components/ui/Tag';
 import { Button } from '../components/ui/Button';
-import { Table, TableHeader, TableBody, TableRow, TableColumn } from '../components/ui/Table';
 import { useDataDetail, useDataPreview } from '../api/hooks';
 import { DATA_TYPE_CONSTANTS, THEME_CONSTANTS, type DataTypeCode, type ThemeCode, parseKeywords, formatDate } from '@iitp-dabt-platform/common';
 
@@ -389,24 +388,54 @@ export function DataDetail() {
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
             데이터 미리보기를 불러올 수 없습니다.
           </div>
-        ) : dataPreviewState.data ? (
-          <div className="data-table" style={{
+        ) : dataPreviewState.data && Array.isArray(dataPreviewState.data) && dataPreviewState.data.length > 0 ? (
+          <div style={{
             borderTop: '1.5px solid #252525',
-            overflow: 'hidden'
+            overflow: 'auto'
           }}>
-            <pre style={{
-              margin: 0,
-              padding: '20px',
-              background: 'white',
-              fontSize: '14px',
-              lineHeight: 1.6,
-              fontFamily: 'monospace',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-              color: 'black'
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              backgroundColor: 'white'
             }}>
-              {JSON.stringify(dataPreviewState.data, null, 2)}
-            </pre>
+              <thead>
+                <tr style={{
+                  backgroundColor: '#f8f9fa',
+                  borderBottom: '2px solid #dee2e6'
+                }}>
+                  {Object.keys(dataPreviewState.data[0]).map((key, index) => (
+                    <th key={index} style={{
+                      padding: '12px 16px',
+                      textAlign: 'left',
+                      fontWeight: '600',
+                      color: '#333',
+                      borderBottom: '1px solid #dee2e6',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {key}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {dataPreviewState.data.map((row: any, rowIndex: number) => (
+                  <tr key={rowIndex} style={{
+                    borderBottom: '1px solid #dee2e6',
+                    backgroundColor: rowIndex % 2 === 0 ? 'white' : '#f8f9fa'
+                  }}>
+                    {Object.values(row).map((value: any, colIndex: number) => (
+                      <td key={colIndex} style={{
+                        padding: '12px 16px',
+                        color: '#555',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {value !== null && value !== undefined ? String(value) : '-'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
