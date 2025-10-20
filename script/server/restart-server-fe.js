@@ -87,22 +87,22 @@ function run(cmd, args) {
   });
 }
 
-// Frontend 재시작 (Nginx reload)
+// Frontend 재시작 (Nginx restart)
 async function restartFrontend() {
-  console.log('🔄 Frontend 재시작 (Nginx reload) 중...');
+  console.log('🔄 Frontend 재시작 (Nginx restart) 중...');
   
   // 버전 정보 출력
   showVersionInfo();
   
   // Nginx 설정 테스트
   console.log('🧪 Nginx 설정 테스트 중...');
-  await run('nginx', ['-t']);
+  await run('sudo', ['nginx', '-t']);
   console.log('✅ Nginx 설정 테스트 통과');
   
-  // Nginx reload (무중단 재시작)
-  console.log('🔄 Nginx reload 중...');
-  await run('systemctl', ['reload', 'nginx']);
-  console.log('✅ Nginx reload 완료');
+  // Nginx 재시작 (sudo 포함)
+  console.log('🔄 Nginx 재시작 중...');
+  await run('sudo', ['systemctl', 'restart', 'nginx']);
+  console.log('✅ Nginx 재시작 완료');
 }
 
 // 메인 실행 함수
@@ -122,10 +122,10 @@ async function main() {
     console.log(`   서비스 경로: ${config.serviceRoot}`);
     console.log('');
     console.log('💡 유용한 명령어:');
-    console.log('   systemctl status nginx        # Nginx 상태 확인');
-    console.log('   nginx -t                      # Nginx 설정 테스트');
-    console.log('   tail -f /var/log/nginx/access.log # 접속 로그');
-    console.log('   tail -f /var/log/nginx/error.log  # 에러 로그');
+    console.log('   sudo systemctl status nginx        # Nginx 상태 확인');
+    console.log('   sudo nginx -t                      # Nginx 설정 테스트');
+    console.log('   sudo tail -f /var/log/nginx/access.log # 접속 로그');
+    console.log('   sudo tail -f /var/log/nginx/error.log  # 에러 로그');
     
   } catch (error) {
     console.error('❌ Frontend 재시작 실패:', error.message);
