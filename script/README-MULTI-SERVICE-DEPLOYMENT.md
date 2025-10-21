@@ -442,7 +442,7 @@ server {
     # [2] Mock 서버 프록시 (선택사항)
     # ========================
     location /mock/ {
-        proxy_pass http://192.168.60.142:4010;
+        proxy_pass http://192.168.60.142:4010/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection keep-alive;
