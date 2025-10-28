@@ -10,7 +10,7 @@
 > 
 > **Platform 단독 설치**는 [Platform 단독 설치 가이드](./README-SERVER-DEPLOYMENT.md) 참조
 >
-> **이 문서대로 순서대로 실행하면 기존 Admin 서비스에 영향 없이 Platform이 추가됩니다.**
+
 
 ## 📋 목차
 
@@ -1184,10 +1184,3 @@ tail -f /var/www/iitp-dabt-platform/be/logs/*.log &
 - [ ] Platform 버전 변경 확인
 
 ---
-
-**이 문서대로 순서대로 실행하면 Admin 서비스에 영향 없이 Platform이 안전하게 설치/운영됩니다!** 🎉
-
-문제 발생 시: [Issues](https://github.com/sweetk-dev/06-IITP-DABT-Platform/issues)
-
-**IITP DABT Platform Team** © 2025
-

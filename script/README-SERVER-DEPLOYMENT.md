@@ -1,6 +1,6 @@
 # 🚀 IITP DABT Platform 단독 설치 가이드 (Standalone Deployment)
 
-본 문서는 **Platform 서비스만 단독으로 설치**하는 경우의 완전한 가이드입니다.
+본 문서는 **Platform 서비스만 단독으로 설치**하는 경우의 가이드입니다.
 
 > **👤 실행 계정 안내**
 > 
@@ -20,7 +20,6 @@
 > - Nginx: `location /` → `location /hub/`, `location /api/` → `location /hub/api/`
 > - 예시: [복합 서비스 설치 가이드](./README-MULTI-SERVICE-DEPLOYMENT.md) 참조
 >
-> **이 문서대로 순서대로 실행하면 빌드 → 배포 → 실행 동작합니다.**
 
 ## 📋 목차
 
@@ -1977,10 +1976,4 @@ npm run build:server:fe
 - [ ] Frontend 정상 접속
 
 ---
-
-**이 문서대로 순서대로 실행하면 Platform 단독 설치가 완벽히 동작합니다!** 🎉
-
-문제 발생 시: [Issues](https://github.com/sweetk-dev/06-IITP-DABT-Platform/issues)
-
-**IITP DABT Platform Team** © 2025
 
