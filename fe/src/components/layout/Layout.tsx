@@ -143,7 +143,7 @@ export function Layout({
             fontWeight: 400,
             wordWrap: 'break-word'
           }}>
-            © 2025 IITP DABT. All rights reserved.
+            © 2025 DABT. All rights reserved.
           </div>
           <div id={`${idPrefix}-footer-description`} style={{
             alignSelf: 'stretch',
