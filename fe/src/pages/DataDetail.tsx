@@ -388,56 +388,81 @@ export function DataDetail() {
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-danger)' }}>
             데이터 미리보기를 불러올 수 없습니다.
           </div>
-        ) : dataPreviewState.data && Array.isArray(dataPreviewState.data) && dataPreviewState.data.length > 0 ? (
-          <div style={{
-            borderTop: '1.5px solid #252525',
-            overflow: 'auto'
-          }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              backgroundColor: 'white'
+        ) : dataPreviewState.data && Array.isArray(dataPreviewState.data) && dataPreviewState.data.length > 0 ? (() => {
+          // 컬럼 순서 정의
+          const columnOrder = ['prdDe', 'c1ObjNm', 'c1Nm', 'c2ObjNm', 'c2Nm', 'c3ObjNm', 'c3Nm', 'itmNm', 'data', 'unitNm', 'lstChnDe'];
+          
+          // 컬럼명 한글 매핑
+          const columnLabels: Record<string, string> = {
+            'prdDe': '년도',
+            'c1ObjNm': '분류1',
+            'c1Nm': '분류1 항목',
+            'c2ObjNm': '분류2',
+            'c2Nm': '분류2 항목',
+            'c3ObjNm': '분류3',
+            'c3Nm': '분류3 항목',
+            'itmNm': '데이터 항목',
+            'data': '데이터',
+            'unitNm': '단위',
+            'lstChnDe': '최종 수정일'
+          };
+          
+          // 실제 데이터에 존재하는 컬럼만 필터링하고 순서대로 정렬
+          const availableColumns = columnOrder.filter(key => 
+            dataPreviewState.data[0] && key in dataPreviewState.data[0]
+          );
+          
+          return (
+            <div style={{
+              borderTop: '1.5px solid #252525',
+              overflow: 'auto'
             }}>
-              <thead>
-                <tr style={{
-                  backgroundColor: '#f8f9fa',
-                  borderBottom: '2px solid #dee2e6'
-                }}>
-                  {Object.keys(dataPreviewState.data[0]).map((key, index) => (
-                    <th key={index} style={{
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      fontWeight: '600',
-                      color: '#333',
-                      borderBottom: '1px solid #dee2e6',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {key}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {dataPreviewState.data.map((row: any, rowIndex: number) => (
-                  <tr key={rowIndex} style={{
-                    borderBottom: '1px solid #dee2e6',
-                    backgroundColor: rowIndex % 2 === 0 ? 'white' : '#f8f9fa'
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                backgroundColor: 'white'
+              }}>
+                <thead>
+                  <tr style={{
+                    backgroundColor: '#f8f9fa',
+                    borderBottom: '2px solid #dee2e6'
                   }}>
-                    {Object.values(row).map((value: any, colIndex: number) => (
-                      <td key={colIndex} style={{
+                    {availableColumns.map((key, index) => (
+                      <th key={index} style={{
                         padding: '12px 16px',
-                        color: '#555',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        color: '#333',
+                        borderBottom: '1px solid #dee2e6',
                         whiteSpace: 'nowrap'
                       }}>
-                        {value !== null && value !== undefined ? String(value) : '-'}
-                      </td>
+                        {columnLabels[key] || key}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
+                </thead>
+                <tbody>
+                  {dataPreviewState.data.map((row: any, rowIndex: number) => (
+                    <tr key={rowIndex} style={{
+                      borderBottom: '1px solid #dee2e6',
+                      backgroundColor: rowIndex % 2 === 0 ? 'white' : '#f8f9fa'
+                    }}>
+                      {availableColumns.map((key, colIndex) => (
+                        <td key={colIndex} style={{
+                          padding: '12px 16px',
+                          color: '#555',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {row[key] !== null && row[key] !== undefined ? String(row[key]) : '-'}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })() : (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
             미리보기 데이터가 없습니다.
           </div>
