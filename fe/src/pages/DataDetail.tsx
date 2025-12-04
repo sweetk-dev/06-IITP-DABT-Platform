@@ -389,28 +389,39 @@ export function DataDetail() {
             데이터 미리보기를 불러올 수 없습니다.
           </div>
         ) : dataPreviewState.data && Array.isArray(dataPreviewState.data) && dataPreviewState.data.length > 0 ? (() => {
-          // 컬럼 순서 정의
-          const columnOrder = ['prdDe', 'c1ObjNm', 'c1Nm', 'c2ObjNm', 'c2Nm', 'c3ObjNm', 'c3Nm', 'itmNm', 'data', 'unitNm', 'lstChnDe'];
+          const isBasicType = detailData?.data_type === 'basic';
           
-          // 컬럼명 한글 매핑
-          const columnLabels: Record<string, string> = {
-            'prdDe': '년도',
-            'c1ObjNm': '분류1',
-            'c1Nm': '분류1 항목',
-            'c2ObjNm': '분류2',
-            'c2Nm': '분류2 항목',
-            'c3ObjNm': '분류3',
-            'c3Nm': '분류3 항목',
-            'itmNm': '데이터 항목',
-            'data': '데이터',
-            'unitNm': '단위',
-            'lstChnDe': '최종 수정일'
-          };
+          // basic 타입일 경우에만 컬럼 순서 및 한글 매핑 적용
+          let availableColumns: string[];
+          let columnLabels: Record<string, string> = {};
           
-          // 실제 데이터에 존재하는 컬럼만 필터링하고 순서대로 정렬
-          const availableColumns = columnOrder.filter(key => 
-            dataPreviewState.data[0] && key in dataPreviewState.data[0]
-          );
+          if (isBasicType) {
+            // 컬럼 순서 정의
+            const columnOrder = ['prdDe', 'c1ObjNm', 'c1Nm', 'c2ObjNm', 'c2Nm', 'c3ObjNm', 'c3Nm', 'itmNm', 'data', 'unitNm', 'lstChnDe'];
+            
+            // 컬럼명 한글 매핑
+            columnLabels = {
+              'prdDe': '년도',
+              'c1ObjNm': '분류1',
+              'c1Nm': '분류1 항목',
+              'c2ObjNm': '분류2',
+              'c2Nm': '분류2 항목',
+              'c3ObjNm': '분류3',
+              'c3Nm': '분류3 항목',
+              'itmNm': '데이터 항목',
+              'data': '데이터',
+              'unitNm': '단위',
+              'lstChnDe': '최종 수정일'
+            };
+            
+            // 실제 데이터에 존재하는 컬럼만 필터링하고 순서대로 정렬
+            availableColumns = columnOrder.filter(key => 
+              dataPreviewState.data[0] && key in dataPreviewState.data[0]
+            );
+          } else {
+            // basic 타입이 아닐 경우 기존 방식대로 모든 키 사용
+            availableColumns = Object.keys(dataPreviewState.data[0]);
+          }
           
           return (
             <div style={{
@@ -436,7 +447,7 @@ export function DataDetail() {
                         borderBottom: '1px solid #dee2e6',
                         whiteSpace: 'nowrap'
                       }}>
-                        {columnLabels[key] || key}
+                        {isBasicType ? (columnLabels[key] || key) : key}
                       </th>
                     ))}
                   </tr>
