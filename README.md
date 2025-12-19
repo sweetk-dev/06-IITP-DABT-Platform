@@ -93,7 +93,7 @@ cd 06-IITP-DABT-Platform
 
 ```bash
 # 전체 프로젝트 의존성 설치
-npm run install:all
+npm  install
 
 # 또는 개별 설치
 npm install                    # 루트 의존성

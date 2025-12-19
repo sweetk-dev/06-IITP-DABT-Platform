@@ -24,7 +24,7 @@ script/local/
 script\local\install-all.bat    # Windows
 ./script/local/install-all.sh   # MacOS/Linux
 # 또는
-npm run install:all
+npm install
 ```
 
 ### Windows 사용자
@@ -81,7 +81,7 @@ chmod +x script/local/*.sh
 ### Node.js 직접 실행 또는 npm scripts
 ```bash
 # 모든 의존성 설치
-npm run install:all
+npm install
 
 # Common package 빌드
 npm run build:common
