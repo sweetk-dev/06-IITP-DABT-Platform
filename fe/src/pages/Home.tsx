@@ -75,7 +75,7 @@ export function Home() {
           {/* About Section */}
           <div id="home-about-section" className="home-about-section">
             <div id="home-about-title" className="home-about-title">
-              장애인의 자립에 관하여
+              장애인의 자립에 관하여!
             </div>
 
             <div id="home-about-description" className="home-about-description">
