@@ -199,3 +199,7 @@ docs/_build/
 01.references/
 
 iitp_plaform_requirement.md
+
+# Local workspace meta
+.workspace/
+WORKSPACE.md
