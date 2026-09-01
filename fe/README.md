@@ -315,8 +315,8 @@ vi .env
 # VITE_API_TIMEOUT=10000
 # VITE_VISUAL_TOOL=http://localhost:3000/
 # VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-# VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
-# VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
+# VITE_OPEN_API_CENTER_URL=http://<SERVER_HOST>/adm/
+# VITE_OPEN_API_CENTER_ABOUT_URL=http://<SERVER_HOST>/adm/about
 ```
 
 #### 프로덕션 빌드
@@ -371,8 +371,8 @@ npm run build
 | `VITE_API_DATA_PREVIEW_LIMIT` | 데이터 미리보기 제한 | `10` | `10` | `10` | (향후 사용) |
 | `VITE_VISUAL_TOOL` | 시각화 도구 URL | `http://localhost:3000/` | `http://서버:포트/` | `http://서버:포트/` | DataDetail.tsx |
 | `VITE_EMPLOYMENT_SITE_URL` | 구인구직 사이트 URL | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | `https://www.ablejob.co.kr/` | Home.tsx |
-| `VITE_OPEN_API_CENTER_URL` | Open API 센터 URL | `http://192.168.60.142/adm/` | `http://서버/admin/` | `http://서버/adm/` | DataDetail.tsx |
-| `VITE_OPEN_API_CENTER_ABOUT_URL` | Open API 센터 소개 | `http://192.168.60.142/adm/about` | `http://서버/admin/about` | `http://서버/adm/about` | DataDetail.tsx (Modal helpText) |
+| `VITE_OPEN_API_CENTER_URL` | Open API 센터 URL | `http://<SERVER_HOST>/adm/` | `http://서버/admin/` | `http://서버/adm/` | DataDetail.tsx |
+| `VITE_OPEN_API_CENTER_ABOUT_URL` | Open API 센터 소개 | `http://<SERVER_HOST>/adm/about` | `http://서버/admin/about` | `http://서버/adm/about` | DataDetail.tsx (Modal helpText) |
 
 ### API 설정
 

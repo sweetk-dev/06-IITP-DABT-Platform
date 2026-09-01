@@ -70,7 +70,7 @@
 ### 0.1 복합 서비스 아키텍처
 
 ```
-서버 IP:192.168.60.142
+서버 IP:<SERVER_HOST>
 ├── /adm/           → Admin Frontend (포트 80 → Nginx)
 ├── /adm/api/       → Admin Backend (포트 30000)
 ├── /hub/           → Platform Frontend (포트 80 → Nginx) ⭐ 신규
@@ -241,7 +241,7 @@ DB_PASSWORD=your_secure_password
 DB_SSL=false
 
 # CORS 설정
-CORS_ORIGINS=http://192.168.60.142
+CORS_ORIGINS=http://<SERVER_HOST>
 
 # OpenAPI 서버 설정 (Admin과 동일 설정 사용 가능)
 OPEN_API_SERVER_URL=https://api.example.com
@@ -286,10 +286,10 @@ VITE_BASE=/hub/
 VITE_API_BASE_URL=/hub
 VITE_API_TIMEOUT=10000
 VITE_API_DATA_PREVIEW_LIMIT=10
-VITE_VISUAL_TOOL=http://192.168.60.142:visual-tool-port/
+VITE_VISUAL_TOOL=http://<SERVER_HOST>:visual-tool-port/
 VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
-VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
+VITE_OPEN_API_CENTER_URL=http://<SERVER_HOST>/adm/
+VITE_OPEN_API_CENTER_ABOUT_URL=http://<SERVER_HOST>/adm/about
 ```
 
 **중요 설정 설명:**
@@ -306,10 +306,10 @@ export VITE_BASE=/hub/
 export VITE_API_BASE_URL=/hub
 export VITE_API_TIMEOUT=10000
 export VITE_API_DATA_PREVIEW_LIMIT=10
-export VITE_VISUAL_TOOL=http://192.168.60.142:visual-tool-port/
+export VITE_VISUAL_TOOL=http://<SERVER_HOST>:visual-tool-port/
 export VITE_EMPLOYMENT_SITE_URL=https://www.ablejob.co.kr/
-export VITE_OPEN_API_CENTER_URL=http://192.168.60.142/adm/
-export VITE_OPEN_API_CENTER_ABOUT_URL=http://192.168.60.142/adm/about
+export VITE_OPEN_API_CENTER_URL=http://<SERVER_HOST>/adm/
+export VITE_OPEN_API_CENTER_ABOUT_URL=http://<SERVER_HOST>/adm/about
 ```
 
 ### 1.5 빌드
@@ -425,7 +425,7 @@ upstream iitp_dabt_platform_backend {
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name 192.168.60.142;
+    server_name <SERVER_HOST>;
 
     root /var/www/html;
     index index.html;
@@ -442,7 +442,7 @@ server {
     # [2] Mock 서버 프록시 (선택사항)
     # ========================
     location /mock/ {
-        proxy_pass http://192.168.60.142:4010/;
+        proxy_pass http://<SERVER_HOST>:4010/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection keep-alive;
