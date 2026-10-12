@@ -15,6 +15,7 @@ import {
   getAreaName
 } from '@iitp-dabt-platform/common';
 import { useRecommendations } from '../../api/hooks';
+import { publicAsset } from '../../utils/publicAsset';
 
 export function SelfCheckResult() {
   const navigate = useNavigate();
@@ -268,7 +269,7 @@ export function SelfCheckResult() {
             <div id="self-check-result-physical-icon" style={{
               width: '80px',
               height: '80px',
-              background: 'url(/medal2.png) no-repeat center center / contain',
+              background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
             }} />
@@ -305,7 +306,7 @@ export function SelfCheckResult() {
             <div id="self-check-result-emotional-icon" style={{
               width: '80px',
               height: '80px',
-              background: 'url(/medal2.png) no-repeat center center / contain',
+              background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
             }} />
@@ -342,7 +343,7 @@ export function SelfCheckResult() {
             <div id="self-check-result-economic-icon" style={{
               width: '80px',
               height: '80px',
-              background: 'url(/medal2.png) no-repeat center center / contain',
+              background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
             }} />
@@ -379,7 +380,7 @@ export function SelfCheckResult() {
             <div id="self-check-result-social-icon" style={{
               width: '80px',
               height: '80px',
-              background: 'url(/medal2.png) no-repeat center center / contain',
+              background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
             }} />
@@ -489,7 +490,7 @@ export function SelfCheckResult() {
                           </CardContent>
                           <CardIcon style={{ alignSelf: 'flex-end' }}>
                             <img 
-                              src="/right_up.svg" 
+                              src={publicAsset('/right_up.svg')} 
                               alt="arrow" 
                               style={{
                                 width: '20px',
@@ -540,7 +541,7 @@ export function SelfCheckResult() {
                           </CardContent>
                           <CardIcon style={{ alignSelf: 'flex-end' }}>
                             <img 
-                              src="/right_up.svg" 
+                              src={publicAsset('/right_up.svg')} 
                               alt="arrow" 
                               style={{
                                 width: '20px',
