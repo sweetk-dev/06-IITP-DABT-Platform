@@ -5,6 +5,7 @@ import { Layout } from '../components/layout/Layout';
 import { Modal } from '../components/ui/Modal';
 import { THEME_CONSTANTS, DATA_TYPE_CONSTANTS, formatCount, type ThemeCode, type DataTypeCode, type DataLatestItem, type DataThemeCountsRes, type DataTypeCountsRes, DATA_LATEST_DEFAULTS } from '@iitp-dabt-platform/common';
 import { useLatestData, useThemeCounts, useTypeCounts } from '../api/hooks';
+import { publicAsset } from '../utils/publicAsset';
 
 export function Home() {
   const navigate = useNavigate();
@@ -96,7 +97,7 @@ export function Home() {
                 <div 
                   id="home-about-link-icon-image"
                   className="icon-container-image"
-                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                  style={{ backgroundImage: `url(${publicAsset('/right_arrow.svg')})` }}
                 />
               </div>
             </Link>
@@ -104,7 +105,7 @@ export function Home() {
             <div 
               id="home-about-bg-image"
               className="home-about-bg-image"
-              style={{ background: 'url(/main_top.png) 50% / cover no-repeat' }}
+              style={{ background: `url(${publicAsset('/main_top.png')}) 50% / cover no-repeat` }}
             />
           </div>
 
@@ -160,7 +161,7 @@ export function Home() {
                 <div 
                   id="home-theme-title-icon-image"
                   className="icon-container-image"
-                  style={{ backgroundImage: 'url(/question.svg)' }}
+                  style={{ backgroundImage: `url(${publicAsset('/question.svg')})` }}
                 />
               </div>
             </div>
@@ -176,7 +177,7 @@ export function Home() {
                 <div className="icon-container-inner" />
                 <div 
                   className="icon-container-image"
-                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                  style={{ backgroundImage: `url(${publicAsset('/right_arrow.svg')})` }}
                 />
               </div>
             </div>
@@ -190,25 +191,25 @@ export function Home() {
                 phys: {
                   background: '#ffeef2',
                   outline: '#ffdde5',
-                  image: '/medal2.png',
+                  image: publicAsset('/medal2.png'),
                   imageStyle: { right: 0, bottom: '-20px', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 emo: {
                   background: '#fffdee',
                   outline: '#fff6b4',
-                  image: '/lightbulb.png',
+                  image: publicAsset('/lightbulb.png'),
                   imageStyle: { right: 0, bottom: '-25px', transform: 'rotate(-8deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 econ: {
                   background: '#eefff2',
                   outline: '#d9f5df',
-                  image: '/money.png',
+                  image: publicAsset('/money.png'),
                   imageStyle: { right: 0, bottom: '-40px', transform: 'rotate(-19deg)', transformOrigin: 'top left', filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 },
                 soc: {
                   background: '#eef8ff',
                   outline: '#d0ecff',
-                  image: '/chat.png',
+                  image: publicAsset('/chat.png'),
                   imageStyle: { right: 0, bottom: 0, filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))' }
                 }
               };
@@ -288,7 +289,7 @@ export function Home() {
                 <div className="icon-container-inner" />
                 <div 
                   className="icon-container-image"
-                  style={{ backgroundImage: 'url(/right_arrow.svg)' }}
+                  style={{ backgroundImage: `url(${publicAsset('/right_arrow.svg')})` }}
                 />
               </div>
             </div>
@@ -330,7 +331,7 @@ export function Home() {
                     <div 
                       id={`home-data-type-card-${dataTypeCode}-icon-image`} 
                       className="home-data-type-card-icon-image"
-                      style={{ backgroundImage: 'url(/right_up.svg)' }}
+                      style={{ backgroundImage: `url(${publicAsset('/right_up.svg')})` }}
                     />
                   </div>
                 </div>
@@ -359,7 +360,7 @@ export function Home() {
             <div 
               id="home-self-check-image" 
               className="home-self-check-image"
-              style={{ backgroundImage: 'url(/contract.png)' }}
+              style={{ backgroundImage: `url(${publicAsset('/contract.png')})` }}
             />
           </div>
         </div>
@@ -395,7 +396,7 @@ export function Home() {
                 <div id={`home-service-card-${index + 1}-content`} className="home-service-card-content">
                   <div id={`home-service-card-${index + 1}-image`} className="home-service-card-image">
                     <img 
-                      src="/image-line.svg" 
+                      src={publicAsset('/image-line.svg')} 
                       alt="이미지 플레이스홀더"
                       className="home-service-card-image-placeholder"
                     />

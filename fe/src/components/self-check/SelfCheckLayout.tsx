@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Layout } from '../layout/Layout';
 import { SelfCheckNavigation } from './SelfCheckNavigation';
+import { publicAsset } from '../../utils/publicAsset';
 
 interface SelfCheckLayoutProps {
   idPrefix: string;
@@ -82,7 +83,7 @@ export function SelfCheckLayout({
             }}
           >
             <img
-              src="/left-arrow.svg"
+              src={publicAsset('/left-arrow.svg')}
               alt="메인화면으로 이동"
               style={{ 
                 width: '18px', 

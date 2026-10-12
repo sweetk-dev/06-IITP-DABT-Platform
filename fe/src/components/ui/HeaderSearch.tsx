@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDataSearchPath } from '../../pages/App';
+import { publicAsset } from '../../utils/publicAsset';
 
 interface HeaderSearchProps {
   idPrefix: string;
@@ -90,7 +91,7 @@ export function HeaderSearch({ idPrefix }: HeaderSearchProps) {
           <div id={`${idPrefix}-search-icon`} style={{
             width: '20px',
             height: '20px',
-            backgroundImage: 'url(/search_ico.svg)',
+            backgroundImage: `url(${publicAsset('/search_ico.svg')})`,
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center'

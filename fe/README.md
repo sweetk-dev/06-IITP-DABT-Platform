@@ -359,6 +359,7 @@ npm run build
 - ❌ 실행 서버(프로덕션)의 FE 디렉토리에는 `.env` 불필요 (이미 빌드된 정적 파일)
 - ✅ Vite가 빌드 시 환경변수를 코드에 하드코딩하므로 런타임 변경 불가
 - 🔧 `VITE_API_BASE_URL=/hub` (not `/hub/api`) - FE 코드가 `/api/v1/...`을 자동으로 추가
+- 🔧 하위 경로 배포(`VITE_BASE=/hub/` 등): 라우터 기준 경로(`BrowserRouter basename`)와 public 폴더 이미지 경로가 `VITE_BASE` 를 따른다. TSX 에서 public 파일(`/chat.png`, `url(/info_back.png)` 등)을 참조할 때는 문자열을 직접 쓰지 말고 `publicAsset('/chat.png')`(`src/utils/publicAsset.ts`)로 감싼다. Vite 는 index.html·CSS 안의 경로에만 base 를 자동으로 붙이기 때문이다
 
 #### 환경변수 목록
 
