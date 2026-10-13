@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { publicAsset } from '../../utils/publicAsset';
 
 interface SelfCheckNavigationProps {
   onPrevious?: () => void;
@@ -75,7 +76,7 @@ export function SelfCheckNavigation({
           }}
         >
           {previousIcon || (
-            <img src="/left_arrow2.svg" alt="이전" style={{ width: '20px', height: '20px' }} />
+            <img src={publicAsset('/left_arrow2.svg')} alt="이전" style={{ width: '20px', height: '20px' }} />
           )}
           <span>{previousText}</span>
         </button>
@@ -108,7 +109,7 @@ export function SelfCheckNavigation({
         >
           <span>{nextText}</span>
           {nextIcon || (
-            <img src="/right_arrow2.svg" alt="다음" style={{ width: '20px', height: '20px' }} />
+            <img src={publicAsset('/right_arrow2.svg')} alt="다음" style={{ width: '20px', height: '20px' }} />
           )}
         </button>
       )}

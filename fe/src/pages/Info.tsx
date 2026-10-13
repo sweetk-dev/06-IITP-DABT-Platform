@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROUTE_PATHS } from './App';
 import { Layout } from '../components/layout/Layout';
+import { publicAsset } from '../utils/publicAsset';
 
 export function Info() {
   return (
@@ -18,7 +19,7 @@ export function Info() {
           position: 'absolute',
           top: 0,
           right: '-51px',
-          background: 'url(/info_back.png) center/cover no-repeat',
+          background: `url(${publicAsset('/info_back.png')}) center/cover no-repeat`,
           zIndex: 2
         }} />
         
@@ -105,7 +106,7 @@ export function Info() {
                   position: 'relative',
                   width: '486px',
                   height: '347px',
-                  background: 'url(/info_main.png) center/cover no-repeat',
+                  background: `url(${publicAsset('/info_main.png')}) center/cover no-repeat`,
                   zIndex: 2
                 }} />
               </div>
@@ -392,7 +393,7 @@ export function Info() {
           <div id="info-contract-image" style={{
             width: '191px',
             height: '191px',
-            background: 'url(/contract.png) center/contain no-repeat',
+            background: `url(${publicAsset('/contract.png')}) center/contain no-repeat`,
             transform: 'rotate(14deg)',
             filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
           }} />
@@ -449,7 +450,7 @@ export function Info() {
           <div id="info-folder-image" style={{
             width: '177px',
             height: '213px',
-            background: 'url(/folder.png) center/contain no-repeat',
+            background: `url(${publicAsset('/folder.png')}) center/contain no-repeat`,
             filter: 'drop-shadow(12px -1px 14px rgba(0, 0, 0, 0.3))'
           }} />
           <div id="info-search-icon2" style={{
@@ -458,7 +459,7 @@ export function Info() {
             position: 'absolute',
             right: '-40px',
             bottom: '-30px',
-            background: 'url(/search.png) center/cover no-repeat'
+            background: `url(${publicAsset('/search.png')}) center/cover no-repeat`
           }} />
         </div>
       </div>

@@ -1,5 +1,7 @@
 # IITP DABT Platform
 
+![version](https://img.shields.io/badge/version-v1.0.1-blue)
+
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
 ## 📋 프로젝트 개요
