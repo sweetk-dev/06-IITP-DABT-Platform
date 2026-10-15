@@ -510,7 +510,8 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       //   여기서 앞쪽 N건만 잘라 보내기 때문에 화면에는 가장 오래된 연도만 보였다.
       //   → basic 이면 자르기 전에 연도 내림차순으로 정렬하도록 옵션 전달 (그 외 유형은 기존 순서 유지)
       const result = await openApiService.getDataPreview(item.open_api_url, query, {
-        sortByPeriodDesc: item.data_type === 'basic',
+        // [2026-10-15] 고용(emp) 데이터도 연도별 누적 표가 있어 같은 정렬 적용 (연도 칸이 없는 표는 순서 그대로)
+        sortByPeriodDesc: item.data_type === 'basic' || item.data_type === 'emp',
       });
       
       return result;
