@@ -1,6 +1,6 @@
 # IITP DABT Platform
 
-![version](https://img.shields.io/badge/version-v1.1.1-blue)
+![version](https://img.shields.io/badge/version-v1.2.0-blue)
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
@@ -140,6 +140,10 @@ npm run build:common           # 공통 패키지 빌드
 - **자가진단 문항**: 4개 영역 35문항 자가진단
 - **결과 분석**: 영역별 점수 및 미달 영역 분석
 - **정책 추천**: 진단 결과 기반 맞춤형 정책 추천
+  - 미달 영역(신체·정서·경제·사회)마다 그 유형으로 분류된 정책 중에서 무작위로 고른다(v1.2.0)
+  - 외부 기관 정책 정보 링크가 비어 있는 정책은 추천하지 않는다
+  - 성별·장애정도는 여러 값이 쉼표로 저장된 칸의 포함 여부로, 연령은 해당 값 또는 `all` 로 거른다
+  - 장애정도를 "모름"으로 답하면 장애인 등록 안내(유형 `basic`, 1건)를 먼저 보여 준다
 
 ### 3. 정책 정보
 - **정책 목록**: 자립 지원 정책 리스트
