@@ -311,7 +311,8 @@ export function SelfCheckMore() {
   );
 
   return (
-    <Layout idPrefix="self-check-more">
+    // [2026-10] 탭 제목을 선택한 메뉴명으로 ("자립 지원 정책 | 장애인 자립 지원 허브")
+    <Layout idPrefix="self-check-more" pageTitle={getTitle()}>
       <div id="self-check-more-container" className="data-list-container">
         {/* Sidebar */}
         <Sidebar idPrefix="self-check-more" title="필터">
@@ -331,11 +332,12 @@ export function SelfCheckMore() {
         {/* Main Content */}
         <div id="self-check-more-main-content" className="main-content">
           <div id="self-check-more-page-header" className="page-header">
-            <div id="self-check-more-page-title" className="page-title-large">{getTitle()}</div>
+            {/* [2026-10 접근성] 화면 제목 h1 (기존 div) */}
+            <h1 id="self-check-more-page-title" className="page-title-large">{getTitle()}</h1>
             <div id="self-check-more-page-description" className="page-description">
               {getDescription()}
             </div>
-            <div id="self-check-more-data-count" className="data-count">
+            <div id="self-check-more-data-count" className="data-count" role="status">
               총 <span id="self-check-more-count-number" className="count-number">{getCount()}</span> 건
             </div>
           </div>

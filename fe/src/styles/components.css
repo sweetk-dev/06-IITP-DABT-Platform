@@ -15,12 +15,14 @@
 }
 .btn--block { width: 100%; }
 .btn--primary { 
-  background: var(--color-primary); 
+  /* [2026-10 접근성] 16px 흰 글자 + 브랜드 파랑(#0090ff)은 3.26:1 로 일반 글자 기준(4.5:1) 미달
+     → 같은 계열의 진한 파랑 토큰(#0070cc, 5.01:1) 사용 */
+  background: var(--color-primary-strong); 
   color: #fff; 
   box-shadow: 0 2px 4px rgba(0, 144, 255, 0.2);
 }
 .btn--primary:hover { 
-  background: var(--color-primary-hover); 
+  background: var(--color-primary-strong-hover); 
   box-shadow: 0 4px 8px rgba(0, 144, 255, 0.3);
   transform: translateY(-1px);
 }
@@ -184,7 +186,7 @@
 
 .tag--primary {
   background: var(--color-primary-light);
-  color: var(--color-primary);
+  color: var(--color-primary-text); /* [2026-10 접근성] 대비 4.5:1 이상 */
   border: 1px solid var(--color-primary);
 }
 
@@ -214,7 +216,7 @@
 
 .tag--info {
   background: var(--color-bg-info);
-  color: var(--color-info);
+  color: #0b6b7b; /* [2026-10 접근성] 기존 #17a2b8 은 3:1 수준 → 같은 청록 계열 진한 톤 */
   border: 1px solid var(--color-info);
 }
 
@@ -282,10 +284,11 @@
   display: flex;
 }
 
+/* [2026-10] .stat-number / .stat-unit 의 font-family: Pretendard → var(--font-family-primary) (대체 글꼴 지정) */
 .stat-number {
-  color: #0090ff;
+  color: var(--color-primary-large); /* [2026-10 접근성] 큰 숫자 대비 확보 */
   font-size: 32px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 700;
   word-wrap: break-word;
 }
@@ -293,28 +296,50 @@
 .stat-unit {
   color: black;
   font-size: 24px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 500;
   word-wrap: break-word;
 }
 
 /* Home Page Specific Styles */
+/* ---------------------------------------------------------------------------
+ * [2026-10 반응형] 홈 화면
+ *  - 1200px / 288px / 389.33px / 384px 등 고정 폭 → 부모 폭 기준(100%, grid 1fr)으로 변경
+ *  - 1024px 이하: 소개+최신 데이터 2열 → 1열, 테마 카드 4열 → 2열, 유형/서비스 카드 3열 → 1~2열
+ *  - 카드가 <a>/<button> 으로 바뀌어 기본 스타일(글자색·밑줄·버튼 테두리)을 초기화한다
+ * ------------------------------------------------------------------------- */
 .home-body-area {
   width: 100%;
   position: relative;
-  display: inline-block;
+  display: block;
+}
+
+/* 카드 목록을 <ul> 로 바꾸면서 기본 목록 스타일 제거 */
+.home-latest-data-list,
+.home-theme-grid,
+.home-data-type-grid,
+.home-services-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.home-grid-item,
+.home-latest-data-li {
+  display: block;
+  min-width: 0;
 }
 
 .home-main-sections {
   width: 100%;
   display: flex;
   gap: 16px;
-  margin-top: 60px;
+  margin-top: 32px;
 }
 
 .home-about-section {
   flex: 1;
-  height: 380px;
+  min-width: 0;
+  min-height: 380px; /* 기존 height 고정 → 최소 높이 (글이 길어지면 늘어남) */
   padding: 32px 40px;
   position: relative;
   background: #d0ecff;
@@ -332,6 +357,7 @@
   font-family: var(--font-family-primary);
   font-weight: 700;
   word-wrap: break-word;
+  margin: 0; /* h2 기본 여백 제거 */
 }
 
 .home-about-description {
@@ -347,7 +373,8 @@
 
 .home-latest-data-section {
   flex: 1;
-  height: 380px;
+  min-width: 0;
+  min-height: 380px;
   padding: 28px;
   background: var(--figma-white);
   box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.08);
@@ -366,12 +393,14 @@
   font-family: var(--font-family-primary);
   font-weight: 600;
   word-wrap: break-word;
+  margin: 0;
 }
 
 .home-latest-data-list {
+  width: 100%;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch; /* [2026-10] 항목이 목록 폭에 맞춰져야 긴 제목이 말줄임(…) 처리됨 (flex-start 면 내용 폭만큼 늘어나 넘침) */
   gap: 16px;
   display: flex;
   margin-top: 24px;
@@ -379,7 +408,9 @@
 
 .home-latest-data-item {
   width: 100%;
-  height: 31px;
+  min-height: 31px;
+  padding: 2px 4px;
+  border-radius: 8px;
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
@@ -397,9 +428,12 @@
   align-items: center;
   gap: 8px;
   display: flex;
+  min-width: 0;
+  width: 100%;
 }
 
 .home-latest-data-category {
+  flex-shrink: 0;
   width: 62px;
   padding: 5px 8px;
   background: rgba(0, 143.88, 255, 0.1);
@@ -411,7 +445,8 @@
 }
 
 .home-latest-data-category-text {
-  color: #0086ed;
+  /* [2026-10 접근성] '기초' 배지 글자: #0086ed 는 연파랑 배경 위 3.3:1 → 진한 파랑 토큰(4.9:1) */
+  color: var(--color-primary-text);
   font-size: 15px;
   font-family: var(--font-family-primary);
   font-weight: 700;
@@ -432,20 +467,21 @@
 
 /* Section Headers */
 .home-section {
-  width: 1200px;
+  width: 100%;
   margin-top: 60px;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 20px;
-  display: inline-flex;
+  display: flex;
 }
 
 .home-section-header {
   align-self: stretch;
   justify-content: space-between;
   align-items: center;
-  display: inline-flex;
+  gap: 12px;
+  display: flex;
 }
 
 .home-section-title {
@@ -454,6 +490,7 @@
   font-family: var(--font-family-primary);
   font-weight: 600;
   word-wrap: break-word;
+  margin: 0;
 }
 
 .home-section-view-all {
@@ -461,6 +498,8 @@
   align-items: center;
   gap: 2px;
   display: flex;
+  flex-shrink: 0;
+  min-height: 44px; /* 터치 영역 */
   cursor: pointer;
 }
 
@@ -500,15 +539,13 @@
 /* Theme Cards */
 .home-theme-grid {
   align-self: stretch;
-  justify-content: flex-start;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 기존 288px × 4 고정 */
   gap: 16px;
-  display: inline-flex;
-  height: 160px;
 }
 
 .home-theme-card {
-  width: 288px;
+  width: 100%;
   height: 160px;
   padding: 28px;
   position: relative;
@@ -517,7 +554,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  display: inline-flex;
+  display: flex;
   cursor: pointer;
 }
 
@@ -537,7 +574,7 @@
 }
 
 .home-theme-card-count-number {
-  color: #0090ff;
+  color: var(--color-primary-large); /* [2026-10 접근성] 분홍 카드 위 #0090ff 2.9:1 → 4:1 이상 */
   font-size: var(--font-size-4xl);
   font-family: var(--font-family-primary);
   font-weight: 700;
@@ -564,26 +601,28 @@
 /* Data Type Cards */
 .home-data-type-grid {
   align-self: stretch;
-  justify-content: flex-start;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 기존 389.33px × 3 고정 */
   gap: 16px;
-  display: inline-flex;
-  height: 160px;
 }
 
 .home-data-type-card {
-  width: 389.33px;
-  height: 160px;
+  width: 100%;
+  min-height: 160px;
   padding: 28px 28px 28px 40px;
   background: #fafcfd;
   overflow: hidden;
   border-radius: 16px;
-  outline: 1px #e3e3e3 solid;
-  outline-offset: -1px;
+  /* 테두리를 outline 대신 inset box-shadow 로 — outline 은 키보드 초점 표시 전용으로 남겨 둔다 */
+  box-shadow: inset 0 0 0 1px #e3e3e3;
   justify-content: space-between;
   align-items: flex-start;
   display: flex;
   cursor: pointer;
+}
+.home-theme-card:hover,
+.home-data-type-card:hover {
+  filter: brightness(0.98);
 }
 
 .home-data-type-card-content {
@@ -609,8 +648,7 @@
   background: var(--figma-white);
   overflow: hidden;
   border-radius: 100px;
-  outline: 1px #d9d9d9 solid;
-  outline-offset: -1px;
+  box-shadow: inset 0 0 0 1px #d9d9d9;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -625,24 +663,30 @@
   background-position: center;
 }
 
-/* Self Check Section */
+/* Self Check Section
+   [2026-10] 기존: width:100vw + margin-left:50% + translateX(-50%) 로 화면 끝까지 배경을 깔았는데,
+   Windows 처럼 세로 스크롤바가 있는 환경에서는 100vw 가 (화면 폭 + 스크롤바 폭)이라 문서가 가로로 넘쳤다.
+   → 상자 폭은 본문 폭 그대로 두고, 같은 색 box-shadow 를 좌우로 크게 펼쳐 "배경만" 화면 끝까지 보이게 한다.
+     box-shadow 는 스크롤 영역 계산에 포함되지 않아 가로 스크롤이 생기지 않는다. clip-path 로 위아래 번짐은 자른다. */
 .home-self-check-section {
-  width: 100vw;
-  height: 289px;
-  margin-left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  min-height: 289px;
   background: #f0f8ff;
+  box-shadow: 0 0 0 100vmax #f0f8ff;
+  clip-path: inset(0 -100vmax);
   margin-top: 60px;
+  padding-bottom: 52px;
 }
 
 .home-self-check-container {
   margin: 0 auto;
-  width: 1200px;
+  width: 100%;
   position: relative;
 }
 
 .home-self-check-title {
   padding-top: 52px;
+  margin: 0;
   color: var(--color-text-primary);
   font-size: var(--font-size-2xl);
   font-family: var(--font-family-primary);
@@ -670,6 +714,7 @@
   display: inline-flex;
   margin-top: 44px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .home-self-check-btn-text {
@@ -682,6 +727,7 @@
 }
 
 .home-self-check-image {
+  pointer-events: none;
   width: 191px;
   height: 191px;
   transform: rotate(15deg);
@@ -697,13 +743,13 @@
 
 /* Services Section */
 .home-services-section {
-  width: 1200px;
+  width: 100%;
   margin-top: 60px;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 24px;
-  display: inline-flex;
+  display: flex;
 }
 
 .home-services-header {
@@ -711,7 +757,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 20px;
-  display: inline-flex;
+  display: flex;
 }
 
 .home-services-title {
@@ -720,28 +766,34 @@
   font-family: var(--font-family-primary);
   font-weight: 600;
   word-wrap: break-word;
+  margin: 0;
 }
 
 .home-services-grid {
   align-self: stretch;
-  justify-content: flex-start;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  display: inline-flex;
 }
 
+/* 서비스 카드는 <a> 또는 <button> — 버튼 기본 스타일(테두리·글꼴·가운데 정렬) 초기화 */
 .home-service-card {
-  flex: 1 1 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
   background: var(--figma-white);
-  box-shadow: 0px 4px 100px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 4px 100px 8px rgba(0, 0, 0, 0.08), inset 0 0 0 1px #efefef;
   overflow: hidden;
   border-radius: 16px;
-  outline: 1px #efefef solid;
-  outline-offset: -1px;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  display: inline-flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  display: flex;
   cursor: pointer;
 }
 
@@ -749,12 +801,12 @@
   position: relative;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch;
   display: flex;
 }
 
 .home-service-card-image {
-  width: 384px;
+  width: 100%;
   height: 248px;
   background: #D9D9D9;
   border-radius: 16px 16px 0 0;
@@ -814,6 +866,9 @@
   display: inline-flex;
   cursor: pointer;
   text-decoration: none;
+  min-height: 44px;
+  position: relative;
+  z-index: 2; /* 배경 일러스트 위에 있어야 클릭·초점 표시가 가려지지 않음 */
 }
 
 .home-about-link-text {
@@ -838,5 +893,129 @@
   background-repeat: no-repeat;
   background-position: center;
   z-index: 1;
+  pointer-events: none;
+}
+
+/* ---- 홈 반응형 ---- */
+@media (max-width: 1024px) {
+  .home-main-sections {
+    flex-direction: column;
+  }
+  .home-about-section,
+  .home-latest-data-section {
+    min-height: 0;
+  }
+  .home-about-section {
+    padding: 28px 28px 200px; /* 아래쪽에 일러스트 자리 확보 */
+  }
+  .home-theme-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-data-type-grid,
+  .home-services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-self-check-image {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-main-sections {
+    margin-top: 8px;
+  }
+  .home-about-title {
+    font-size: var(--font-size-xl);
+  }
+  .home-about-description,
+  .home-self-check-description {
+    font-size: 17px;
+    line-height: 26px;
+  }
+  .home-about-bg-image {
+    width: 220px;
+    height: 122px;
+    right: 12px;
+    bottom: 12px;
+  }
+  .home-about-section {
+    padding: 24px 20px 150px;
+  }
+  .home-latest-data-section {
+    padding: 20px;
+  }
+  .home-latest-data-title-text {
+    font-size: 16px;
+  }
+  .home-section,
+  .home-services-section {
+    margin-top: 40px;
+  }
+  .home-section-title,
+  .home-services-title,
+  .home-self-check-title {
+    font-size: var(--font-size-xl);
+  }
+  .home-data-type-grid,
+  .home-services-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-theme-card,
+  .home-data-type-card {
+    height: auto;
+    min-height: 128px;
+    padding: 20px;
+  }
+  .home-theme-card-image {
+    width: 100px;
+    height: 100px;
+  }
+  .home-self-check-section {
+    margin-top: 40px;
+    padding-bottom: 32px;
+  }
+  .home-self-check-title {
+    padding-top: 32px;
+  }
+  .home-self-check-btn {
+    margin-top: 24px;
+  }
+  /* 휴대폰에서는 장식 일러스트가 글·버튼을 가리므로 숨김 */
+  .home-self-check-image {
+    display: none;
+  }
+  .home-service-card-image {
+    height: 160px;
+  }
+  .home-service-card-text {
+    padding: 20px;
+  }
+  /* 설명문의 강제 줄바꿈(\n)은 데스크톱 카드 폭 기준이라 좁은 화면에서는 무시하고 자연 줄바꿈 */
+  .home-service-card-description {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-theme-grid {
+    gap: 10px;
+  }
+  .home-theme-card {
+    padding: 16px;
+    min-height: 120px;
+  }
+  .home-theme-card-title,
+  .home-data-type-card-title {
+    font-size: 18px;
+  }
+  .home-theme-card-count-number,
+  .stat-number {
+    font-size: 26px;
+  }
+  .home-theme-card-image {
+    width: 76px;
+    height: 76px;
+  }
 }
 

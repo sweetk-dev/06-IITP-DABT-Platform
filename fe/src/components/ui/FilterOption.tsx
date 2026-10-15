@@ -10,10 +10,21 @@ interface FilterOptionProps {
   onClick?: () => void;
 }
 
+/**
+ * 필터 선택 버튼.
+ *
+ * [2026-10 접근성]
+ *  - aria-pressed 로 현재 선택된 필터인지 스크린리더에 전달 (기존: 배경색으로만 구분 → 색만으로 정보 전달)
+ *  - 선택된 항목 글자색 #0090ff(연파랑 배경 위 2.9:1) → --color-primary-text(4.9:1)
+ *  - type="button" 명시 (form 안에서 쓰여도 제출되지 않도록)
+ */
 export function FilterOption({ id, name, count, icon, isActive = false, onClick }: FilterOptionProps) {
   return (
     <button
       id={id}
+      type="button"
+      className={`filter-option ${isActive ? 'is-active' : ''}`}
+      aria-pressed={isActive}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -23,11 +34,12 @@ export function FilterOption({ id, name, count, icon, isActive = false, onClick 
         border: 'none',
         borderRadius: '8px',
         cursor: 'pointer',
-        transition: 'all 0.2s ease',
+        // 'all' 이면 초점 테두리(outline)까지 서서히 나타나 키보드 초점이 늦게 보임 → 배경·글자색만 전환
+        transition: 'background-color 0.2s ease, color 0.2s ease',
         fontSize: '16px',
-        fontFamily: 'Pretendard',
+        fontFamily: 'var(--font-family-primary)',
         fontWeight: isActive ? 600 : 400,
-        color: isActive ? '#0090ff' : 'black',
+        color: isActive ? 'var(--color-primary-text)' : 'black',
         width: '100%',
         textAlign: 'left'
       }}
@@ -50,9 +62,9 @@ export function FilterOption({ id, name, count, icon, isActive = false, onClick 
       {count !== undefined && (
         <span id={`${id}-count`} style={{
           fontSize: '14px',
-          fontFamily: 'Pretendard',
+          fontFamily: 'var(--font-family-primary)',
           fontWeight: 500,
-          color: isActive ? '#0090ff' : '#666'
+          color: isActive ? 'var(--color-primary-text)' : '#595959'
         }}>
           {count}
         </span>

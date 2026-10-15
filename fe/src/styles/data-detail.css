@@ -1,0 +1,255 @@
+/* ============================================================================
+ * data-detail.css — 데이터 상세 화면 (/data/:id)
+ * [2026-10] 기존 DataDetail.tsx 의 inline style 을 옮기고 반응형·접근성 보정을 추가.
+ * 시각적 값(글자 크기·색·테두리)은 기존 inline style 과 동일하게 맞췄다.
+ * ========================================================================== */
+
+.data-detail-header {
+  margin-bottom: 32px;
+}
+.data-title-large {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #000;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.data-description {
+  font-size: 20px;
+  color: #000;
+  line-height: 30px;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* 정보 표 (<dl>) */
+.data-info-table {
+  border-top: 1.5px solid #252525;
+  margin: 0 0 64px;
+}
+.data-info-table .info-row {
+  display: flex;
+  border-bottom: 1px solid #ececec;
+  min-height: 56px;
+}
+.data-info-table .info-row:last-child {
+  border-bottom: none;
+}
+.data-info-table .info-label {
+  flex: 0 0 200px;
+  margin: 0;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #ececec;
+}
+.data-info-table .info-value {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+.detail-info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 데이터 보기 / 시각화 구역 공통 머리 */
+.data-view-section,
+.data-visual-section {
+  margin-bottom: 32px;
+}
+.data-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #ececec;
+  margin-bottom: 24px;
+}
+.data-view-header .section-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+  scroll-margin-top: 16px;
+}
+.data-view-header .section-title:focus {
+  outline: none;
+}
+.data-view-header .section-title:focus-visible {
+  outline: 3px solid var(--color-focus-ring) !important;
+}
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* 미리보기 상태 문구 */
+.detail-preview-state {
+  padding: 40px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.detail-preview-state--error {
+  color: #c82333; /* 흰 배경 5.1:1 */
+}
+
+/* 미리보기 표 — 상자 안에서만 가로 스크롤 */
+.detail-preview-scroll {
+  border-top: 1.5px solid #252525;
+}
+.detail-preview-scroll:focus-visible {
+  outline-offset: -3px !important;
+}
+.detail-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+.detail-preview-table thead tr {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+.detail-preview-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
+}
+.detail-preview-table td {
+  padding: 12px 16px;
+  color: #555;
+  white-space: nowrap;
+}
+.detail-preview-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+}
+.detail-preview-table tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+.detail-preview-table td.is-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 시각화(Metabase iframe) */
+.data-visual-newwin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--figma-gray-300);
+  border-radius: 8px;
+  color: var(--color-primary-text);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  background: #fff;
+}
+.data-visual-newwin:hover {
+  background: var(--figma-gray-50);
+  text-decoration: underline;
+}
+.data-visual-help {
+  margin: -8px 0 16px;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+.data-visual-frame-wrap {
+  width: 100%;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fbfc;
+}
+.data-visual-frame {
+  display: block;
+  width: 100%;
+  height: 900px; /* 데스크톱: 대시보드 카드 2~3줄이 한 번에 보이는 높이 */
+  border: 0;
+}
+
+/* Open API 센터 버튼 */
+.open-api-section {
+  margin: 32px 0 64px;
+  display: flex;
+  justify-content: center;
+}
+.btn-open-api-center {
+  background: #fff;
+  color: #000;
+  outline: 1px solid #dadada;
+  outline-offset: -1px;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-size: 20px;
+  font-family: var(--font-family-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-width: 200px;
+  min-height: 44px;
+}
+.btn-open-api-center:hover {
+  background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .data-title-large {
+    font-size: 24px;
+  }
+  .data-description {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .data-info-table {
+    margin-bottom: 40px;
+  }
+  /* 좁은 화면: 라벨(위) / 값(아래) 로 쌓기 */
+  .data-info-table .info-row {
+    flex-direction: column;
+    min-height: 0;
+  }
+  .data-info-table .info-label {
+    flex-basis: auto;
+    padding: 10px 16px;
+    border-right: none;
+  }
+  .data-info-table .info-value {
+    padding: 12px 16px;
+  }
+  .data-view-header .section-title {
+    font-size: 22px;
+  }
+  .data-view-header {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+  }
+  .detail-preview-table th,
+  .detail-preview-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  /* 휴대폰: 대시보드 카드가 세로로 길게 쌓이므로 높이를 늘린다 */
+  .data-visual-frame {
+    height: 1200px;
+  }
+}

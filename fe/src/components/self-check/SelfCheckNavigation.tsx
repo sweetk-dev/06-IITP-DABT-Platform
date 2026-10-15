@@ -13,6 +13,18 @@ interface SelfCheckNavigationProps {
   previousIcon?: ReactNode;
 }
 
+/**
+ * 자가진단 이전/다음 버튼 줄.
+ *
+ * [2026-10 개편]
+ *  - 기존: 피그마 좌표(left 362px / 1280px, top 863×0.952px)로 position:absolute 배치
+ *    → 패널 높이·화면 크기가 다르면 버튼이 경계에 걸리거나 화면 밖으로 나감.
+ *  - 변경: 문서 흐름 안의 가운데 정렬 flex 줄(.sc-nav). 좁은 화면에서는 두 버튼이 반반 폭 + 하단 고정(sticky).
+ *  - 다음 버튼 글자는 굵게(700) 19px 이상 → 흰 글자/브랜드 파랑 대비를 "큰 글자" 기준(3:1)으로 충족.
+ *  - 화살표 이미지는 장식(alt="") — 기존 alt="이전"/"다음" 은 버튼 글자와 중복되어 "이전 이전" 으로 읽혔다.
+ *  - 비활성(응답 전) 다음 버튼은 native disabled 로 키보드 초점에서도 제외.
+ *  - 이전 버튼 표시 조건은 기존 동작(showPrevious && onNext 가 있을 때)을 그대로 유지.
+ */
 export function SelfCheckNavigation({
   onPrevious,
   onNext,
@@ -24,95 +36,34 @@ export function SelfCheckNavigation({
   nextIcon,
   previousIcon
 }: SelfCheckNavigationProps) {
-  // 피그마 기준 (1840px × 882px)을 현재 SelfCheckLayout (1840px × 840px)로 비율 계산
-  // 높이 비율: 840/882 = 0.952
-  const heightRatio = 840 / 882;
-  
-  // 피그마 기준 위치를 SelfCheckLayout 내부 기준으로 변환
-  const getButtonPosition = (figmaLeft: number, figmaTop: number, isCentered = false) => ({
-    position: 'absolute' as const,
-    left: isCentered ? 'calc(50% - 140px)' : `${figmaLeft}px`, // 중앙이면 SelfCheckLayout 내부 중앙, 아니면 피그마 기준
-    top: `${figmaTop * heightRatio}px`, // 높이 비율 적용
-    width: '280px',
-    height: '77px',
-    minWidth: '280px',
-    borderRadius: '16px',
-    padding: '24px',
-    gap: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '24px',
-    fontFamily: 'var(--font-family-primary)',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    textAlign: 'center' as const,
-    border: 'none'
-  });
-
   return (
-    <>
-      {/* Previous Button - 피그마 스펙 적용 */}
+    <div className="sc-nav">
       {showPrevious && onNext && (
         <button
+          type="button"
           onClick={onPrevious}
-          style={{
-            ...getButtonPosition(362, 863), // 피그마 기준 위치
-            background: '#FFFFFF',
-            color: 'var(--color-text-primary)',
-            border: '1px solid #DADADA',
-            opacity: 1
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
-            e.currentTarget.style.borderColor = '#999';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-            e.currentTarget.style.borderColor = '#DADADA';
-          }}
+          className="sc-nav-button sc-nav-button--prev"
         >
           {previousIcon || (
-            <img src={publicAsset('/left_arrow2.svg')} alt="이전" style={{ width: '20px', height: '20px' }} />
+            <img src={publicAsset('/left_arrow2.svg')} alt="" />
           )}
           <span>{previousText}</span>
         </button>
       )}
 
-      {/* Next Button - 피그마 스펙 적용 */}
       {showNext && onNext && (
         <button
+          type="button"
           onClick={onNext}
           disabled={isNextDisabled}
-          style={{
-            ...getButtonPosition(showPrevious ? 1280 : 0, 863, !showPrevious), // 이전 버튼이 있으면 1280px, 없으면 브라우저 중앙
-            background: '#0090FF',
-            color: '#FFFFFF',
-            opacity: isNextDisabled ? 0.3 : 1,
-            cursor: isNextDisabled ? 'not-allowed' : 'pointer'
-          }}
-          onMouseEnter={(e) => {
-            if (!isNextDisabled) {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 144, 255, 0.4)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isNextDisabled) {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }
-          }}
+          className="sc-nav-button sc-nav-button--next"
         >
           <span>{nextText}</span>
           {nextIcon || (
-            <img src={publicAsset('/right_arrow2.svg')} alt="다음" style={{ width: '20px', height: '20px' }} />
+            <img src={publicAsset('/right_arrow2.svg')} alt="" />
           )}
         </button>
       )}
-    </>
+    </div>
   );
 }

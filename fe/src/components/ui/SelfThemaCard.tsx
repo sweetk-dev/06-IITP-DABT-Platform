@@ -56,7 +56,9 @@ export function SelfThemaCard({
       justifyContent: 'space-between',
       alignItems: 'flex-start',
       padding: '28px',
-      width: '384px',
+      // [2026-10 반응형] 384px 고정 → 최대 384px (좁은 화면에서는 부모 폭에 맞춤)
+      width: '100%',
+      maxWidth: '384px',
       minHeight: '211px',
       boxShadow: 'none'
     },
@@ -72,10 +74,11 @@ export function SelfThemaCard({
     }
   };
 
+  // [2026-10] 고정 height → minHeight: 정책명이 길어 2~3줄이 되면 글자가 카드 밖으로 넘쳤다
   const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { height: '120px' },
-    md: { height: '160px' },
-    lg: { height: '200px' }
+    sm: { minHeight: '120px' },
+    md: { minHeight: '160px' },
+    lg: { minHeight: '200px' }
   };
 
   const combinedStyle = {
@@ -125,7 +128,8 @@ export function CardContent({ children, className = '', style = {} }: CardConten
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         gap: '8px',
-        width: '328px',
+        width: '100%', /* [2026-10] 328px 고정 → 카드 폭에 맞춤 */
+        minWidth: 0,
         flex: 1,
         ...style
       }}
@@ -148,11 +152,12 @@ export function CardTitle({ children, className = '', style = {} }: CardTitlePro
       style={{
         color: 'black',
         fontSize: '24px',
-        fontFamily: 'Pretendard',
+        fontFamily: 'var(--font-family-primary)',
         fontWeight: 700,
         fontStyle: 'Bold',
         wordWrap: 'break-word',
-        width: '328px',
+        wordBreak: 'keep-all',
+        width: '100%', /* [2026-10] 328px 고정 → 카드 폭에 맞춤 */
         lineHeight: '140%',
         letterSpacing: '0%',
         ...style
@@ -174,12 +179,13 @@ export function CardSubtitle({ children, className = '', style = {} }: CardSubti
     <div 
       className={`card-subtitle ${className}`}
       style={{
-        color: '#0086ed',
+        // [2026-10 접근성] #0086ed(회색 카드 위 3.4:1) → 진한 파랑 토큰(5:1 이상)
+        color: 'var(--color-primary-text)',
         fontSize: '18px',
-        fontFamily: 'Pretendard',
+        fontFamily: 'var(--font-family-primary)',
         fontWeight: 600,
-        fontStyle: 'SemiBold',
-        whiteSpace: 'nowrap',
+        // 줄바꿈 허용 (nowrap 이면 좁은 화면에서 카드 밖으로 넘침)
+        whiteSpace: 'normal',
         lineHeight: '150%',
         letterSpacing: '0%',
         ...style

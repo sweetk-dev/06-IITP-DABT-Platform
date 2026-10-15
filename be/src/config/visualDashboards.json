@@ -1,0 +1,32 @@
+{
+  "_comment": "데이터 상세 화면 시각화(Metabase 공개 대시보드) 매핑. key = sys_data_summary_info.sys_tbl_id, value = Metabase 공개 대시보드 UUID. 이 값은 '현재 운영 중인 Metabase 인스턴스'에서 발급된 공개 링크 UUID 라 인스턴스마다 다르다(다른 서버에 설치하면 그 서버의 Metabase 에서 다시 발급해 바꿔야 함).",
+  "_howToUpdate": "Metabase 관리자 > 대시보드 > 공유(Sharing) > 공개 링크(Public link) 생성 후 URL 끝의 UUID 를 map 에 '<sys_tbl_id>': '<UUID>' 로 추가/수정한다. 매핑이 없는 데이터는 default(전체 '장애인데이터분석' 대시보드)를 쓴다. 대시보드 주소 앞부분은 환경변수 VISUAL_TOOL_BASE_URL(기본 https://www.sweetk.ai/iitp/analysis/public/dashboard/). 수정 후 BE 재빌드·재시작 필요(빌드 시 dist 로 복사됨).",
+  "default": "422fa2d8-ed1e-4a66-a8d9-fbc3ac23cea8",
+  "map": {
+    "stats_dis_reg_natl_by_new": "5730d710-289c-4c3e-a98f-a9101c3708a6",
+    "stats_dis_reg_natl_by_age_type_sev_gen": "abab786e-aa5e-4aaa-8c0a-f0ee3b427802",
+    "stats_dis_reg_sido_by_type_sev_gen": "96d007b0-96ae-4b50-9a27-2343ad7dc5a3",
+    "stats_dis_life_supp_need_lvl": "2efa59ec-ad33-46ec-9517-00d6c5f15db0",
+    "stats_dis_life_maincarer": "6c2bb58d-b8e2-42dc-af1d-937710f76605",
+    "stats_dis_life_primcarer": "03c640d8-17fa-4ca5-9ba5-216c253349d9",
+    "stats_dis_life_supp_field": "11234601-c195-452b-ae18-18641780a5d4",
+    "stats_dis_hlth_medical_usage": "cd11fb25-156e-4857-abc8-06387215f01b",
+    "stats_dis_hlth_disease_cost_sub": "e310bebb-367d-4dad-ab20-e6d05cea092a",
+    "stats_dis_hlth_sport_exec_type": "0b11c9ef-1c90-4b3f-8989-dfe1b8fcda89",
+    "stats_dis_hlth_exrc_best_aid": "8186301c-e0a0-4a3e-9f61-ed78fba5bb9b",
+    "stats_dis_aid_device_usage": "c3c282e0-6ef1-41a6-adb6-643c74a4592e",
+    "stats_dis_aid_device_need": "72bdd301-493a-4082-ae1f-4822355f15fc",
+    "stats_dis_edu_voca_exec": "df2cbc94-3dcc-4830-9b49-0ed15ba8b56c",
+    "stats_dis_edu_voca_exec_way": "541ce384-9438-4650-874e-0752f892fb07",
+    "stats_dis_emp_natl": "86819f47-b7d4-41e9-a9be-cdc5f18f3006",
+    "stats_dis_emp_natl_public": "aba597f4-bf87-4bf5-8afb-c3c69ec0b426",
+    "stats_dis_emp_natl_private": "105e96d3-03f2-4c76-9cf9-593bfaf3c1de",
+    "stats_dis_emp_natl_gov_org": "dacf5610-09da-4430-aff9-f446583b1d64",
+    "stats_dis_emp_natl_dis_type_sev": "9ebf0e47-bf96-4056-a717-7f2aa6480c22",
+    "mv_poi": "ad38aa26-0e2d-48e2-818c-42bf772a443c",
+    "emp_dis_jobseeker_status": "7be2fc5e-6a3a-46b7-95f1-19c7a440eff6",
+    "emp_dis_center_usage": "1bb26d60-370e-4b81-9d1b-da20e3f3a358",
+    "emp_dis_obligation_status": "6846067e-f104-46ac-bc00-53a1f2e825a3",
+    "emp_dis_consulting_his": "1db9bb30-2186-4de8-b68c-ed406125ea68"
+  }
+}

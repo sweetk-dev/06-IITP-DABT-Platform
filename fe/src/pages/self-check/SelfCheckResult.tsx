@@ -17,6 +17,15 @@ import {
 import { useRecommendations } from '../../api/hooks';
 import { publicAsset } from '../../utils/publicAsset';
 
+/*
+ * [2026-10 반응형·접근성 개편] — 점수 계산·70점 기준·추천 케이스 로직·추천 API 호출은 변경 없음(화면 표현만 변경)
+ *  - 점수 카드 4열 고정 → 1024px 이하 2열 (layout.css .sc-result-scores)
+ *  - 추천 카드: div+onClick → 실제 링크(<a target="_blank"> 외부 정책 / <Link> 더보기 화면)
+ *    384px 고정 카드·1200px 고정 줄 → 최대 384px, 좁은 화면 전체 폭
+ *  - 하단 버튼: <Link><button/></Link> 중첩 → 버튼 모양 링크 / 버튼 하나씩
+ *  - 강조 글자·점수 색: 배경 대비 3:1(큰 글자) 이상 되도록 진한 톤으로 조정
+ *  - 제목 구조: h1(결과) → h2(영역별 점수, 추천 정보) → h3(각 영역)
+ */
 export function SelfCheckResult() {
   const navigate = useNavigate();
   
@@ -195,16 +204,49 @@ export function SelfCheckResult() {
     return deficientThemes.map(area => getAreaName(area.theme as any));
   };
 
-  // 추천 항목 클릭 핸들러
-  const handleRecommendationClick = (recommendation: any) => {
-    if (recommendation.link) {
-      // API에서 받은 link가 있으면 새창으로 열기
-      window.open(recommendation.link, '_blank', 'noopener,noreferrer');
-    } else {
-      // link가 없으면 SelfCheckMore 페이지로 이동 (기본 메뉴, 자가진단 결과 전달)
-      const themes = getThemesFromScores();
-      navigate(`${ROUTE_PATHS.SELF_CHECK_MORE}?menu=${SELF_CHECK_MORE_CONSTANTS.MENU_TYPES.policies.code}&themes=${themes}`);
-    }
+  // 더 많은 지원 정보(SelfCheckMore) 경로 — 정책 메뉴 + 미달 영역 전달 (기존 계산식 그대로)
+  const getMorePath = () =>
+    `${ROUTE_PATHS.SELF_CHECK_MORE}?menu=${SELF_CHECK_MORE_CONSTANTS.MENU_TYPES.policies.code}&themes=${getThemesFromScores()}`;
+
+  /**
+   * 추천 카드 하나 그리기.
+   * [2026-10] 기존 div+onClick(window.open / navigate) → 실제 링크로 변경 (동작은 동일)
+   *  - link 가 있으면: 외부 정책 페이지 새 창 <a target="_blank" rel="noopener noreferrer">
+   *  - link 가 없으면: 자립 지원 정보(더보기) 화면 <Link>
+   */
+  const renderRecommendationCard = (rec: any, index: number) => {
+    const card = (
+      <SelfThemaCard variant="recommendation" size="md">
+        <CardContent style={{ flex: 1 }}>
+          <CardSubtitle>
+            {rec.self_rlty_type 
+              ? `${SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRltyTypeCode].name}을 위한`
+              : '정책'}
+          </CardSubtitle>
+          <CardTitle style={{ marginBottom: 0 }}>
+            {rec.policy_name || '정책명'}
+          </CardTitle>
+        </CardContent>
+        <CardIcon style={{ alignSelf: 'flex-end' }}>
+          {/* 화살표는 장식 (기존 alt="arrow") */}
+          <img src={publicAsset('/right_up.svg')} alt="" style={{ width: '20px', height: '20px' }} />
+        </CardIcon>
+      </SelfThemaCard>
+    );
+    return (
+      <li key={rec.policy_id || index} className="sc-result-rec-item">
+        {rec.link ? (
+          <a href={rec.link} target="_blank" rel="noopener noreferrer" className="sc-result-rec-link card-link">
+            {card}
+            <span className="sr-only">(새 창)</span>
+          </a>
+        ) : (
+          <Link to={getMorePath()} className="sc-result-rec-link card-link">
+            {card}
+          </Link>
+        )}
+      </li>
+    );
   };
 
   return (
@@ -214,48 +256,35 @@ export function SelfCheckResult() {
         width: '100%',
         maxWidth: '1840px',
         margin: '0 auto',
-        padding: '40px 0'
+        padding: '24px 0'
       }}>
         {/* Result Title Section */}
         <div id="self-check-result-title-section" style={{
           textAlign: 'center',
           marginBottom: '60px'
         }}>
-          <h1 id="self-check-result-main-title" style={{
-            fontSize: '48px',
-            fontFamily: 'Pretendard',
-            fontWeight: 700,
-            color: 'black',
-            marginBottom: '20px',
-            lineHeight: '1.2'
-          }}>
+          <h1 id="self-check-result-main-title" className="sc-result-title">
             나의 자립 점수는?<br />
             {(() => {
               const deficientNames = getDeficientThemeNames();
               if (deficientNames.length === 0) {
-                return <span style={{ color: '#0090ff' }}>모든 영역이 충분해요!</span>;
+                return <span className="sc-highlight">모든 영역이 충분해요!</span>;
               } else if (deficientNames.length === 1) {
-                return <><span style={{ color: '#0090ff' }}>{deficientNames[0]}</span>이 조금 더 필요해요.</>;
+                return <><span className="sc-highlight">{deficientNames[0]}</span>이 조금 더 필요해요.</>;
               } else if (deficientNames.length === 2) {
-                return <><span style={{ color: '#0090ff' }}>{deficientNames[0]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[1]}</span>이 조금 더 필요해요.</>;
+                return <><span className="sc-highlight">{deficientNames[0]}</span>, <span className="sc-highlight">{deficientNames[1]}</span>이 조금 더 필요해요.</>;
               } else if (deficientNames.length === 3) {
-                return <><span style={{ color: '#0090ff' }}>{deficientNames[0]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[1]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[2]}</span>이 조금 더 필요해요.</>;
+                return <><span className="sc-highlight">{deficientNames[0]}</span>, <span className="sc-highlight">{deficientNames[1]}</span>, <span className="sc-highlight">{deficientNames[2]}</span>이 조금 더 필요해요.</>;
               } else {
-                return <><span style={{ color: '#0090ff' }}>{deficientNames[0]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[1]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[2]}</span>, <span style={{ color: '#0090ff' }}>{deficientNames[3]}</span>이 조금 더 필요해요.</>;
+                return <><span className="sc-highlight">{deficientNames[0]}</span>, <span className="sc-highlight">{deficientNames[1]}</span>, <span className="sc-highlight">{deficientNames[2]}</span>, <span className="sc-highlight">{deficientNames[3]}</span>이 조금 더 필요해요.</>;
               }
             })()}
           </h1>
         </div>
 
-        {/* Score Cards */}
-        <div id="self-check-result-score-cards-container" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '40px',
-          width: '100%',
-          maxWidth: '1200px',
-          margin: '0 auto 80px auto'
-        }}>
+        {/* Score Cards — 화면에는 제목이 없어 스크린리더용 h2 를 둔다 */}
+        <h2 className="sr-only">영역별 자립 점수</h2>
+        <div id="self-check-result-score-cards-container" className="sc-result-scores">
           {/* Physical Card */}
           <div id="self-check-result-physical-card" style={{
             background: '#ffeef2',
@@ -272,10 +301,10 @@ export function SelfCheckResult() {
               background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
-            }} />
+            }} aria-hidden="true" />
             <h3 id="self-check-result-physical-title" style={{
               fontSize: '20px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 600,
               color: 'black',
               margin: '0 0 12px 0'
@@ -284,9 +313,9 @@ export function SelfCheckResult() {
             </h3>
             <div id="self-check-result-physical-score" style={{
               fontSize: '36px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 700,
-              color: '#e91e63',
+              color: '#c2185b', /* [2026-10 접근성] #e91e63(3.9:1) → 진한 분홍(5.3:1) */
               margin: '0'
             }}>
               {scores.phys || 0}점
@@ -309,10 +338,10 @@ export function SelfCheckResult() {
               background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
-            }} />
+            }} aria-hidden="true" />
             <h3 id="self-check-result-emotional-title" style={{
               fontSize: '20px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 600,
               color: 'black',
               margin: '0 0 12px 0'
@@ -321,9 +350,9 @@ export function SelfCheckResult() {
             </h3>
             <div id="self-check-result-emotional-score" style={{
               fontSize: '36px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 700,
-              color: '#ff9800',
+              color: '#a35a00', /* [2026-10 접근성] #ff9800(2.1:1) → 같은 주황 계열 진한 톤(5.1:1) */
               margin: '0'
             }}>
               {scores.emo || 0}점
@@ -346,10 +375,10 @@ export function SelfCheckResult() {
               background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
-            }} />
+            }} aria-hidden="true" />
             <h3 id="self-check-result-economic-title" style={{
               fontSize: '20px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 600,
               color: 'black',
               margin: '0 0 12px 0'
@@ -358,9 +387,9 @@ export function SelfCheckResult() {
             </h3>
             <div id="self-check-result-economic-score" style={{
               fontSize: '36px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 700,
-              color: '#4caf50',
+              color: '#2e7d32', /* [2026-10 접근성] #4caf50(2.7:1) → 진한 초록(4.9:1) */
               margin: '0'
             }}>
               {scores.econ || 0}점
@@ -383,10 +412,10 @@ export function SelfCheckResult() {
               background: `url(${publicAsset('/medal2.png')}) no-repeat center center / contain`,
               margin: '0 auto 16px',
               filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
-            }} />
+            }} aria-hidden="true" />
             <h3 id="self-check-result-social-title" style={{
               fontSize: '20px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 600,
               color: 'black',
               margin: '0 0 12px 0'
@@ -395,9 +424,9 @@ export function SelfCheckResult() {
             </h3>
             <div id="self-check-result-social-score" style={{
               fontSize: '36px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 700,
-              color: '#2196f3',
+              color: '#1565c0', /* [2026-10 접근성] #2196f3(2.9:1) → 진한 파랑(5.3:1) */
               margin: '0'
             }}>
               {scores.soc || 0}점
@@ -408,42 +437,22 @@ export function SelfCheckResult() {
       </div>
 
       {/* Recommendations Section - SelfCheckLayout 밖에 배치 */}
-      <div id="self-check-result-recommendations-section" style={{
-        width: '100%',
-        maxWidth: '1200px',
-        margin: '80px auto 0 auto',
-        padding: '0'
-      }}>
-        <h3 id="self-check-result-recommendations-title" style={{
-          fontSize: '32px',
-          fontFamily: 'Pretendard',
-          fontWeight: 700,
-          color: 'black',
-          textAlign: 'center',
-          marginBottom: '60px'
-        }}>
+      <section id="self-check-result-recommendations-section" className="sc-result-recs" aria-labelledby="self-check-result-recommendations-title">
+        <h2 id="self-check-result-recommendations-title" className="sc-result-recs-title">
           이런 정보를 확인해보세요
-        </h3>
+        </h2>
         
-        <div id="self-check-result-recommendations-grid" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '24px',
-          marginBottom: '60px',
-          width: '1200px',
-          margin: '0 auto'
-        }}>
+        <div id="self-check-result-recommendations-grid" className="sc-result-recs-grid">
           {recommendationsState.loading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            <div role="status" style={{ textAlign: 'center', padding: '40px', color: '#595959' }}>
               로딩 중...
             </div>
           ) : recommendationsState.error ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#e91e63' }}>
+            <div role="alert" style={{ textAlign: 'center', padding: '40px', color: '#c2185b' }}>
               추천 정책을 불러오는 중 오류가 발생했습니다.
             </div>
           ) : recommendations.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            <div style={{ textAlign: 'center', padding: '40px', color: '#595959' }}>
               추천 정책이 없습니다.
             </div>
           ) : (() => {
@@ -455,170 +464,42 @@ export function SelfCheckResult() {
               <>
                 {/* 기초 정책이 있으면 첫 줄에 표시 */}
                 {basicPolicies.length > 0 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    gap: '24px',
-                    flexWrap: 'wrap',
-                    width: '100%'
-                  }}>
-                    {basicPolicies.map((rec, index) => (
-                      <div 
-                        key={rec.policy_id || index} 
-                        onClick={() => handleRecommendationClick(rec)}
-                        style={{ 
-                          textDecoration: 'none', 
-                          cursor: rec.link ? 'pointer' : 'default'
-                        }}
-                      >
-                        <SelfThemaCard 
-                          variant="recommendation" 
-                          size="md"
-                        >
-                          <CardContent style={{ flex: 1 }}>
-                            <CardSubtitle>
-                              {rec.self_rlty_type 
-                                ? `${SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRltyTypeCode].name}을 위한`
-                                : '정책'}
-                            </CardSubtitle>
-                            <CardTitle style={{ 
-                              marginBottom: 0
-                            }}>
-                              {rec.policy_name || '정책명'}
-                            </CardTitle>
-                          </CardContent>
-                          <CardIcon style={{ alignSelf: 'flex-end' }}>
-                            <img 
-                              src={publicAsset('/right_up.svg')} 
-                              alt="arrow" 
-                              style={{
-                                width: '20px',
-                                height: '20px'
-                              }} 
-                            />
-                          </CardIcon>
-                        </SelfThemaCard>
-                      </div>
-                    ))}
-                  </div>
+                  <ul className="sc-result-rec-row">
+                    {basicPolicies.map((rec, index) => renderRecommendationCard(rec, index))}
+                  </ul>
                 )}
                 
                 {/* 테마 정책들 표시 */}
                 {themePolicies.length > 0 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    gap: '24px',
-                    flexWrap: 'wrap',
-                    width: '100%'
-                  }}>
-                    {themePolicies.map((rec, index) => (
-                      <div 
-                        key={rec.policy_id || index} 
-                        onClick={() => handleRecommendationClick(rec)}
-                        style={{ 
-                          textDecoration: 'none', 
-                          cursor: rec.link ? 'pointer' : 'default'
-                        }}
-                      >
-                        <SelfThemaCard 
-                          variant="recommendation" 
-                          size="md"
-                        >
-                          <CardContent style={{ flex: 1 }}>
-                            <CardSubtitle>
-                              {rec.self_rlty_type 
-                                ? `${SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES[rec.self_rlty_type as SelfRltyTypeCode].name}을 위한`
-                                : '정책'}
-                            </CardSubtitle>
-                            <CardTitle style={{ 
-                              marginBottom: 0
-                            }}>
-                              {rec.policy_name || '정책명'}
-                            </CardTitle>
-                          </CardContent>
-                          <CardIcon style={{ alignSelf: 'flex-end' }}>
-                            <img 
-                              src={publicAsset('/right_up.svg')} 
-                              alt="arrow" 
-                              style={{
-                                width: '20px',
-                                height: '20px'
-                              }} 
-                            />
-                          </CardIcon>
-                        </SelfThemaCard>
-                      </div>
-                    ))}
-                  </div>
+                  <ul className="sc-result-rec-row">
+                    {themePolicies.map((rec, index) => renderRecommendationCard(rec, index))}
+                  </ul>
                 )}
               </>
             );
           })()}
         </div>
 
-        {/* Action Buttons */}
-        <div id="self-check-result-action-buttons" style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '24px',
-          marginTop: '40px'
-        }}>
-          <Link to={ROUTE_PATHS.SELF_CHECK_START} style={{ textDecoration: 'none' }}>
-            <button id="self-check-result-restart-button" style={{
-              width: '280px',
-              height: '77px',
-              minWidth: '280px',
-              padding: '24px',
-              fontSize: '18px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              color: 'black',
-              background: '#FFFFFF',
-              border: '1px solid #DADADA',
-              borderRadius: '16px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px'
-            }}>
-              자가 진단 다시하기
-            </button>
+        {/* Action Buttons — 링크 안 버튼 중첩 제거 */}
+        <div id="self-check-result-action-buttons" className="sc-result-actions">
+          <Link
+            to={ROUTE_PATHS.SELF_CHECK_START}
+            id="self-check-result-restart-button"
+            className="cta-button sc-result-action sc-result-action--secondary"
+          >
+            자가 진단 다시하기
           </Link>
           <button 
+            type="button"
             id="self-check-result-more-info-button" 
-            onClick={() => {
-              const themes = getThemesFromScores();
-              navigate(`${ROUTE_PATHS.SELF_CHECK_MORE}?menu=${SELF_CHECK_MORE_CONSTANTS.MENU_TYPES.policies.code}&themes=${themes}`);
-            }}
-            style={{
-              width: '280px',
-              height: '77px',
-              minWidth: '280px',
-              padding: '24px',
-              fontSize: '18px',
-              fontFamily: 'Pretendard',
-              fontWeight: 600,
-              color: 'white',
-              background: '#0090FF',
-              border: 'none',
-              borderRadius: '16px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px'
-            }}>
-              더 많은 지원 정보 보기
-            </button>
+            className="cta-button sc-result-action sc-result-action--primary"
+            onClick={() => navigate(getMorePath())}
+          >
+            더 많은 지원 정보 보기
+          </button>
         </div>
 
-      </div>
+      </section>
     </Layout>
   );
 }

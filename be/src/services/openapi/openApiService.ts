@@ -216,6 +216,56 @@ class OpenApiClient {
   }
 }
 
+// ============================================================================
+// [2026-10] 미리보기 행 정렬 — 기초(통계) 데이터 최신 연도 우선
+// ============================================================================
+
+/** 통계 행의 기간 필드 후보 (09 Open API 기초 통계 응답은 prdDe: 통계연도(숫자)) */
+const PERIOD_KEYS = ['prdDe', 'prd_de'] as const;
+
+/** 행에서 기간 값을 숫자로 꺼낸다. 2022 / "2022" / "202212"(연월) 모두 숫자 비교 가능. 없으면 null */
+function getPeriodValue(row: any): number | null {
+  if (!row || typeof row !== 'object') return null;
+  for (const key of PERIOD_KEYS) {
+    const raw = row[key];
+    if (raw === null || raw === undefined || raw === '') continue;
+    const num = Number(String(raw).replace(/[^0-9]/g, ''));
+    if (Number.isFinite(num) && num > 0) return num;
+  }
+  return null;
+}
+
+/**
+ * 통계 미리보기 행을 기간(prdDe) 내림차순으로 정렬한다 — 순수 함수(원본 배열 변경 없음).
+ *
+ * 배경: 09 Open API 의 기초 통계 /latest 는 최근 3+1개년 전체를 `prd_de ASC`(오래된 연도 먼저)로 주고,
+ *       06 BE 는 그중 앞에서 N건만 잘라 화면에 보낸다 → 화면에는 항상 가장 오래된 연도만 보였다.
+ * 처리: 자르기 "전에" 최신 연도가 앞으로 오도록 정렬한다.
+ *  - 안정 정렬(stable): 같은 연도 안에서는 09 가 준 원래 순서(분류 순서)를 그대로 유지한다.
+ *    (Array.prototype.sort 는 Node 12+ 에서 안정 정렬이 보장되지만, 명시적으로 원래 인덱스를 보조 키로 쓴다)
+ *  - 기간 값이 없는 행은 맨 뒤로 보낸다.
+ *
+ * @example sortPreviewRowsByPeriodDesc([{prdDe:2022},{prdDe:2024},{prdDe:2023}]) // 2024, 2023, 2022
+ */
+export function sortPreviewRowsByPeriodDesc<T = any>(rows: T[]): T[] {
+  return rows
+    .map((row, index) => ({ row, index, period: getPeriodValue(row) }))
+    .sort((a, b) => {
+      if (a.period === null && b.period === null) return a.index - b.index;
+      if (a.period === null) return 1;   // 기간 없는 행은 뒤로
+      if (b.period === null) return -1;
+      if (b.period !== a.period) return b.period - a.period; // 최신 연도 먼저
+      return a.index - b.index;          // 같은 연도: 원래 순서 유지
+    })
+    .map((entry) => entry.row);
+}
+
+/** getDataPreview 추가 옵션 (2026-10) */
+export interface PreviewOptions {
+  /** true 면 자르기 전에 기간(prdDe) 내림차순 정렬 — 기초(통계) 데이터에서 사용 */
+  sortByPeriodDesc?: boolean;
+}
+
 // OpenAPI 서비스 클래스
 class OpenApiService {
   private client: OpenApiClient;
@@ -225,7 +275,8 @@ class OpenApiService {
   }
 
   // 데이터 미리보기 조회
-  async getDataPreview(openApiUrl: string, query?: any): Promise<any> {
+  // [2026-10] options.sortByPeriodDesc: 기초(통계) 데이터는 최신 연도부터 보이도록 자르기 전에 정렬
+  async getDataPreview(openApiUrl: string, query?: any, options: PreviewOptions = {}): Promise<any> {
     try {
       logger.debug('OpenAPI 데이터 미리보기 조회 시작', { openApiUrl, query });
       
@@ -290,9 +341,13 @@ class OpenApiService {
       
       let limitedData = data;
       
+      // [2026-10] 기초(통계) 데이터: 자르기 전에 최신 연도(prdDe) 순으로 정렬 (sortPreviewRowsByPeriodDesc 주석 참고)
+      // 응답 구조별로 실제 행 배열을 찾아 정렬한 사본으로 교체한다. 그 외 데이터 유형은 기존 순서 그대로.
+      const sortRows = (rows: any[]) => (options.sortByPeriodDesc ? sortPreviewRowsByPeriodDesc(rows) : rows);
+
       // items 구조는 템플릿 여부와 무관하게 항상 BE에서 limit 적용
       if (hasItemsArray) {
-        limitedData = data.items.slice(0, requestedLimit);
+        limitedData = sortRows(data.items).slice(0, requestedLimit);
         logger.debug('items 구조 limit 적용', {
           hasTemplate,
           requestedLimit,
@@ -304,17 +359,21 @@ class OpenApiService {
       else if (!hasTemplate) {
         // Case 1: 응답이 직접 배열 형식 [{}, {}, ...]
         if (Array.isArray(data)) {
-          limitedData = data.slice(0, requestedLimit);
+          limitedData = sortRows(data).slice(0, requestedLimit);
         }
         // Case 2: 응답이 PageRes 형식 { content: [], page: 1, size: 10, total: 100 }
         // → content 배열만 잘라서 반환 (PageRes 구조 제거, content만 전달)
         else if (hasContentArray) {
-          limitedData = data.content.slice(0, requestedLimit);
+          limitedData = sortRows(data.content).slice(0, requestedLimit);
         }
       }
       // 템플릿이 있고 content 구조인 경우: OpenAPI가 이미 limit 적용했으므로 content만 추출
       else if (hasTemplate && hasContentArray) {
-        limitedData = data.content;
+        limitedData = sortRows(data.content);
+      }
+      // 템플릿이 있고 직접 배열인 경우(기존에는 그대로 통과): 정렬만 적용
+      else if (Array.isArray(data)) {
+        limitedData = sortRows(data);
       }
       
       // 최종 반환 데이터 검증: 배열이 아니면 빈 배열 반환
@@ -348,6 +407,7 @@ class OpenApiService {
         finalSize,     // FE로 전달하는 최종 크기
         limitApplied,  // limit 적용 여부
         limitSource: query?.limit ? 'FE request' : 'BE default',  // limit 출처
+        sortedByPeriodDesc: !!options.sortByPeriodDesc,  // [2026-10] 최신 연도 우선 정렬 적용 여부
         limitValue: hasItemsArray && requestedLimit !== pageSize ? requestedLimit : pageSize,  // 실제 적용된 limit 값
       });
       

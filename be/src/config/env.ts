@@ -30,6 +30,11 @@ const envSchema = z.object({
   OPEN_API_AUTH_SECRET: z.string().optional(), // (사용되지 않음, 하위 호환용)
   OPEN_API_PAGE_SIZE: z.string().transform(Number).default('100'),
   OPEN_API_TIMEOUT: z.string().transform(Number).default('30000'),
+
+  // [2026-10] 데이터 상세 시각화(Metabase 공개 대시보드) 주소 앞부분.
+  //   상세 응답의 visual_url = VISUAL_TOOL_BASE_URL + '/' + 대시보드 UUID (config/visualDashboards.json)
+  //   'off' 로 설정하면 visual_url 을 내려주지 않는다.
+  VISUAL_TOOL_BASE_URL: z.string().default('https://www.sweetk.ai/iitp/analysis/public/dashboard/'),
   
   // 로깅 설정
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),

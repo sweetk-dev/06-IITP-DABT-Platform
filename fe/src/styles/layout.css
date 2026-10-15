@@ -1,0 +1,1140 @@
+/* ============================================================================
+ * layout.css — 2026-10 반응형 레이아웃 · 접근성(KWCAG 2.2 / WCAG 2.1 AA) 공통 스타일
+ * ----------------------------------------------------------------------------
+ * 배경
+ *  - 기존 화면은 헤더·본문·자가진단 패널이 1200px / 1840px 고정 폭(inline style)이라
+ *    360px 폭 휴대폰에서 문서가 1200~1620px 로 가로 스크롤되고, 1440px 에서도
+ *    자가진단 화면이 1640px 로 넘쳤다.
+ *  - 이 파일은 "고정 폭 → 최대 폭(max-width) + 좌우 여백" 원칙으로 공통 골격을 다시 잡는다.
+ *
+ * 중단점(breakpoint) 기준 — 모든 화면에서 같은 값을 쓴다
+ *  - 1024px 이하 : 태블릿 가로/작은 노트북 (2열 → 1열 전환 시작)
+ *  - 768px  이하 : 태블릿 세로/큰 휴대폰 (헤더 검색 접힘, 카드 1열)
+ *  - 480px  이하 : 휴대폰 (글자·여백 축소)
+ *
+ * 색상은 globals.css 의 토큰(--color-primary-text 등)만 참조한다.
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 접근성 유틸리티
+ * ------------------------------------------------------------------------- */
+
+/* 화면에는 보이지 않지만 스크린리더는 읽는 텍스트 (예: 페이지 h1, "새 창" 안내)
+   display:none 과 달리 접근성 트리에 남는다. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* "본문 바로가기" 건너뛰기 링크 (KWCAG 6.4.1 반복 영역 건너뛰기)
+   평소에는 화면 밖에 있다가 Tab 으로 초점을 받으면 좌상단에 나타난다. */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 2000;
+  padding: 12px 20px;
+  background: var(--color-primary-strong);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 12px;
+}
+
+/* 키보드 초점 표시 (KWCAG 6.2.1 초점 이동과 표시)
+   - 기존 코드 곳곳의 inline style 이 outline 을 'none' 이나 테두리 용도로 덮어쓰고 있어
+     !important 로 초점 표시를 강제한다. 마우스 클릭 시에는 :focus-visible 이 적용되지 않으므로
+     기존 디자인(클릭 시 테두리 없음)은 유지된다. */
+:focus-visible {
+  outline: 3px solid var(--color-focus-ring) !important;
+  outline-offset: 2px !important;
+  /* 기존 요소들의 'transition: all' 이 outline 에도 적용돼 초점 표시가 서서히 나타나는 것을 막음 */
+  transition-property: background-color, color, border-color, box-shadow, transform !important;
+}
+/* 검색 입력칸처럼 바깥 상자(form)가 테두리 역할을 하는 경우는 상자에 초점 표시 */
+.header-search-form:focus-within {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.header-search-form input:focus-visible {
+  outline: none !important;
+}
+
+/* 움직임 줄이기 설정을 켠 사용자에게는 hover 이동·전환 애니메이션을 끈다 (WCAG 2.3.3 권장) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 사이트 골격: header / main / footer
+ * ------------------------------------------------------------------------- */
+
+.site-root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary);
+}
+
+/* 본문 폭: 콘텐츠 영역 1200px 을 유지하면서 좌우 여백(--site-gutter)을 더한 값이 최대 폭.
+   그래서 1440px 이상 화면에서는 기존과 똑같이 1200px 로 보이고, 그보다 좁으면 자연스럽게 줄어든다. */
+.site-container {
+  --site-gutter: 24px;
+  width: 100%;
+  max-width: calc(1200px + var(--site-gutter) * 2);
+  margin: 0 auto;
+  padding-left: var(--site-gutter);
+  padding-right: var(--site-gutter);
+}
+/* 자가진단 패널처럼 넓게 쓰는 화면용 (기존 1840px 패널 폭을 최대값으로) */
+.site-container--wide {
+  max-width: calc(1840px + var(--site-gutter) * 2);
+}
+
+.site-header {
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-primary);
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* 넓은 화면: 로고·메뉴·검색 한 줄 (줄바꿈하면 검색창이 둘째 줄로 내려감). 1024px 이하에서 wrap */
+  flex-wrap: nowrap;
+  gap: 12px 24px;
+  min-height: 118px; /* 기존 헤더 높이 유지 */
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.site-logo {
+  flex-shrink: 0;
+  color: #000;
+  font-size: 30px;
+  font-weight: 700;
+  font-family: var(--font-family-primary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* 헤더 주요 메뉴 (nav 랜드마크). 기존에는 홈 외 주요 화면으로 가는 메뉴가 없어
+   자가진단·사이트 소개로 가려면 홈으로 돌아가야 했다. */
+.site-nav {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.site-nav-list {
+  display: flex;
+  gap: 4px 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* 터치 영역 44px 이상 (WCAG 2.5.5 권장) */
+  padding: 0 4px;
+  color: var(--color-text-primary);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.site-nav-link:hover {
+  color: var(--color-primary-text);
+}
+.site-nav-link[aria-current='page'] {
+  color: var(--color-primary-text);
+  border-bottom-color: var(--color-primary);
+}
+
+/* 헤더 검색 */
+.header-search {
+  flex: 0 1 485px; /* 기존 검색창 폭 485px 를 최대값으로 */
+  min-width: 220px;
+  display: flex;
+  justify-content: flex-end;
+}
+.header-search-form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--figma-gray-50);
+  border: 1px solid var(--figma-gray-150);
+  border-radius: 16px;
+  padding: 0 8px 0 24px;
+  min-height: 58px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.header-search-form:hover {
+  border-color: var(--figma-gray-300);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.header-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 18px;
+  font-family: var(--font-family-primary);
+  padding: 12px 0;
+}
+.header-search-input::placeholder {
+  color: var(--color-text-muted);
+}
+.header-search-submit,
+.header-search-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+.header-search-submit:hover,
+.header-search-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.header-search-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+/* 데스크톱에서는 펼침 버튼이 필요 없다 */
+.header-search-toggle {
+  display: none;
+}
+
+.site-main {
+  flex: 1;
+  width: 100%;
+  padding-bottom: 94px; /* 기존 본문 하단 여백 유지 */
+}
+/* 건너뛰기 링크로 main 에 초점이 와도 큰 테두리를 그리지 않음 (main 은 조작 요소가 아님) */
+.site-main:focus {
+  outline: none;
+}
+.site-main:focus-visible {
+  outline: none !important;
+}
+.site-main--no-breadcrumb {
+  padding-top: 28px;
+}
+
+.site-footer {
+  width: 100%;
+  min-height: 120px;
+  background: #282828;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+  text-align: center;
+}
+.site-footer p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+/* 브레드크럼 (nav 랜드마크, aria-label="현재 위치")
+   기존에는 전체를 opacity 0.5 로 흐리게 처리해 글자 대비가 2:1 수준이었다. 투명도 대신 진한 회색 사용 */
+.breadcrumb-nav {
+  margin: 28px 0;
+}
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumb-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.breadcrumb-link,
+.breadcrumb-current {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20.8px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.breadcrumb-link:hover {
+  color: var(--color-primary-text);
+  text-decoration: underline;
+}
+.breadcrumb-current {
+  color: var(--color-primary-text);
+  font-weight: 700;
+}
+.breadcrumb-sep {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 공통 컴포넌트 보정
+ * ------------------------------------------------------------------------- */
+
+/* 표가 넓을 때 페이지가 아니라 표 상자 안에서만 가로 스크롤 */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 링크처럼 보이는 버튼/카드의 기본 글자 장식 제거 */
+a.card-link,
+a.card-link:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 버튼 모양 링크 (기존 <Link><button/></Link> 중첩을 하나의 <a> 로 바꾸면서 사용) */
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-family-primary);
+}
+
+/* 모달 (role="dialog") — 폭을 화면에 맞게 줄인다 */
+.modal-dialog {
+  width: min(408px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 반응형 — 헤더/푸터
+ * ------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .site-header-inner {
+    flex-wrap: wrap;
+    min-height: 0;
+    padding-top: 20px;
+    padding-bottom: 16px;
+  }
+  /* 메뉴를 로고 아래 줄로 내린다 */
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+  .site-nav-list {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-container {
+    --site-gutter: 16px; /* 휴대폰 좌우 여백 16px */
+  }
+  .site-header-inner {
+    padding-top: 12px;
+    padding-bottom: 8px;
+    gap: 4px 12px;
+  }
+  .site-logo {
+    font-size: 22px;
+  }
+  .site-nav-list {
+    gap: 0 14px;
+  }
+  .site-nav-link {
+    font-size: 15px;
+    padding: 0 2px;
+  }
+  /* 검색: 아이콘 버튼만 보이고, 누르면 로고 아래 전체 폭으로 펼쳐진다 */
+  .header-search {
+    flex: 0 0 auto;
+    min-width: 0;
+    order: 2;
+  }
+  .header-search-toggle {
+    display: inline-flex;
+  }
+  .header-search-form {
+    display: none;
+    min-height: 52px;
+    padding-left: 16px;
+  }
+  .header-search.is-open {
+    order: 4;
+    flex: 1 1 100%;
+  }
+  .header-search.is-open .header-search-toggle {
+    display: none;
+  }
+  .header-search.is-open .header-search-form {
+    display: flex;
+  }
+  .header-search-input {
+    font-size: 16px; /* iOS 는 16px 미만 입력칸에서 화면을 확대하므로 16px 유지 */
+  }
+  .site-main {
+    padding-bottom: 56px;
+  }
+  .site-main--no-breadcrumb {
+    padding-top: 16px;
+  }
+  .site-footer {
+    min-height: 96px;
+  }
+  .site-footer p {
+    font-size: 15px;
+  }
+  .breadcrumb-nav {
+    margin: 16px 0;
+  }
+  .breadcrumb-link,
+  .breadcrumb-current,
+  .breadcrumb-sep {
+    font-size: 14px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 자가진단 (start / identity / questions)
+ *  - 기존: 1840×840px 패널을 position:absolute 로 띄우고, 이전/다음 버튼을
+ *    피그마 좌표(top 822px)에 절대 배치 → 화면 높이가 900px 대면 버튼이 패널 경계에 걸리거나
+ *    화면 밖으로 나갔다.
+ *  - 변경: 패널은 문서 흐름(normal flow) 안의 블록이고 높이는 내용만큼. 문항·선택지·이전/다음이
+ *    한 열로 쌓이고 간격을 줄여 1440×900, 1920×920, 360×780 모두 한 화면에 들어오게 한다.
+ * ------------------------------------------------------------------------- */
+.sc-panel {
+  position: relative;
+  width: 100%;
+  margin: 24px auto 0;
+  background: #f0f8ff;
+  border-radius: 40px;
+  padding: 28px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.sc-panel-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+/* "메인화면으로 이동" — 기존 div+onClick 을 button 으로 바꾸고 opacity 대신 대비 확보된 회색 사용 */
+.sc-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 8px;
+  margin-left: -8px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+}
+.sc-back-button:hover {
+  color: var(--color-text-primary);
+  background: rgba(0, 0, 0, 0.04);
+}
+.sc-back-button img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.sc-body {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.sc-title {
+  margin: 0;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all; /* 한국어 단어 중간 줄바꿈 방지 */
+  overflow-wrap: anywhere;
+}
+.sc-title:focus {
+  outline: none;
+}
+.sc-subtitle {
+  margin: 0;
+  color: #000;
+  font-size: 20px;
+  line-height: 30px;
+  word-break: keep-all;
+}
+.sc-area-label {
+  color: var(--color-primary-text);
+  font-size: 20px;
+  font-weight: 700;
+}
+.sc-highlight {
+  color: var(--color-primary-text);
+}
+
+/* 진행 단계 (본인 확인 → 4개 영역) */
+.sc-progress {
+  width: 100%;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 100px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  padding: 16px 28px;
+}
+.sc-progress-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sc-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.sc-progress-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  white-space: nowrap;
+}
+.sc-progress-step.is-active {
+  color: #000;
+  font-weight: 600;
+}
+.sc-progress-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d9d9;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.sc-progress-step.is-active .sc-progress-num {
+  background: var(--color-primary-strong);
+  color: #fff;
+}
+.sc-progress-sep {
+  width: 40px;
+  height: 1px;
+  background: #a4a4a4;
+}
+.sc-progress-sep.is-active {
+  background: var(--color-primary);
+}
+/* 좁은 화면용 요약 표시: "2/5 신체적 자립(0/8)" */
+.sc-progress-compact {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+.sc-progress-compact-count {
+  color: var(--color-primary-text);
+  font-weight: 700;
+}
+.sc-progress-bar {
+  display: none;
+  width: 100%;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: #e3e9ef;
+  overflow: hidden;
+}
+.sc-progress-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+/* 선택지 (라디오 그룹) — 1~5 척도 */
+/* 데스크톱: [전혀 아니다] (1)(2)(3)(4)(5) [매우 그렇다] 한 줄
+   좁은 화면: 첫 줄에 양끝 라벨, 둘째 줄에 버튼 5개 (grid-template-areas 로 위치만 바꿈) */
+.sc-scale {
+  width: 100%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-areas: 'min opts max';
+  align-items: center;
+  justify-content: center;
+  gap: 12px 32px;
+}
+.sc-scale-label--min { grid-area: min; }
+.sc-scale-label--max { grid-area: max; }
+.sc-scale-options { grid-area: opts; }
+.sc-scale-label {
+  color: #000;
+  font-size: 22px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.sc-scale-label--min { text-align: right; }
+.sc-scale-label--max { text-align: left; }
+.sc-scale-options {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+}
+.sc-scale-option {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--color-text-primary);
+  border: 5px solid #b2deff;
+  font-size: 28px;
+  font-weight: 700;
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.sc-scale-option:hover {
+  border-color: var(--color-primary);
+  background: #f0f8ff;
+  transform: translateY(-2px);
+}
+.sc-scale-option[aria-checked='true'] {
+  /* 선택 상태: 28px 굵게(700) 흰 글자 → 큰 글자 기준(3:1) 충족, 브랜드 파랑 유지 */
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 144, 255, 0.3);
+}
+
+/* 선택지 (라디오 그룹) — 본인 확인 문항의 글자형 선택지 */
+.sc-choices {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px 40px;
+}
+.sc-choice {
+  min-width: 280px;
+  min-height: 72px;
+  padding: 12px 24px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sc-choice:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-color: #b2deff;
+}
+.sc-choice[aria-checked='true'] {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 144, 255, 0.3);
+}
+
+/* 이전 / 다음 — 패널 안, 선택지 바로 아래 (문서 흐름 안에 배치) */
+.sc-nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 8px;
+}
+.sc-nav-button {
+  min-width: 240px;
+  min-height: 64px;
+  padding: 0 24px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700; /* 흰 글자/파랑 배경 대비를 "큰 글자(굵게 18.66px↑)" 기준으로 충족 */
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sc-nav-button img {
+  width: 20px;
+  height: 20px;
+}
+.sc-nav-button--prev {
+  background: #fff;
+  color: var(--color-text-primary);
+  border: 1px solid #dadada;
+}
+.sc-nav-button--prev:hover {
+  border-color: #999;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+.sc-nav-button--next {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sc-nav-button--next:hover:not(:disabled) {
+  box-shadow: 0 6px 16px rgba(0, 144, 255, 0.4);
+  transform: translateY(-2px);
+}
+.sc-nav-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* 자가진단 시작 버튼 */
+.sc-start-button {
+  width: min(600px, 100%);
+  padding: 28px 48px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 1px 30px 8px rgba(0, 144, 255, 0.2);
+  margin-top: 16px;
+}
+.sc-start-button:hover {
+  background: #007acc;
+}
+
+@media (max-width: 1024px) {
+  .sc-panel {
+    border-radius: 28px;
+    padding: 20px 24px 24px;
+    gap: 16px;
+  }
+  /* 진행 단계: 5단계 전체 목록 대신 요약 + 진행 막대 */
+  .sc-progress {
+    border-radius: 16px;
+    padding: 12px 16px;
+  }
+  .sc-progress-list {
+    display: none;
+  }
+  .sc-progress-compact,
+  .sc-progress-bar {
+    display: flex;
+  }
+  .sc-title {
+    font-size: 26px;
+  }
+  /* 라벨은 버튼 줄 위에 양 끝 정렬로, 버튼 5개는 그 아래 한 줄로 */
+  .sc-scale {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'min max'
+      'opts opts';
+    justify-content: stretch;
+    gap: 6px 8px;
+  }
+  .sc-scale-label--min { text-align: left; }
+  .sc-scale-label--max { text-align: right; }
+}
+
+@media (max-width: 768px) {
+  .sc-panel {
+    margin-top: 12px;
+    border-radius: 20px;
+    padding: 12px 16px 16px;
+    gap: 12px;
+  }
+  .sc-body {
+    gap: 10px;
+  }
+  .sc-title {
+    font-size: 21px;
+    line-height: 1.45;
+  }
+  .sc-subtitle {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .sc-area-label {
+    font-size: 16px;
+  }
+  .sc-scale-label {
+    font-size: 15px;
+  }
+  .sc-scale-options {
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .sc-scale-option {
+    /* 한 줄 5개, 터치 영역 44px 이상 유지 (360px 폭 기준 약 54px) */
+    width: auto;
+    height: auto;
+    flex: 1 1 0;
+    aspect-ratio: 1 / 1;
+    min-width: 44px;
+    max-width: 64px;
+    min-height: 44px;
+    border-width: 3px;
+    font-size: 20px;
+  }
+  .sc-choices {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .sc-choice {
+    min-width: 0;
+    width: 100%;
+    min-height: 52px;
+    font-size: 19px; /* 19px 굵게 = 큰 글자 기준 → 선택 시 흰 글자/파랑 배경 대비 충족 */
+  }
+  /* 이전/다음: 패널 하단에 붙여(sticky) 문항이 길어도 항상 보이게 */
+  .sc-nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    gap: 10px;
+    margin-top: 4px;
+    padding: 8px 0 4px;
+    background: #f0f8ff;
+  }
+  .sc-nav-button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 52px;
+    font-size: 19px;
+  }
+  .sc-start-button {
+    padding: 18px 24px;
+    font-size: 20px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 자가진단 결과 (/self-check/result)
+ *  - 4열 점수 카드(1200px), 384px 추천 카드 줄(1200px 고정), 280px 버튼 → 유동 폭
+ * ------------------------------------------------------------------------- */
+.sc-result-title {
+  margin: 0 0 20px;
+  color: #000;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+.sc-result-scores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 64px;
+}
+.sc-result-recs {
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto 0;
+}
+.sc-result-recs-title {
+  margin: 0 0 40px;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+}
+.sc-result-recs-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+.sc-result-rec-row {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sc-result-rec-item {
+  flex: 0 1 384px;
+  min-width: 0;
+  display: flex;
+}
+.sc-result-rec-link {
+  display: flex;
+  width: 100%;
+  border-radius: 16px;
+}
+.sc-result-rec-link > .self-thema-card {
+  width: 100% !important;
+  max-width: none !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sc-result-rec-link:hover > .self-thema-card {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+.sc-result-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin-top: 40px;
+}
+.sc-result-action {
+  min-width: 280px;
+  min-height: 72px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-size: 20px;  /* 20px 굵게(700) = 큰 글자 → 흰 글자/브랜드 파랑 대비 기준(3:1) 충족 */
+  font-weight: 700;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.sc-result-action--secondary {
+  background: #fff;
+  color: #000;
+  border: 1px solid #dadada;
+}
+.sc-result-action--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sc-result-action:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+  .sc-result-title {
+    font-size: 34px;
+  }
+  .sc-result-scores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .sc-result-recs-title {
+    font-size: 26px;
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sc-result-title {
+    font-size: 26px;
+  }
+  .sc-result-rec-item {
+    flex-basis: 100%;
+  }
+  .sc-result-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sc-result-action {
+    min-width: 0;
+    width: 100%;
+    min-height: 56px;
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sc-result-scores {
+    gap: 10px;
+  }
+  /* 점수 카드 안쪽 여백·숫자 크기 축소 (inline style 덮어쓰기) */
+  .sc-result-scores > div {
+    padding: 16px 8px !important;
+  }
+  .sc-result-scores h3 {
+    font-size: 17px !important;
+  }
+  .sc-result-scores h3 + div {
+    font-size: 28px !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 사이트 소개 (/info)
+ *  - 1200px 고정 폭 블록, 1920px 배경, 단계 원 3개 + 절대 위치 화살표, 200+640+200px 고정 3단 구성
+ *    → 유동 폭 + 1024px 이하 세로 쌓기 (Info.tsx 의 inline style 위에 클래스로 덮어씀)
+ * ------------------------------------------------------------------------- */
+.info-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.info-hero-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+.info-hero-inner::after {
+  content: none;
+}
+.info-stages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 80px;
+  list-style: none;
+  padding: 0;
+}
+.info-stage-arrow {
+  position: relative;
+  flex: 0 0 60px;
+  height: 8px;
+}
+/* 단계 원은 줄어들지 않게 (줄면 타원이 됨) */
+.info-stages > div[id^='info-stage-card'] {
+  flex-shrink: 0;
+}
+.info-diagnosis-section {
+  flex-wrap: wrap;
+}
+@media (max-width: 1024px) {
+  .info-hero-inner {
+    flex-direction: column;
+  }
+  .info-hero-text,
+  .info-hero-text > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* 이미지 칸이 내용 폭(0)으로 줄어 이미지가 사라지지 않도록 전체 폭으로 */
+  #info-hero-right {
+    align-self: stretch;
+  }
+  .info-hero-image {
+    width: 100% !important;
+    max-width: 486px;
+    height: auto !important;
+    aspect-ratio: 486 / 347;
+    align-self: center;
+  }
+  .info-stages {
+    flex-direction: column;
+    gap: 12px;
+  }
+  /* 세로로 쌓일 때 화살표는 아래 방향 */
+  .info-stage-arrow {
+    flex-basis: 8px;
+    width: 40px;
+    transform: rotate(90deg);
+    margin: 16px 0;
+  }
+  .info-diagnosis-section {
+    gap: 24px !important;
+    padding: 48px 16px !important;
+  }
+  .info-diagnosis-content {
+    flex: 1 1 100% !important;
+  }
+}
+@media (max-width: 768px) {
+  .info-diagnosis-side {
+    display: none !important;
+  }
+  .info-role-cards {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+  .info-diagnosis-button {
+    min-width: 0 !important;
+    width: 100%;
+    font-size: 20px !important;
+  }
+  .info-title-h1 {
+    font-size: 26px !important;
+  }
+  .info-section-title {
+    font-size: 22px !important;
+  }
+  .info-role-title {
+    font-size: 20px !important;
+    line-height: 1.4 !important;
+  }
+}
