@@ -23,6 +23,8 @@ import { logger } from '../../config/logger';
 import { openApiService } from '../../services/openapi/openApiService';
 import { getSequelize } from '../../config/database';
 import { Op } from 'sequelize';
+import { buildDataOrder } from '../../utils/response';
+import { buildVisualUrl } from '../../config/visualDashboards';
 
 // 데이터 Repository 클래스
 class DataRepository extends BaseRepository<DataSummaryInfo> {
@@ -45,7 +47,8 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           del_yn: 'N',
         },
         limit: options.limit,
-        order: [[options.orderBy, options.direction]],
+        // [2026-10] NULL 뒤로 + data_id 보조 정렬 (utils/response.ts buildDataOrder 참고)
+        order: buildDataOrder(options.orderBy, options.direction),
         attributes: ['data_id', 'title', 'data_type'],
       });
 
@@ -174,7 +177,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         where,
         page: options.page,
         pageSize: options.pageSize,
-        order: [[options.orderBy, options.direction]],
+        order: buildDataOrder(options.orderBy, options.direction),
         attributes: [
           'data_id',
           'title',
@@ -186,6 +189,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'src_org_name',
           'src_latest_chn_dt',
           'sys_data_reg_dt',
+          'data_format',    // [2026-10] 목록 "제공 포맷" 표시용 (기존에는 내려주지 않아 화면이 항상 'csv' 로 표시)
         ],
       });
 
@@ -201,6 +205,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
           sys_data_reg_dt: item.sys_data_reg_dt,
+          data_format: item.data_format || undefined,
         })),
         totalItems,
       };
@@ -270,7 +275,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         },
         page: options.page,
         pageSize: options.pageSize,
-        order: [[options.orderBy, options.direction]],
+        order: buildDataOrder(options.orderBy, options.direction),
         attributes: [
           'data_id',
           'title',
@@ -282,6 +287,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'src_org_name',
           'src_latest_chn_dt',
           'sys_data_reg_dt',
+          'data_format',    // [2026-10] 목록 "제공 포맷" 표시용 (기존에는 내려주지 않아 화면이 항상 'csv' 로 표시)
         ],
       });
 
@@ -297,6 +303,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
           sys_data_reg_dt: item.sys_data_reg_dt,
+          data_format: item.data_format || undefined,
         })),
         totalItems,
       };
@@ -359,7 +366,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         },
         page: options.page,
         pageSize: options.pageSize,
-        order: [[options.orderBy, options.direction]],
+        order: buildDataOrder(options.orderBy, options.direction),
         attributes: [
           'data_id',
           'title',
@@ -371,6 +378,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           'src_org_name',
           'src_latest_chn_dt',
           'sys_data_reg_dt',
+          'data_format',    // [2026-10] 목록 "제공 포맷" 표시용 (기존에는 내려주지 않아 화면이 항상 'csv' 로 표시)
         ],
       });
 
@@ -386,6 +394,7 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           src_org_name: item.src_org_name,
           src_latest_chn_dt: item.src_latest_chn_dt,
           sys_data_reg_dt: item.sys_data_reg_dt,
+          data_format: item.data_format || undefined,
         })),
         totalItems,
       };
@@ -445,6 +454,9 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
         sys_data_ref_dt: item.sys_data_ref_dt || undefined,
         sys_data_reg_dt: item.sys_data_reg_dt,
         open_api_url: item.open_api_url,
+        // [2026-10] 상세 화면 시각화(Metabase 공개 대시보드) 임베드 주소.
+        // sys_tbl_id 별 대시보드 매핑은 config/visualDashboards.json (없으면 기본 대시보드, 기능 꺼짐이면 undefined)
+        visual_url: buildVisualUrl(item.sys_tbl_id),
       };
     } catch (error) {
       logger.error('데이터 Repository - 데이터 상세 조회 오류', { error });
@@ -464,7 +476,8 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
           status: 'A',
           del_yn: 'N',
         },
-        attributes: ['data_id', 'title', 'open_api_url'],  // title도 로깅용으로 조회
+        // title: 로깅용, data_type: [2026-10] 기초(통계) 데이터 미리보기 정렬(최신 연도 우선) 판단용
+        attributes: ['data_id', 'title', 'open_api_url', 'data_type'],
       });
 
       if (!item) {
@@ -493,7 +506,12 @@ class DataRepository extends BaseRepository<DataSummaryInfo> {
       });
 
       // OpenAPI 서비스를 통해 실제 데이터 조회
-      const result = await openApiService.getDataPreview(item.open_api_url, query);
+      // [2026-10] 기초(통계, basic) 데이터는 09 Open API 가 prd_de(통계연도) 오름차순으로 주고
+      //   여기서 앞쪽 N건만 잘라 보내기 때문에 화면에는 가장 오래된 연도만 보였다.
+      //   → basic 이면 자르기 전에 연도 내림차순으로 정렬하도록 옵션 전달 (그 외 유형은 기존 순서 유지)
+      const result = await openApiService.getDataPreview(item.open_api_url, query, {
+        sortByPeriodDesc: item.data_type === 'basic',
+      });
       
       return result;
     } catch (error) {

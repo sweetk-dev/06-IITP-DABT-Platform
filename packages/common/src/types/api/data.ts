@@ -74,8 +74,9 @@ export interface DataSearchItem {
   data_keywords?: string; // 콤마 구분 문자열, 최대 3개 (예: '키워드1,키워드2,키워드3')
   sys_tbl_id: string;
   src_org_name: string;
-  src_latest_chn_dt: string;
-  sys_data_reg_dt: string;
+  src_latest_chn_dt: string; // 원천 최종 변경일 — 목록·검색 화면 "최종 수정일" 표시 및 기본 정렬 기준 (2026-10)
+  sys_data_reg_dt: string;   // 플랫폼 최초 등록일 (갱신되지 않음)
+  data_format?: string;      // 제공 포맷 원문 (예: '[json]') — 목록 "제공 포맷" 표시용 (2026-10 추가)
 }
 
 export type DataSearchRes = PaginationRes<DataSearchItem>;
@@ -177,6 +178,12 @@ export interface DataDetailRes {
   sys_data_ref_dt?: string;
   sys_data_reg_dt: string;
   open_api_url: string;
+  /**
+   * 이 데이터의 시각화(Metabase 공개 대시보드) 전체 URL (2026-10 추가).
+   * BE 가 sys_tbl_id → 대시보드 UUID 매핑(be/src/config/visualDashboards.json)과
+   * 환경변수 VISUAL_TOOL_BASE_URL 로 만든다. 매핑이 없으면 기본(전체) 대시보드, 설정이 비활성이면 생략.
+   */
+  visual_url?: string;
 }
 
 // ============================================================================

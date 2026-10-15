@@ -18,7 +18,8 @@ const tagVariants = {
   },
   primary: {
     background: 'var(--figma-blue-50)',
-    color: 'var(--color-primary)',
+    // [2026-10 접근성] 12~14px 글자에 #0090ff(연파랑 배경 3.0:1) → 진한 파랑 토큰(5.2:1)
+    color: 'var(--color-primary-text)',
     border: '1px solid var(--figma-blue-200)'
   },
   secondary: {
@@ -28,7 +29,7 @@ const tagVariants = {
   },
   success: {
     background: 'var(--figma-economic-50)',
-    color: 'var(--color-success)',
+    color: '#1e7e34', // [2026-10 접근성] #28a745(3.0:1) → 진한 초록
     border: '1px solid var(--figma-economic-100)'
   },
   warning: {
@@ -43,7 +44,7 @@ const tagVariants = {
   },
   info: {
     background: 'var(--figma-blue-50)',
-    color: 'var(--color-info)',
+    color: '#0b6b7b', // [2026-10 접근성] #17a2b8(2.9:1) → 같은 청록 계열 진한 톤
     border: '1px solid var(--figma-blue-200)'
   }
 };

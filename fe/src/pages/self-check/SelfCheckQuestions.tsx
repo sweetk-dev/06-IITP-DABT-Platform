@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
-import { useEffect, useState } from 'react';
-import { SelfCheckLayout, SelfCheckProgress, SelfCheckContainer } from '../../components/self-check';
+import { useEffect, useRef, useState } from 'react';
+import { SelfCheckLayout, SelfCheckProgress, SelfCheckContainer, SelfCheckRadioGroup } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
 import { 
   SELF_CHECK_QUESTIONS, 
@@ -11,8 +11,39 @@ import {
   type SelfCheckResponse 
 } from '@iitp-dabt-platform/common';
 
+/**
+ * 1~5 척도 선택지. 값 범위는 기존과 같이 SELF_CHECK_CONSTANTS.SCORE(MIN~MAX)에서 만든다.
+ * 스크린리더 이름: 양끝은 "1 전혀 아니다" / "5 매우 그렇다", 가운데는 숫자만(척도 의미는 양끝 이름으로 전달).
+ */
+const SCALE_OPTIONS = Array.from(
+  { length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 },
+  (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN
+).map((value) => ({
+  value,
+  label: String(value),
+  ariaLabel:
+    value === SELF_CHECK_CONSTANTS.SCORE.MIN ? `${value} 전혀 아니다`
+    : value === SELF_CHECK_CONSTANTS.SCORE.MAX ? `${value} 매우 그렇다`
+    : undefined
+}));
+
+/**
+ * 자가진단 문항 화면.
+ *
+ * [2026-10 반응형·접근성 개편] — 문항·점수 산식·영역 구성 등 진단 로직은 변경 없음(화면 표현만 변경)
+ *  - 1~5 선택지: 단순 버튼 → 라디오 그룹(SelfCheckRadioGroup). 이름 "1 전혀 아니다" … "5 매우 그렇다",
+ *    화살표 키로 선택 이동, 문항 제목(h1)과 그룹 연결.
+ *  - 레이아웃: 120px 동그라미 + 48px 간격 고정 → 데스크톱 100px, 휴대폰은 한 줄 5개(44px 이상)로 축소,
+ *    "전혀 아니다/매우 그렇다" 는 좁은 화면에서 버튼 줄 위 양끝에 표시 (layout.css .sc-scale).
+ *  - 문항이 바뀌면 초점을 새 문항 제목으로 옮겨 스크린리더가 새 문항을 읽게 함
+ *    (기존: 초점이 "다음" 버튼에 남아 문항이 바뀐 것을 알 수 없었음).
+ */
 export function SelfCheckQuestions() {
   const navigate = useNavigate();
+  // 문항 제목(h1) — 문항 전환 시 초점 이동 대상
+  const questionTitleRef = useRef<HTMLHeadingElement>(null);
+  // 첫 렌더에는 초점을 옮기지 않기 위한 표시 (화면 진입 직후 건너뛰기 링크 등 기본 초점 흐름 유지)
+  const hasNavigatedRef = useRef(false);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [currentAreaIndex, setCurrentAreaIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -54,6 +85,15 @@ export function SelfCheckQuestions() {
     setSelectedValue(currentResponse || null);
   }, [currentQuestionId, responses]);
 
+  // [2026-10 접근성] 문항이 바뀌면 새 문항 제목으로 초점 이동 (첫 진입 시에는 이동하지 않음)
+  useEffect(() => {
+    if (!hasNavigatedRef.current) {
+      hasNavigatedRef.current = true;
+      return;
+    }
+    questionTitleRef.current?.focus();
+  }, [currentQuestionId]);
+
   // 사용자 정보가 없으면 로딩 표시
   if (!userInfo) {
     return (
@@ -62,11 +102,11 @@ export function SelfCheckQuestions() {
         showBackButton={true}
         onBackClick={() => setShowExitModal(true)}
       >
-        <div style={{ 
+        <div role="status" style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          height: '50vh' 
+          minHeight: '200px'
         }}>
           로딩 중...
         </div>
@@ -159,121 +199,29 @@ export function SelfCheckQuestions() {
         areaProgress={getAreaProgress()}
       />
 
-      {/* Main Container */}
-      <SelfCheckContainer title="">
-        {/* Category Title */}
-        <div style={{
-          textAlign: 'center',
-          color: '#0090ff',
-          fontSize: '20px',
-          fontFamily: 'Pretendard',
-          fontWeight: 700,
-          marginBottom: '20px'
-        }}>
+      {/* Main Container — 영역명 → 문항 제목(h1) → 1~5 척도 */}
+      <SelfCheckContainer
+        title={<>{currentQuestionIndex + 1}. {currentQuestion.question}</>}
+        titleId="self-check-question-title"
+        titleRef={questionTitleRef}
+      >
+        {/* Category Title — 문항 앞 영역 표시 (h1 보다 위에 보이도록 order 로 배치) */}
+        <div className="sc-area-label" style={{ order: -1 }}>
           {getAreaName(currentArea)} 영역
         </div>
 
-        {/* Question Title */}
-        <h1 style={{
-          color: 'black',
-          fontSize: '32px',
-          fontFamily: 'Pretendard',
-          fontWeight: 700,
-          lineHeight: '48px',
-          wordWrap: 'break-word',
-          marginBottom: '40px',
-          textAlign: 'center'
-        }}>
-          {currentQuestionIndex + 1}. {currentQuestion.question}
-        </h1>
-
-        {/* Scale Section */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '20px',
-          margin: '0 auto 40px auto',
-          maxWidth: '1000px',
-          width: '100%'
-        }}>
-          {/* Scale Buttons */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '48px'
-          }}>
-            {/* Left Label */}
-            <div style={{
-              color: 'black',
-              fontSize: '24px',
-              fontFamily: 'Pretendard',
-              fontWeight: 500,
-              textAlign: 'right',
-              wordWrap: 'break-word',
-              whiteSpace: 'nowrap'
-            }}>
-              전혀 아니다
-            </div>
-            
-            {/* Scale Buttons */}
-            {Array.from({ length: SELF_CHECK_CONSTANTS.SCORE.MAX - SELF_CHECK_CONSTANTS.SCORE.MIN + 1 }, (_, i) => i + SELF_CHECK_CONSTANTS.SCORE.MIN).map((value) => (
-              <button
-                key={value}
-                onClick={() => setSelectedValue(value)}
-                style={{
-                  width: '120px',
-                  height: '120px',
-                  borderRadius: '50%',
-                  background: selectedValue === value ? 'var(--color-primary)' : 'var(--figma-white)',
-                  color: selectedValue === value ? 'var(--figma-white)' : 'var(--color-text-primary)',
-                  border: selectedValue === value ? '5px solid var(--color-primary)' : '5px solid #b2deff',
-                  fontSize: '28px',
-                  fontFamily: 'var(--font-family-primary)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: selectedValue === value 
-                    ? '0 4px 12px rgba(0, 144, 255, 0.3)' 
-                    : '0 2px 8px rgba(0, 0, 0, 0.1)'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedValue !== value) {
-                    e.currentTarget.style.borderColor = 'var(--color-primary)';
-                    e.currentTarget.style.background = '#f0f8ff';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedValue !== value) {
-                    e.currentTarget.style.borderColor = '#b2deff';
-                    e.currentTarget.style.background = 'var(--figma-white)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-                  }
-                }}
-              >
-                {value}
-              </button>
-            ))}
-            
-            {/* Right Label */}
-            <div style={{
-              color: 'black',
-              fontSize: '24px',
-              fontFamily: 'Pretendard',
-              fontWeight: 500,
-              wordWrap: 'break-word',
-              whiteSpace: 'nowrap'
-            }}>
-              매우 그렇다
-            </div>
-          </div>
+        {/* Scale Section — 라디오 그룹. 양끝 라벨은 시각용(aria-hidden), 이름은 각 선택지 aria-label 에 포함 */}
+        <div className="sc-scale">
+          <span className="sc-scale-label sc-scale-label--min" aria-hidden="true">전혀 아니다</span>
+          <SelfCheckRadioGroup
+            variant="scale"
+            idPrefix={`self-check-${currentQuestionId}`}
+            labelledBy="self-check-question-title"
+            value={selectedValue}
+            onChange={(value) => setSelectedValue(value)}
+            options={SCALE_OPTIONS}
+          />
+          <span className="sc-scale-label sc-scale-label--max" aria-hidden="true">매우 그렇다</span>
         </div>
       </SelfCheckContainer>
 

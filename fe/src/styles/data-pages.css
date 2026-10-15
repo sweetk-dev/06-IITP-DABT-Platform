@@ -1,4 +1,11 @@
 /* Data List and Search Pages Styles - Based on Figma Design */
+/* [2026-10 반응형·접근성]
+ *  - 사이드바 폭(280px)을 inline style 에서 이 파일(.sidebar)로 옮겨 1024px 이하에서 위쪽 가로 필터로 전환
+ *  - 목록 줄 전체 클릭 → 제목 링크 + stretched link(.data-row-link::after) 로 변경 (키보드 이동 가능)
+ *  - 파랑 글자(#0090ff) 대비 미달 → --color-primary-text 토큰
+ *  - font-family: Pretendard(대체 글꼴 없음) → var(--font-family-primary)
+ *    (Pretendard 가 설치되지 않은 PC 에서 목록 글자가 명조체로 보이던 문제)
+ */
 
 /* Data List Container */
 .data-list-container {
@@ -12,6 +19,20 @@
   width: 280px;
   flex-shrink: 0;
 }
+.sidebar-filter-title {
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.sidebar-filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
 .filter-section {
   margin-bottom: 40px;
@@ -20,7 +41,7 @@
 .filter-title {
   color: black;
   font-size: 20px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 600;
   margin-bottom: 16px;
 }
@@ -35,7 +56,7 @@
   padding: 12px 16px;
   color: black;
   font-size: 16px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 400;
   text-decoration: none;
   border-radius: 8px;
@@ -49,7 +70,7 @@
 
 .filter-item.active {
   background: #e3f2fd;
-  color: #0090ff;
+  color: var(--color-primary-text);
   font-weight: 600;
 }
 
@@ -66,15 +87,16 @@
 .page-title-large {
   color: black;
   font-size: 32px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 700;
-  margin-bottom: 12px;
+  margin: 0 0 12px; /* h1 로 바뀌면서 기본 상단 여백 제거 */
+  word-break: keep-all;
 }
 
 .page-description {
   color: black;
   font-size: 18px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 400;
   line-height: 27px;
   margin-bottom: 16px;
@@ -84,7 +106,7 @@
 .data-count {
   color: black;
   font-size: 18px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 400;
   text-align: right;
 }
@@ -112,7 +134,7 @@
   padding: 16px 24px;
   color: black;
   font-size: 16px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 600;
 }
 
@@ -121,7 +143,7 @@
   padding: 16px 24px;
   color: black;
   font-size: 16px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 600;
   text-align: center;
 }
@@ -132,11 +154,33 @@
 }
 
 .data-row {
+  position: relative; /* stretched link 기준 */
   display: flex;
   padding: 24px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s ease;
+}
+.data-row--linked {
   cursor: pointer;
+}
+/* 제목 링크: 글자 모양은 기존 제목과 동일하게, ::after 로 클릭 영역을 줄 전체로 확장 */
+.data-row-link {
+  color: inherit;
+  text-decoration: none;
+}
+.data-row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.data-row-link:hover {
+  text-decoration: underline;
+}
+/* 키보드 초점 시 줄 전체에 초점 테두리 (링크 자체 outline 은 글자에만 생기므로) */
+.data-row:has(.data-row-link:focus-visible) {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: -3px;
+  background: #f8f9fa;
 }
 
 .data-row:hover {
@@ -155,10 +199,11 @@
 .data-title {
   color: black;
   font-size: 18px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 600;
   margin-bottom: 12px;
   line-height: 24px;
+  overflow-wrap: anywhere;
 }
 
 .data-meta {
@@ -175,16 +220,16 @@
 }
 
 .meta-label {
-  color: #666;
+  color: #595959;
   font-size: 14px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 400;
 }
 
 .meta-value {
   color: black;
   font-size: 14px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 500;
 }
 
@@ -206,9 +251,9 @@
 .tag {
   padding: 4px 8px;
   background: #e3f2fd;
-  color: #0090ff;
+  color: var(--color-primary-text); /* [2026-10 접근성] #0090ff(2.9:1) → 4.9:1 */
   font-size: 12px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 500;
   border-radius: 4px;
 }
@@ -237,15 +282,15 @@
 .search-title {
   color: black;
   font-size: 28px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 600;
   margin: 0;
 }
 
 .search-term {
-  color: #666;
+  color: #595959;
   font-size: 18px;
-  font-family: Pretendard;
+  font-family: var(--font-family-primary);
   font-weight: 400;
   margin-bottom: 32px;
 }
@@ -257,33 +302,76 @@
   overflow: hidden;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
+/* 검색어 강조 */
+.search-highlight {
+  color: var(--color-primary-text);
+  font-weight: 700;
+}
+
+/* Responsive Design
+   [2026-10] 기존 1200px 중단점은 1200px 콘텐츠 폭과 같아 데스크톱(1280~1440)에서도 사이드바가 위로 올라갔다.
+   → 1024px 이하에서만 사이드바를 위쪽 가로 필터(칩)로 전환 */
+@media (max-width: 1024px) {
   .data-list-container {
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    margin-top: 8px;
   }
   
   .sidebar {
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
   }
-  
-  .filter-list {
+  .sidebar .sidebar-filter-section {
+    margin-bottom: 0 !important;
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  .sidebar-filter-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .sidebar-filter-list {
     flex-direction: row;
     flex-wrap: wrap;
+    gap: 6px;
   }
-  
-  .filter-item {
-    flex: 1;
-    min-width: 120px;
-    text-align: center;
+  /* 필터 버튼을 칩 모양으로 (inline style 의 width:100% 를 덮어씀) */
+  .sidebar-filter-list .filter-option {
+    width: auto !important;
+    min-height: 44px;
+    padding: 8px 14px !important;
+    border: 1px solid #dfe3e8 !important;
+    border-radius: 999px !important;
+    font-size: 15px !important;
+  }
+  .page-title-large {
+    font-size: 26px;
+  }
+  .page-description {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .data-count {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 768px) {
+  /* 머리글 줄("데이터명 | 태그")은 1열 배치에서는 의미가 없어 숨김 */
+  .data-table-header {
+    display: none;
+  }
   .data-row {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    padding: 16px;
+  }
+  .data-title {
+    font-size: 16px;
+    margin-bottom: 8px;
   }
   
   .data-tags {

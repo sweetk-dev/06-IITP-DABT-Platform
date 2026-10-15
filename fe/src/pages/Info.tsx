@@ -3,6 +3,18 @@ import { ROUTE_PATHS } from './App';
 import { Layout } from '../components/layout/Layout';
 import { publicAsset } from '../utils/publicAsset';
 
+/**
+ * 사이트 소개 화면 (문구·이미지 변경 없음).
+ *
+ * [2026-10 반응형·접근성 개편]
+ *  - 1200px 고정 블록 → .info-inner(최대 1200px), float 좌우 배치 → flex (1024px 이하 세로)
+ *  - 자립 3단계: 왼쪽 120px 들여쓰기 + 절대 위치 화살표 → flex 한 줄(화살표도 흐름 안), 1024px 이하 세로 + 아래 화살표
+ *  - 자가진단 안내: 200+640+200px 고정 3단 → 줄바꿈 허용, 768px 이하 장식 이미지 숨김
+ *  - 역할 카드 2열 → 768px 이하 1열
+ *  - 제목 구조: h1(장애인 자립 지원 허브란?) → h2(구역 제목) → h3(역할 카드 제목)
+ *  - 3단계 원(흰 글자/#4db1ff, 2.3:1) 배경을 같은 파랑 계열 진한 톤(#0070cc, 5:1)으로
+ *  - 링크 안 버튼 중첩(<Link><button/>) → 버튼 모양 링크 하나, 장식 이미지는 aria-hidden
+ */
 export function Info() {
   return (
     <Layout idPrefix="info">
@@ -42,38 +54,34 @@ export function Info() {
           zIndex: 2
         }}>
           <div id="info-hero-content" style={{
-            display: 'inline',
-            paddingTop: '60px',
-            paddingBottom: '60px'
+            display: 'block',
+            paddingTop: '40px'
           }}>
-            <div style={{
-              margin: '0 auto',
-              width: '1200px'
-            }}>
-              <div id="info-hero-left" style={{
-                float: 'left'
-              }}>
-                {/* Main Title */}
-                <div id="info-main-title" style={{
+            <div className="info-inner info-hero-inner">
+              <div id="info-hero-left" className="info-hero-text" style={{ minWidth: 0 }}>
+                {/* Main Title — 화면 제목 h1 */}
+                <h1 id="info-main-title" className="info-title-h1" style={{
                   position: 'relative',
-                  width: '511px',
+                  margin: 0,
+                  maxWidth: '511px',
                   color: 'black',
                   fontSize: '32px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 700,
                   wordWrap: 'break-word',
                   zIndex: 2
                 }}>
                   장애인 자립 지원 허브란?
-                </div>
+                </h1>
 
                 {/* Main Description */}
                 <div id="info-main-description" style={{
                   position: 'relative',
-                  width: '689px',
+                  width: '100%',
+                  maxWidth: '689px',
                   color: 'black',
                   fontSize: '16px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 400,
                   lineHeight: '24px',
                   wordWrap: 'break-word',
@@ -98,11 +106,9 @@ export function Info() {
                 </div>
               </div>
               
-              <div id="info-hero-right" style={{
-                float: 'right'
-              }}>
-                {/* Hero Side Image */}
-                <div id="info-hero-side-image" style={{
+              <div id="info-hero-right" style={{ flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+                {/* Hero Side Image — 글자 없는 장식 일러스트 */}
+                <div id="info-hero-side-image" className="info-hero-image" aria-hidden="true" style={{
                   position: 'relative',
                   width: '486px',
                   height: '347px',
@@ -126,20 +132,18 @@ export function Info() {
           padding: '60px 0',
           width: '100%'
         }}>
-          <div style={{
-            margin: '0 auto',
-            width: '1200px'
-          }}>
-            <div id="info-about-section-title" style={{
+          <div className="info-inner">
+            <h2 id="info-about-section-title" className="info-section-title" style={{
+              margin: 0,
               color: 'black',
               fontSize: '28px',
-              fontFamily: 'Pretendard',
+              fontFamily: 'var(--font-family-primary)',
               fontWeight: 600,
               wordWrap: 'break-word',
               marginBottom: '32px'
             }}>
               장애인 자립에 관하여
-            </div>
+            </h2>
 
             {/* Independence Definition */}
             <div id="info-independence-definition" style={{
@@ -148,7 +152,7 @@ export function Info() {
               <span style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 700,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
@@ -158,7 +162,7 @@ export function Info() {
               <span style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 400,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
@@ -173,16 +177,7 @@ export function Info() {
             </div>
 
             {/* Independence Stages - 퍼블리싱 CSS 정확히 적용 */}
-            <div id="info-independence-stages" style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '70px',
-              marginBottom: '80px',
-              marginLeft: '120px',
-              position: 'relative',
-              width: '85%'
-            }}>
+            <div id="info-independence-stages" className="info-stages">
               {/* Stage 1 - 원형, 연한 파란색 */}
               <div id="info-stage-card-1" style={{
                 width: '240px',
@@ -199,7 +194,7 @@ export function Info() {
               }}>
                 <div id="info-stage-title-1" style={{
                   fontSize: '18px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 700,
                   lineHeight: '27px',
                   wordWrap: 'break-word',
@@ -209,7 +204,7 @@ export function Info() {
                 </div>
                 <div id="info-stage-description-1" style={{
                   fontSize: '16px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 400,
                   lineHeight: '24px',
                   wordWrap: 'break-word',
@@ -222,17 +217,7 @@ export function Info() {
               </div>
 
               {/* Arrow 1 - 퍼블리싱 CSS 정확히 적용 */}
-              <div id="info-stage-arrow-1" style={{
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '87px',
-                height: '2px',
-                background: 'none',
-                border: 'none',
-                zIndex: 1,
-                left: 'calc(240px + 40px)'
-              }}>
+              <div id="info-stage-arrow-1" className="info-stage-arrow" aria-hidden="true">
                 <div style={{
                   position: 'absolute',
                   top: '50%',
@@ -271,7 +256,7 @@ export function Info() {
               }}>
                 <div id="info-stage-title-2" style={{
                   fontSize: '18px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 700,
                   lineHeight: '27px',
                   wordWrap: 'break-word',
@@ -281,7 +266,7 @@ export function Info() {
                 </div>
                 <div id="info-stage-description-2" style={{
                   fontSize: '16px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 400,
                   lineHeight: '24px',
                   wordWrap: 'break-word',
@@ -294,17 +279,7 @@ export function Info() {
               </div>
 
               {/* Arrow 2 - 퍼블리싱 CSS 정확히 적용 */}
-              <div id="info-stage-arrow-2" style={{
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '87px',
-                height: '2px',
-                background: 'none',
-                border: 'none',
-                zIndex: 1,
-                right: 'calc(245px + 35px)'
-              }}>
+              <div id="info-stage-arrow-2" className="info-stage-arrow" aria-hidden="true">
                 <div style={{
                   position: 'absolute',
                   top: '50%',
@@ -339,12 +314,12 @@ export function Info() {
                 gap: '8px',
                 textAlign: 'center',
                 padding: '20px',
-                background: '#4db1ff',
+                background: '#0070cc', /* [2026-10 접근성] #4db1ff(흰 글자 2.3:1) → 5:1 */
                 color: 'white'
               }}>
                 <div id="info-stage-title-3" style={{
                   fontSize: '18px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 700,
                   lineHeight: '27px',
                   wordWrap: 'break-word',
@@ -354,7 +329,7 @@ export function Info() {
                 </div>
                 <div id="info-stage-description-3" style={{
                   fontSize: '16px',
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'var(--font-family-primary)',
                   fontWeight: 400,
                   lineHeight: '24px',
                   wordWrap: 'break-word',
@@ -371,7 +346,7 @@ export function Info() {
       </div>
 
       {/* Diagnosis Section - 퍼블리싱 CSS 정확히 적용 */}
-      <div id="info-diagnosis-section" style={{
+      <div id="info-diagnosis-section" className="info-diagnosis-section" style={{
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
@@ -384,7 +359,7 @@ export function Info() {
         boxShadow: 'inset 0 -1px 0 rgba(0, 0, 0, 0.05)'
       }}>
         {/* Left Contract Images */}
-        <div id="info-diagnosis-left-images" style={{
+        <div id="info-diagnosis-left-images" className="info-diagnosis-side" aria-hidden="true" style={{
           flex: '0 0 200px',
           position: 'relative',
           width: '200px',
@@ -400,18 +375,19 @@ export function Info() {
         </div>
 
         {/* Center Content */}
-        <div id="info-diagnosis-content" style={{
-          flex: '0 0 640px',
+        <div id="info-diagnosis-content" className="info-diagnosis-content" style={{
+          flex: '0 1 640px',
+          minWidth: 0,
           textAlign: 'center'
         }}>
-          <div id="info-diagnosis-info-title" style={{
+          <h2 id="info-diagnosis-info-title" className="info-section-title" style={{
             fontSize: '28px',
             fontWeight: 700,
-            marginBottom: '20px',
+            margin: '0 0 20px',
             color: 'black'
           }}>
             자립 수준 자가 진단
-          </div>
+          </h2>
           <div id="info-diagnosis-info-description" style={{
             fontSize: '20px',
             lineHeight: '1.6',
@@ -421,8 +397,12 @@ export function Info() {
             간단한 자가 진단으로 자립 수준을 확인하고, 맞춤 정보를
             바로 만나보세요.
           </div>
-          <Link to={ROUTE_PATHS.SELF_CHECK_START} style={{ textDecoration: 'none' }}>
-            <button id="info-diagnosis-info-button" style={{
+          {/* 버튼 모양 링크 하나 (기존: 링크 안에 버튼 중첩) */}
+          <Link
+            to={ROUTE_PATHS.SELF_CHECK_START}
+            id="info-diagnosis-info-button"
+            className="cta-button info-diagnosis-button"
+            style={{
               minWidth: '320px',
               padding: '22px 36px',
               background: '#0090ff',
@@ -434,14 +414,14 @@ export function Info() {
               cursor: 'pointer',
               boxShadow: '0px 4px 20px rgba(0, 144, 255, 0.4)',
               transition: 'all 0.2s ease'
-            }}>
-              자립 수준 자가진단
-            </button>
+            }}
+          >
+            자립 수준 자가진단
           </Link>
         </div>
 
         {/* Right Folder and Search Images */}
-        <div id="info-diagnosis-right-images" style={{
+        <div id="info-diagnosis-right-images" className="info-diagnosis-side" aria-hidden="true" style={{
           flex: '0 0 200px',
           position: 'relative',
           width: '200px',
@@ -465,26 +445,24 @@ export function Info() {
       </div>
 
       {/* Role Section - 퍼블리싱 CSS 정확히 적용 */}
-      <div style={{
-        margin: '0 auto',
-        width: '1200px'
-      }}>
+      <div className="info-inner">
         <div id="info-role-section" style={{
           marginBottom: '60px'
         }}>
-          <div id="info-role-section-title" style={{
+          <h2 id="info-role-section-title" className="info-section-title" style={{
+            margin: 0,
             color: 'black',
             fontSize: '28px',
-            fontFamily: 'Pretendard',
+            fontFamily: 'var(--font-family-primary)',
             fontWeight: 600,
             wordWrap: 'break-word',
             marginBottom: '32px'
           }}>
             장애인 자립 지원 허브의 역할
-          </div>
+          </h2>
 
           {/* Role Cards - 퍼블리싱 CSS 정확히 적용 */}
-          <div id="info-role-cards" style={{
+          <div id="info-role-cards" className="info-role-cards" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '32px'
@@ -499,30 +477,31 @@ export function Info() {
               gap: '20px'
             }}>
               <div id="info-role-category-1" style={{
-                color: '#0086ed',
+                color: 'var(--color-primary-text)', /* [2026-10 접근성] #0086ed(3.4:1) → 5:1 이상 */
                 fontSize: '18px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 600,
                 lineHeight: '27px',
                 wordWrap: 'break-word'
               }}>
                 일반/사회적 기업
               </div>
-              <div id="info-role-title-1" style={{
+              <h3 id="info-role-title-1" className="info-role-title" style={{
+                margin: 0,
                 color: 'black',
                 fontSize: '24px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 700,
                 lineHeight: '33.6px',
                 wordWrap: 'break-word'
               }}>
                 장애인 대상 제품 및 서비스<br />개발을
                 지원합니다
-              </div>
+              </h3>
               <div id="info-role-description-1" style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 400,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
@@ -543,30 +522,31 @@ export function Info() {
               gap: '20px'
             }}>
               <div id="info-role-category-2" style={{
-                color: '#0086ed',
+                color: 'var(--color-primary-text)', /* [2026-10 접근성] #0086ed(3.4:1) → 5:1 이상 */
                 fontSize: '18px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 600,
                 lineHeight: '27px',
                 wordWrap: 'break-word'
               }}>
                 공공기관
               </div>
-              <div id="info-role-title-2" style={{
+              <h3 id="info-role-title-2" className="info-role-title" style={{
+                margin: 0,
                 color: 'black',
                 fontSize: '24px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 700,
                 lineHeight: '33.6px',
                 wordWrap: 'break-word'
               }}>
                 장애인 민원 및 복지 업무의<br />효율화를
                 지원합니다
-              </div>
+              </h3>
               <div id="info-role-description-2" style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 400,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
@@ -587,29 +567,30 @@ export function Info() {
               gap: '20px'
             }}>
               <div id="info-role-category-3" style={{
-                color: '#0086ed',
+                color: 'var(--color-primary-text)', /* [2026-10 접근성] #0086ed(3.4:1) → 5:1 이상 */
                 fontSize: '18px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 600,
                 lineHeight: '27px',
                 wordWrap: 'break-word'
               }}>
                 복지관/센터
               </div>
-              <div id="info-role-title-3" style={{
+              <h3 id="info-role-title-3" className="info-role-title" style={{
+                margin: 0,
                 color: 'black',
                 fontSize: '24px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 700,
                 lineHeight: '33.6px',
                 wordWrap: 'break-word'
               }}>
                 현장 중심의 자립 실무를<br />지원합니다
-              </div>
+              </h3>
               <div id="info-role-description-3" style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 400,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
@@ -631,29 +612,30 @@ export function Info() {
               gap: '20px'
             }}>
               <div id="info-role-category-4" style={{
-                color: '#0086ed',
+                color: 'var(--color-primary-text)', /* [2026-10 접근성] #0086ed(3.4:1) → 5:1 이상 */
                 fontSize: '18px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 600,
                 lineHeight: '27px',
                 wordWrap: 'break-word'
               }}>
                 연구기관
               </div>
-              <div id="info-role-title-4" style={{
+              <h3 id="info-role-title-4" className="info-role-title" style={{
+                margin: 0,
                 color: 'black',
                 fontSize: '24px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 700,
                 lineHeight: '33.6px',
                 wordWrap: 'break-word'
               }}>
                 자립 관련 연구와 평가를<br />지원합니다
-              </div>
+              </h3>
               <div id="info-role-description-4" style={{
                 color: 'black',
                 fontSize: '16px',
-                fontFamily: 'Pretendard',
+                fontFamily: 'var(--font-family-primary)',
                 fontWeight: 400,
                 lineHeight: '24px',
                 wordWrap: 'break-word'
