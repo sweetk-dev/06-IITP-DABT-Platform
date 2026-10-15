@@ -15,7 +15,7 @@ import { SelfDiagProvider } from '../../models/selfcheck/SelfDiagProvider';
 import { SelfDiagFacility } from '../../models/selfcheck/SelfDiagFacility';
 import { logger } from '../../config/logger';
 import { getSequelize } from '../../config/database';
-import { Op } from 'sequelize';
+import { buildPolicyWhere } from './policyWhere';
 
 // 구체적인 Repository 클래스들
 class PolicyRepository extends BaseRepository<SelfDiagPolicy> {
@@ -63,27 +63,13 @@ class SelfCheckRepository {
       if (themes && Array.isArray(themes) && themes.length > 0) {
         // 각 테마별 쿼리를 병렬로 실행
         const queryPromises = themes.map(async (theme) => {
-          const where: any = {
-            self_rlty_type: theme,
-            link: { [Op.ne]: null }, // 링크가 있는 정책만
-          };
-
-          // 추가 필터 조건 적용
-          if (options.filterConditions.gender) {
-            where.gender = options.filterConditions.gender;
-          }
-          if (options.filterConditions.disLevel) {
-            where.dis_level = options.filterConditions.disLevel;
-          }
-          if (options.filterConditions.ageCond) {
-            where.age_cond = options.filterConditions.ageCond;
-          }
+          const where = buildPolicyWhere(options.filterConditions, { theme, requireLink: true });
 
           // 각 테마별로 limit개씩 조회
           return await this.policyRepo.findAll({
             where,
             limit: options.limit,
-            order: [['created_at', 'DESC']],
+            order: getSequelize().random(), // 청구항 7: 유형별 후보 중 무작위 선택
             attributes: [
               'policy_id',
               'category',
@@ -104,24 +90,12 @@ class SelfCheckRepository {
         results.forEach(data => allResults.push(...data));
       } else {
         // themes가 없으면 기존 로직대로 전체 조회
-        const where: any = {
-          link: { [Op.ne]: null }, // 링크가 있는 정책만
-        };
-
-        if (options.filterConditions.gender) {
-          where.gender = options.filterConditions.gender;
-        }
-        if (options.filterConditions.disLevel) {
-          where.dis_level = options.filterConditions.disLevel;
-        }
-        if (options.filterConditions.ageCond) {
-          where.age_cond = options.filterConditions.ageCond;
-        }
+        const where = buildPolicyWhere(options.filterConditions, { requireLink: true });
 
         const data = await this.policyRepo.findAll({
           where,
           limit: options.limit,
-          order: [['created_at', 'DESC']],
+          order: getSequelize().random(), // 청구항 7: 유형별 후보 중 무작위 선택
           attributes: [
             'policy_id',
             'category',
@@ -173,28 +147,13 @@ class SelfCheckRepository {
     try {
       logger.debug('자가진단 Repository - 자립 지원 정책 조회', { options });
       
-      const where: any = {};
-
-      // 필터 조건 적용
-      Object.entries(options.filterConditions).forEach(([key, value]) => {
-        if (value) {
-          if (key === 'themes' && Array.isArray(value)) {
-            where.self_rlty_type = { [Op.in]: value };
-          } else if (key === 'gender' && value) {
-            where.gender = value;
-          } else if (key === 'disLevel' && value) {
-            where.dis_level = value;
-          } else if (key === 'ageCond' && value) {
-            where.age_cond = value;
-          }
-        }
-      });
+      const where = buildPolicyWhere(options.filterConditions);
 
       const { data, totalItems } = await this.policyRepo.findWithPagination({
         where,
         page: options.page,
         pageSize: options.pageSize,
-        order: [['created_at', 'DESC']],
+        order: [['policy_id', 'ASC']],
         attributes: [
           'policy_id',
           'category',
