@@ -220,8 +220,8 @@ class OpenApiClient {
 // [2026-10] 미리보기 행 정렬 — 기초(통계) 데이터 최신 연도 우선
 // ============================================================================
 
-/** 통계 행의 기간 필드 후보 (09 Open API 기초 통계 응답은 prdDe: 통계연도(숫자)) */
-const PERIOD_KEYS = ['prdDe', 'prd_de'] as const;
+/** 행의 기간 필드 후보 — prdDe/prd_de: 09 기초 통계의 통계연도, year: 09 고용(emp) 중 연도별 누적 표의 연도 (2026-10-15 추가) */
+const PERIOD_KEYS = ['prdDe', 'prd_de', 'year'] as const;
 
 /** 행에서 기간 값을 숫자로 꺼낸다. 2022 / "2022" / "202212"(연월) 모두 숫자 비교 가능. 없으면 null */
 function getPeriodValue(row: any): number | null {
