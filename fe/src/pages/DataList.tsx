@@ -1,4 +1,5 @@
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { getDataDetailPath } from './App';
 import { Layout } from '../components/layout/Layout';
 import { Sidebar } from '../components/ui/Sidebar';
 import { FilterSection } from '../components/ui/FilterSection';
@@ -87,8 +88,11 @@ export function DataList() {
   // 현재 데이터 상태 결정
   const currentDataState = activeFilter === 'theme' ? themeItemsState : typeItemsState;
 
+  // [2026-10] 브라우저 탭 제목도 화면 제목과 같게 ("신체적 자립 | 장애인 자립 지원 허브")
+  const pageTitle = getTitle();
+
   return (
-    <Layout idPrefix="data-list">
+    <Layout idPrefix="data-list" pageTitle={pageTitle}>
       <div id="data-list-container" className="data-list-container">
         {/* Sidebar */}
         <Sidebar idPrefix="data-list" title="필터">
@@ -126,11 +130,13 @@ export function DataList() {
         {/* Main Content */}
         <div id="data-list-main-content" className="main-content">
           <div id="data-list-page-header" className="page-header">
-            <div id="data-list-page-title" className="page-title-large">{getTitle()}</div>
+            {/* [2026-10 접근성] 화면 제목을 h1 으로 (기존 div — 화면에 h1 이 하나도 없었음) */}
+            <h1 id="data-list-page-title" className="page-title-large">{pageTitle}</h1>
             <div id="data-list-page-description" className="page-description">
               {getDescription()}
             </div>
-            <div id="data-list-data-count" className="data-count">
+            {/* 필터를 바꾸면 건수가 바뀌므로 스크린리더에 변경을 알림(role="status") */}
+            <div id="data-list-data-count" className="data-count" role="status">
               총 <span id="data-list-count-number" className="count-number">{getCount()}</span> 건
             </div>
           </div>
@@ -149,12 +155,12 @@ export function DataList() {
               error={currentDataState.error}
               emptyMessage="데이터가 없습니다."
               renderRow={(item: any, index: number) => (
+                // [2026-10] 줄 클릭(onClick) → 제목 링크(href). 날짜는 목록·검색 모두 "최종 수정일"
                 <DataItemRow 
                   item={item}
                   index={index}
                   idPrefix="data-list"
-                  showModifiedDate={false}
-                  onRowClick={() => navigate(`/data/${item.id}`)}
+                  href={getDataDetailPath(String(item.id))}
                 />
               )}
             />

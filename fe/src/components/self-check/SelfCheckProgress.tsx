@@ -1,4 +1,3 @@
-import React from 'react';
 import { SELF_CHECK_CONSTANTS, getAreaName } from '@iitp-dabt-platform/common';
 
 interface SelfCheckProgressProps {
@@ -14,109 +13,64 @@ const getDefaultStepNames = () => {
   return ['본인 확인', ...areaKeys.map(key => getAreaName(key as any))];
 };
 
+/**
+ * 자가진단 진행 단계 표시 (본인 확인 → 신체적 → 정서적 → 경제적 → 사회적).
+ *
+ * [2026-10 반응형·접근성 개편]
+ *  - 기존: 폭 1200px 고정 알약 모양 + position:absolute → 좁은 화면에서 넘치고, 단계가 색으로만 구분됐다.
+ *  - 넓은 화면(1025px↑): 5단계 전체 목록(<ol>). 현재 단계에 aria-current="step",
+ *    완료 단계는 숫자 대신 ✓ 와 "(완료)" 숨김 텍스트.
+ *  - 좁은 화면(1024px↓): "2/5 신체적 자립(0/8)" 한 줄 요약 + 진행 막대 (layout.css 에서 전환)
+ *    목록은 display:none 이 되어 스크린리더도 요약 한 줄만 읽는다(중복 낭독 방지).
+ *  - 단계 숫자 원 배경: 흰 글자 대비를 위해 --color-primary-strong 사용
+ */
 export function SelfCheckProgress({ 
   currentStep, 
   totalSteps, 
   stepNames = getDefaultStepNames(), 
   areaProgress = {}
 }: SelfCheckProgressProps) {
+  const labelOf = (name: string, index: number) => (index === 0 ? name : areaProgress[name] || name);
+  const currentIndex = Math.min(Math.max(currentStep - 1, 0), stepNames.length - 1);
+  const currentLabel = labelOf(stepNames[currentIndex], currentIndex);
+  const percent = Math.round((currentStep / Math.max(totalSteps, 1)) * 100);
+
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '30px',
-      marginBottom: '80px',
-      padding: '20px 30px',
-      maxWidth: '1200px',
-      width: '1200px',
-      background: 'white',
-      borderRadius: '100px',
-      boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.05)',
-      position: 'absolute',
-      top: '40px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 5
-    }}>
-      {/* Progress Steps - HTML Design */}
-      {stepNames.map((name, index) => {
-        const isActive = index < currentStep;
-        const isCompleted = index < currentStep - 1;
-        const isCurrent = index === currentStep - 1;
-        
-        return (
-          <React.Fragment key={index}>
-            {/* Step Item - HTML Structure */}
-            <div className={`step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-              {/* Step Icon/Number - HTML Style */}
-              {isCompleted ? (
-                <div className="step-icon" style={{
-                  width: '22px',
-                  height: '22px',
-                  background: '#0090ff',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <div className="check-icon" style={{
-                    width: '11.31px',
-                    height: '8.01px',
-                    background: 'white',
-                    clipPath: 'polygon(0 0, 100% 0, 100% 70%, 0 70%)',
-                    transform: 'rotate(-45deg)'
-                  }} />
-                </div>
-              ) : (
-                <div className={`step-number ${isActive ? 'active' : ''}`} style={{
-                  width: '22px',
-                  height: '22px',
-                  background: isActive ? '#0090ff' : '#d9d9d9',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  color: isActive ? 'white' : 'black',
-                  fontSize: '15px',
-                  fontWeight: '500',
-                  fontFamily: 'Pretendard'
-                }}>
-                  {index + 1}
-                </div>
+    <div className="sc-progress">
+      {/* 넓은 화면: 단계 전체 목록 */}
+      <ol className="sc-progress-list" aria-label="자가진단 진행 단계">
+        {stepNames.map((name, index) => {
+          const isActive = index < currentStep;
+          const isCompleted = index < currentStep - 1;
+          const isCurrent = index === currentStep - 1;
+          
+          return (
+            <li key={index} className="sc-progress-item" aria-current={isCurrent ? 'step' : undefined}>
+              <span className={`sc-progress-step ${isActive ? 'is-active' : ''}`}>
+                <span className="sc-progress-num" aria-hidden="true">
+                  {isCompleted ? '✓' : index + 1}
+                </span>
+                <span>{labelOf(name, index)}</span>
+                {isCompleted && <span className="sr-only">(완료)</span>}
+                {isCurrent && <span className="sr-only">(현재 단계)</span>}
+              </span>
+              {index < stepNames.length - 1 && (
+                <span className={`sc-progress-sep ${index < currentStep - 1 ? 'is-active' : ''}`} aria-hidden="true" />
               )}
-              
-              {/* Step Text - HTML Style */}
-              <div className="step-text" style={{
-                fontSize: '18px',
-                fontWeight: isActive ? '500' : '400',
-                color: isActive ? 'black' : '#666',
-                fontFamily: 'Pretendard',
-                lineHeight: '1.2',
-                whiteSpace: 'nowrap'
-              }}>
-                {index === 0 ? name : areaProgress[name] || name}
-              </div>
-            </div>
-            
-            {/* Separator - HTML Design (실선, 1px 높이) */}
-            {index < stepNames.length - 1 && (
-              <div 
-                className={`step-separator ${isActive ? 'active' : ''}`}
-                style={{ 
-                  width: '60px', 
-                  height: '1px', 
-                  background: isActive ? '#0090ff' : '#a4a4a4'
-                }} 
-              />
-            )}
-          </React.Fragment>
-        );
-      })}
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* 좁은 화면: 한 줄 요약 (예: "2/5 신체적 자립(0/8)") */}
+      <p className="sc-progress-compact" style={{ margin: 0 }}>
+        <span className="sr-only">진행 단계 </span>
+        <span className="sc-progress-compact-count">{currentStep}/{totalSteps}</span>
+        <span>{currentLabel}</span>
+      </p>
+      <div className="sc-progress-bar" aria-hidden="true">
+        <span style={{ width: `${percent}%` }} />
+      </div>
     </div>
   );
 }

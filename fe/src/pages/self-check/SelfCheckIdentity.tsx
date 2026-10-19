@@ -1,12 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATHS } from '../App';
-import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer } from '../../components/self-check';
+import { SelfCheckLayout, SelfCheckProgress, SelfCheckNavigation, SelfCheckContainer, SelfCheckRadioGroup } from '../../components/self-check';
 import { Modal } from '../../components/ui/Modal';
 import { IDENTITY_QUESTIONS, SELF_CHECK_CONSTANTS, getAreaName, type IdentityQuestionType, type IdentityResponse } from '@iitp-dabt-platform/common';
 
+/**
+ * 자가진단 본인 확인(4문항) 화면.
+ *
+ * [2026-10 반응형·접근성 개편] — 문항·선택지 값·저장 방식은 변경 없음
+ *  - 선택지: 단순 버튼 → 라디오 그룹(SelfCheckRadioGroup, variant="choice"), 문항 제목(h1)과 연결
+ *  - 280×77px 고정 버튼 + 60px 간격 → 데스크톱은 같은 크기(최소 폭 280px), 768px 이하에서는 전체 폭 세로 목록
+ *  - 문항이 바뀌면 초점을 새 문항 제목으로 이동
+ */
 export function SelfCheckIdentity() {
   const navigate = useNavigate();
+  const questionTitleRef = useRef<HTMLHeadingElement>(null);
+  const hasNavigatedRef = useRef(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userResponses, setUserResponses] = useState<Partial<IdentityResponse>>({});
@@ -15,6 +25,15 @@ export function SelfCheckIdentity() {
   const currentQuestion = IDENTITY_QUESTIONS[currentQuestionIndex];
   const isFirstQuestion = currentQuestionIndex === 0;
   const isLastQuestion = currentQuestionIndex === IDENTITY_QUESTIONS.length - 1;
+
+  // [2026-10 접근성] 문항 전환 시 새 문항 제목으로 초점 이동 (첫 진입 제외)
+  useEffect(() => {
+    if (!hasNavigatedRef.current) {
+      hasNavigatedRef.current = true;
+      return;
+    }
+    questionTitleRef.current?.focus();
+  }, [currentQuestionIndex]);
 
   // 현재 질문에 대한 응답이 있는지 확인
   const hasResponse = userResponses[currentQuestion.id] !== undefined;
@@ -78,60 +97,18 @@ export function SelfCheckIdentity() {
       {/* Main Container */}
       <SelfCheckContainer 
         title={currentQuestion.question}
+        titleId="self-check-identity-title"
+        titleRef={questionTitleRef}
       >
-        {/* Answer Options - 1840px 컨테이너에 맞게 배치 */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: '60px',
-          margin: '0 auto 80px auto', // 상하좌우 중앙 정렬, 하단 80px
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          maxWidth: '1400px',
-          width: '100%'
-        }}>
-          {currentQuestion.options.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => handleResponse(option.value)}
-              style={{
-                width: '280px',
-                height: '77px',
-                background: userResponses[currentQuestion.id] === option.value ? 'var(--color-primary)' : 'var(--figma-white)',
-                color: userResponses[currentQuestion.id] === option.value ? 'var(--figma-white)' : 'var(--color-text-primary)',
-                border: 'none',
-                borderRadius: '16px',
-                fontSize: '24px',
-                fontFamily: 'var(--font-family-primary)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                textAlign: 'center',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: userResponses[currentQuestion.id] === option.value 
-                  ? '0 4px 12px rgba(0, 144, 255, 0.3)' 
-                  : '0 2px 8px rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseEnter={(e) => {
-                if (userResponses[currentQuestion.id] !== option.value) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (userResponses[currentQuestion.id] !== option.value) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-                }
-              }}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-
+        {/* Answer Options — 라디오 그룹 (기존: 280×77px 버튼 나열, 1400px 폭 고정 줄) */}
+        <SelfCheckRadioGroup
+          variant="choice"
+          idPrefix={`self-check-identity-${currentQuestion.id}`}
+          labelledBy="self-check-identity-title"
+          value={userResponses[currentQuestion.id] as string | undefined}
+          onChange={(value) => handleResponse(value)}
+          options={currentQuestion.options.map((option) => ({ value: option.value as string, label: option.label }))}
+        />
       </SelfCheckContainer>
 
       {/* Navigation */}

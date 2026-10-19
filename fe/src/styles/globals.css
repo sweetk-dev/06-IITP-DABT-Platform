@@ -63,8 +63,24 @@
   /* Text Colors - Updated from Figma */
   --color-text-primary: #252525;
   --color-text-secondary: #6f6f6f;
-  --color-text-muted: #939393;
+  /* [2026-10 접근성] 기존 #939393 은 흰 배경 대비 3.07:1 로 KWCAG 2.2 / WCAG 1.4.3(4.5:1) 미달.
+     같은 회색 계열에서 4.5:1 을 넘는 가장 밝은 값(#767676, 4.54:1)으로 조정한다. */
+  --color-text-muted: #767676;
   --color-text-inverse: #ffffff;
+
+  /* [2026-10 접근성] 브랜드 파랑(#0090ff)은 흰 배경 대비 3.26:1 이라
+     - 큰 글자(24px 이상, 또는 18.66px 이상 굵게 700) 와 배경·장식에는 그대로 쓰고
+     - 일반 크기 "글자색"으로 쓸 때는 같은 색상(hue)의 진한 톤 --color-primary-text(#0066cc, 흰 배경 5.57:1)를,
+     - 작은 글자가 올라가는 "채움 버튼 배경"에는 --color-primary-strong(#0070cc, 흰 글자 5.01:1)을 쓴다.
+     값은 토큰으로만 바꾸고 개별 화면에서는 이 변수를 참조하게 해 두었다(색 조정 시 여기만 고치면 됨). */
+  --color-primary-text: #0066cc;
+  --color-primary-strong: #0070cc;
+  /* 연한 색 카드(분홍·노랑·초록·하늘) 위 "큰 숫자"(32px 굵게)용 — #0090ff 는 분홍 카드 위 2.9:1 로 큰 글자 기준(3:1)에도 미달.
+     거의 같은 색감에서 모든 카드 배경 대비 4:1 이상인 값 */
+  --color-primary-large: #0077d9;
+  --color-primary-strong-hover: #005fb0;
+  /* 키보드 초점 표시 색 (흰 배경 5.57:1, 연파랑 패널 #f0f8ff 위에서도 5:1 이상) */
+  --color-focus-ring: #0066cc;
   
   /* Background Colors - Updated from Figma */
   --color-bg-primary: #ffffff;
@@ -79,6 +95,8 @@
   --color-border-focus: var(--color-primary);
   
   /* Typography System - Pretendard Font */
+  /* [2026-10] CSS·TSX 곳곳의 font-family: 'Pretendard'(대체 글꼴 없음)를 이 변수로 통일 —
+     Pretendard 가 없는 PC 에서 일부 글자가 명조체(serif)로 보이던 문제 */
   --font-family-primary: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
   /* Font Sizes - Exact from Figma */
@@ -212,7 +230,8 @@
   --transition-slow: 350ms ease;
   
   /* Focus Styles */
-  --focus-ring: 0 0 0 3px rgba(0, 144, 255, 0.1);
+  /* [2026-10 접근성] 기존 값(투명도 0.1)은 사실상 보이지 않아 초점 위치를 알 수 없었다. 0.35 로 올림 */
+  --focus-ring: 0 0 0 3px rgba(0, 102, 204, 0.35);
   --focus-ring-offset: 2px;
 }
 

@@ -20,6 +20,21 @@ interface SelfCheckLayoutProps {
   previousIcon?: ReactNode;
 }
 
+/**
+ * 자가진단(시작·본인 확인·문항) 화면 공통 패널.
+ *
+ * [2026-10 반응형 개편 — 사용자 스크린샷 지적 사항 대응]
+ *  기존 문제
+ *   - 1840×840px 고정 패널을 position:absolute + left:50% 로 띄워 1440px 화면에서도 문서 폭이 1640px 로 넘쳤다.
+ *   - 이전/다음 버튼을 피그마 좌표(top 822px)에 절대 배치 → 화면 높이 900px 대에서는 버튼이 화면 맨 아래에 붙거나
+ *     패널 경계에 걸렸고, 360px 휴대폰에서는 아예 화면 밖이었다.
+ *  변경
+ *   - 패널은 문서 흐름(normal flow) 안의 블록, 높이는 내용만큼(min-height 강제 없음), 폭은 본문 폭(최대 1840px).
+ *   - [메인화면으로 이동] → 진행 단계 → 문항 → 선택지 → [이전/다음] 을 위에서 아래로 한 열로 쌓고 간격을 줄여
+ *     1920×920, 1440×900, 360×780 에서 스크롤 없이 한 화면에 들어오게 했다 (스타일: layout.css .sc-*).
+ *   - 이전/다음은 패널 "안" 맨 아래. 768px 이하에서는 position: sticky 로 화면 하단에 고정.
+ *   - "메인화면으로 이동"을 div+onClick → <button> 으로 (키보드 사용 가능).
+ */
 export function SelfCheckLayout({ 
   idPrefix, 
   children, 
@@ -37,84 +52,30 @@ export function SelfCheckLayout({
   previousIcon
 }: SelfCheckLayoutProps) {
   return (
-    <Layout idPrefix={idPrefix} showBreadcrumb={!showBackButton}>
-      {/* Self Check Container - 브라우저 전체 기준 중앙 정렬 (Header 중앙선과 일치) */}
-      <div
-        id={`${idPrefix}-container`}
-        style={{
-          margin: '40px auto',
-          width: '1840px',
-          height: '840px',
-          background: '#f0f8ff',
-          borderRadius: '40px',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 10
-        }}
-      >
-        {/* 메인화면으로 이동 - 왼쪽 상단에 위치 */}
+    <Layout idPrefix={idPrefix} showBreadcrumb={!showBackButton} wide>
+      <div id={`${idPrefix}-container`} className="sc-panel">
+        {/* 메인화면으로 이동 - 패널 왼쪽 위 */}
         {showBackButton && (
-          <div
-            id={`${idPrefix}-back-button`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              opacity: '0.5',
-              cursor: 'pointer',
-              transition: 'opacity 0.2s ease',
-              position: 'absolute',
-              top: '40px',
-              left: '40px',
-              zIndex: 10
-            }}
-            onClick={onBackClick}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.8';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '0.5';
-            }}
-          >
-            <img
-              src={publicAsset('/left-arrow.svg')}
-              alt="메인화면으로 이동"
-              style={{ 
-                width: '18px', 
-                height: '18px'
-              }}
-            />
-            <span style={{
-              color: 'black',
-              fontSize: '16px',
-              fontFamily: 'Pretendard',
-              fontWeight: 500,
-              lineHeight: '20.8px'
-            }}>
-              메인화면으로 이동
-            </span>
+          <div className="sc-panel-top">
+            <button
+              type="button"
+              id={`${idPrefix}-back-button`}
+              className="sc-back-button"
+              onClick={onBackClick}
+            >
+              {/* 화살표는 장식 (버튼 이름은 옆 글자) */}
+              <img src={publicAsset('/left-arrow.svg')} alt="" />
+              <span>메인화면으로 이동</span>
+            </button>
           </div>
         )}
 
-        {/* Main Content - Absolute positioned elements */}
-        <div
-          id={`${idPrefix}-main-content`}
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%'
-          }}
-        >
+        {/* Main Content */}
+        <div id={`${idPrefix}-main-content`} className="sc-panel-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'inherit' }}>
           {children}
         </div>
 
-        {/* Navigation - SelfCheckLayout 내부에 배치 */}
+        {/* Navigation - 패널 안 맨 아래 (문서 흐름) */}
         {(onPrevious || onNext) && (
           <SelfCheckNavigation
             onPrevious={onPrevious}

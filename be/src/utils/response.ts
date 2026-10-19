@@ -104,14 +104,37 @@ export function calculateLimit(pageSize: number): number {
 }
 
 // 정렬 옵션 처리 함수
+// [2026-10] 'recent'(최신순, 기본값)의 기준 컬럼 변경: sys_data_reg_dt → src_latest_chn_dt
+//  - sys_data_reg_dt 는 플랫폼에 "처음 등록한 날"이라 이후 갱신 배치(08)가 건드리지 않는다.
+//    그래서 홈 "최신 데이터"·목록 순서가 데이터가 새로 갱신돼도 바뀌지 않았다.
+//  - src_latest_chn_dt 는 원천 데이터의 최종 변경일(기초 통계는 08 배치가 갱신)로,
+//    상세 화면 "최종 수정일"과 같은 값이다. 화면에 보이는 날짜와 정렬 기준이 일치하게 된다.
+//  - 값이 같은 행이 많아 순서가 매번 달라지지 않도록, 실제 ORDER BY 는 buildDataOrder() 로 data_id 를 보조 키로 붙인다.
 export function processSortOption(sort?: string): { orderBy: string; direction: 'ASC' | 'DESC' } {
   switch (sort) {
     case 'alpha':
       return { orderBy: 'title', direction: 'ASC' };
     case 'recent':
     default:
-      return { orderBy: 'sys_data_reg_dt', direction: 'DESC' };
+      return { orderBy: 'src_latest_chn_dt', direction: 'DESC' };
   }
+}
+
+/**
+ * sys_data_summary_info 조회용 ORDER BY 절 생성 (2026-10 추가)
+ *
+ * - 날짜 컬럼(src_latest_chn_dt 등) 정렬은 NULL 을 항상 뒤로 보낸다.
+ *   PostgreSQL 은 DESC 정렬 시 NULL 을 "맨 앞"에 두므로, 날짜가 비어 있는 데이터가
+ *   "최신 데이터" 1순위로 올라오는 것을 막기 위함. (Sequelize 는 'DESC NULLS LAST' 방향 문자열을 지원)
+ * - 같은 값끼리의 순서를 고정하기 위해 data_id 를 보조 정렬 키로 추가한다
+ *   (페이지를 넘길 때 같은 행이 중복/누락되는 현상 방지). 보조 키 방향은 주 정렬과 같게.
+ *
+ * @returns BaseRepository 의 order 옵션 형식 ([컬럼, 방향][])
+ */
+export function buildDataOrder(orderBy: string, direction: 'ASC' | 'DESC'): [string, string][] {
+  const isDateColumn = /_dt$/.test(orderBy);
+  const primary: [string, string] = [orderBy, isDateColumn ? `${direction} NULLS LAST` : direction];
+  return orderBy === 'data_id' ? [primary] : [primary, ['data_id', direction]];
 }
 
 // 검색 쿼리 처리 함수

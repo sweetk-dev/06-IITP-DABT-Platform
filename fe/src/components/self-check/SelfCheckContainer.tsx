@@ -1,60 +1,40 @@
-import { ReactNode } from 'react';
+import { ReactNode, Ref } from 'react';
 
 interface SelfCheckContainerProps {
   title: ReactNode;
   subtitle?: ReactNode;
   children: ReactNode;
+  /** 제목(h1) 요소 id — 선택지 라디오 그룹의 aria-labelledby 로 연결할 때 사용 */
+  titleId?: string;
+  /** 제목(h1) ref — 문항이 바뀔 때 초점을 제목으로 옮길 때 사용 */
+  titleRef?: Ref<HTMLHeadingElement>;
 }
 
-export function SelfCheckContainer({ title, subtitle, children }: SelfCheckContainerProps) {
+/**
+ * 자가진단 패널 안 본문(제목·부제·내용).
+ *
+ * [2026-10 개편]
+ *  - 기존: margin-top 120px, 좌우 padding 60px, min-height 600px 고정 → 패널이 화면보다 길어지는 주원인.
+ *    → 여백을 걷어 내고 내용 높이만큼만 차지(.sc-body).
+ *  - 기존: title 이 빈 문자열이어도 빈 <h1> 을 그려, 문항 화면에 h1 이 2개였다(빈 h1 + 문항 h1).
+ *    → title 이 있을 때만 h1 을 그린다.
+ */
+export function SelfCheckContainer({ title, subtitle, children, titleId, titleRef }: SelfCheckContainerProps) {
   return (
-    <div style={{
-      width: '100%',
-      maxWidth: '1840px', // SelfCheckLayout과 동일한 너비
-      margin: '120px auto 0 auto', // 상단 120px, 좌우 중앙 정렬
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center',
-      padding: '0 60px',
-      height: '100%',
-      minHeight: '600px'
-    }}>
-      {/* Title - HTML Design Style */}
-      <h1 style={{
-        color: 'black',
-        fontSize: '32px',
-        fontFamily: 'Pretendard',
-        fontWeight: 700,
-        lineHeight: '48px',
-        wordWrap: 'break-word',
-        marginBottom: subtitle ? '20px' : '40px',
-        textAlign: 'center'
-      }}>
-        {title}
-      </h1>
+    <div className="sc-body">
+      {title ? (
+        <h1 id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined} className="sc-title">
+          {title}
+        </h1>
+      ) : null}
 
-      {/* Subtitle - HTML Design Style */}
       {subtitle && (
-        <p style={{
-          color: 'black',
-          fontSize: '20px',
-          fontFamily: 'Pretendard',
-          fontWeight: 400,
-          lineHeight: '30px',
-          wordWrap: 'break-word',
-          marginBottom: '40px',
-          textAlign: 'center'
-        }}>
+        <p className="sc-subtitle">
           {subtitle}
         </p>
       )}
 
-      {/* Content */}
-      <div style={{ width: '100%' }}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

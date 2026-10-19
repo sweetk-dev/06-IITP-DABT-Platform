@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './pages/App';
 import './styles/globals.css';
 import './styles/components.css';
+// [2026-10] 반응형 골격·접근성 공통 스타일 (Layout, 헤더 검색, 자가진단 패널, 초점 표시 등)
+import './styles/layout.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
