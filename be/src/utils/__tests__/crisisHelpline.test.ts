@@ -2,9 +2,10 @@
 import { CRISIS_HELPLINE_CONSTANTS, needsCrisisHelpline } from '@iitp-dabt-platform/common';
 
 describe('needsCrisisHelpline', () => {
-  it('자살 생각 통계에는 안내를 띄운다', () => {
+  it('자살 생각·시도 통계에는 안내를 띄운다', () => {
     expect(needsCrisisHelpline('stats_dis_emo_suicide_ideation')).toBe(true);
     expect(needsCrisisHelpline(' stats_dis_emo_suicide_ideation ')).toBe(true);
+    expect(needsCrisisHelpline('stats_dis_emo_rpt_mental')).toBe(true);
   });
 
   it('다른 데이터에는 띄우지 않는다', () => {

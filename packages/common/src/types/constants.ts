@@ -477,9 +477,10 @@ export function formatDate(dateString?: string): string {
  * - 번호: 자살예방상담전화 109(2024-01 통합, 24시간), 정신건강위기상담전화 1577-0199(24시간)
  */
 export const CRISIS_HELPLINE_CONSTANTS = {
-  SYS_TBL_IDS: ['stats_dis_emo_suicide_ideation'] as const,
+  // 장애인삶패널조사 자살 생각 표, 2023년 장애인실태조사 보고서 정신건강 지표(자살 생각·시도 포함)
+  SYS_TBL_IDS: ['stats_dis_emo_suicide_ideation', 'stats_dis_emo_rpt_mental'] as const,
   TITLE: '혼자 힘들어하지 마세요',
-  DESCRIPTION: '이 데이터는 자살 생각과 관련된 통계입니다. 마음이 힘들거나 주변에 걱정되는 분이 있다면 언제든 전화해 상담받을 수 있습니다.',
+  DESCRIPTION: '이 데이터에는 자살 생각·시도와 관련된 통계가 들어 있습니다. 마음이 힘들거나 주변에 걱정되는 분이 있다면 언제든 전화해 상담받을 수 있습니다.',
   LINES: [
     { name: '자살예방상담전화', tel: '109', hours: '24시간' },
     { name: '정신건강위기상담전화', tel: '1577-0199', hours: '24시간' },
