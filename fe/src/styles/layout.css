@@ -949,6 +949,65 @@ a.card-link:hover {
 .sc-result-rec-row[data-count="4"] {
   max-width: 792px;
 }
+/* [v1.2.2] 장애정도 '모름' 안내 상자 — 결과 화면을 보는 동안 고정 표시 */
+.sc-result-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  margin: 0 auto 8px;
+  padding: 20px 28px;
+  border: 2px solid #0b67c2;
+  border-radius: 16px;
+  background: #f0f7ff;
+}
+.sc-result-notice-title {
+  margin: 0 0 4px;
+  color: #0b4f96; /* 배경 대비 7:1 이상 */
+  font-size: 20px;
+  font-weight: 700;
+}
+.sc-result-notice-desc {
+  margin: 0;
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.sc-result-notice-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #0b67c2; /* 흰 글자 대비 5.4:1 */
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sc-result-notice-link:hover,
+.sc-result-notice-link:focus-visible {
+  background: #08529b;
+}
+.sc-result-notice-link:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
+}
+@media (max-width: 768px) {
+  .sc-result-notice {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+  .sc-result-notice-link {
+    justify-content: center;
+  }
+}
 .sc-result-recs-empty {
   text-align: center;
   padding: 40px 16px;

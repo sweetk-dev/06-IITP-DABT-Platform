@@ -142,18 +142,12 @@ export function SelfCheckResult() {
       return [];
     }
 
-    const isDisLevelUnknown = identityInfo?.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.code;
-    
-    // basic 정책 분리
-    const basicPolicies = apiData.filter((p: any) => p.self_rlty_type === 'basic');
+    // [v1.2.2] 기초(장애인 등록 안내, self_rlty_type=basic)는 추천 카드 목록에 넣지 않는다.
+    //  추천 목록은 미달 유형의 콘텐츠만으로 구성한다(등록특허 청구항 6 "미달 유형에 대응되는 콘텐츠만").
+    //  장애정도 '모름'일 때의 등록 안내는 결과 화면 위쪽의 별도 안내 상자(registrationNotice)로 보여 준다.
     const themePolicies = apiData.filter((p: any) => p.self_rlty_type !== 'basic');
      
     const result: any[] = [];
-    
-    // 장애정도 모름이면 basic 1개 먼저 추가
-    if (isDisLevelUnknown && basicPolicies.length > 0) {
-      result.push(basicPolicies[0]);
-    }
     
     // [v1.2.1] 케이스·노출 건수는 common planRecommendations 한 곳에서 정한다(등록특허 청구항 3~6).
     //  - Case 1(4개 미달): 우선순위(신체>경제>정서>사회) 상위 3개 유형 1건씩 — 이전에는 4개 유형을 점수 낮은 순으로 4건
@@ -167,6 +161,14 @@ export function SelfCheckResult() {
   };
 
   const recommendations = getDisplayRecommendations();
+
+  // [v1.2.2] 장애정도 '모름' 안내 상자 — 표시 조건은 이전 등록 안내 카드와 같다(본인 확인에서 '모름' 선택).
+  //  링크는 추천 API 가 주는 기초 정책(장애인등록/장애정도 심사제도)의 공식 안내 링크. 없으면 문구만 보여 준다.
+  //  결과 화면을 보는 동안 계속 보이는 고정 안내이며(팝업·자동 사라짐 없음), 추천 카드 구성에는 영향이 없다.
+  const isDisLevelUnknown = identityInfo?.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.unknown.code;
+  const registrationPolicy = isDisLevelUnknown
+    ? (recommendationsState.data || []).find((p: any) => p.self_rlty_type === 'basic' && p.link)
+    : undefined;
 
   // 미달인 테마 이름들을 가져오는 함수
   const getDeficientThemeNames = () => {
@@ -406,6 +408,31 @@ export function SelfCheckResult() {
 
       </div>
 
+      {/* [v1.2.2] 장애정도 '모름' 안내 상자 — 점수 카드와 추천 사이 */}
+      {isDisLevelUnknown && (
+        <aside id="self-check-result-registration-notice" className="sc-result-notice" aria-labelledby="self-check-result-registration-notice-title">
+          <div className="sc-result-notice-text">
+            <h2 id="self-check-result-registration-notice-title" className="sc-result-notice-title">
+              장애 정도를 ‘모름’으로 답하셨어요.
+            </h2>
+            <p className="sc-result-notice-desc">
+              장애인으로 등록하거나 장애 정도 심사를 받으면 아래 지원을 더 정확하게 안내받을 수 있어요.
+            </p>
+          </div>
+          {registrationPolicy && (
+            <a
+              href={registrationPolicy.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sc-result-notice-link"
+            >
+              장애인 등록 안내 보기
+              <span className="sr-only">(새 창)</span>
+            </a>
+          )}
+        </aside>
+      )}
+
       {/* Recommendations Section - SelfCheckLayout 밖에 배치 */}
       <section id="self-check-result-recommendations-section" className="sc-result-recs" aria-labelledby="self-check-result-recommendations-title">
         <h2 id="self-check-result-recommendations-title" className="sc-result-recs-title">
@@ -429,19 +456,11 @@ export function SelfCheckResult() {
                 : <>조건에 맞는 추천 정보를 찾지 못했어요.<br />아래 ‘더 많은 지원 정보 보기’에서 확인해 주세요.</>}
             </div>
           ) : (() => {
-            // 기초 정책과 테마 정책 분리
-            const basicPolicies = recommendations.filter(rec => rec.self_rlty_type === 'basic');
-            const themePolicies = recommendations.filter(rec => rec.self_rlty_type !== 'basic');
+            // [v1.2.2] 추천 목록에는 미달 유형 정책만 있다(기초 등록 안내는 위 안내 상자로 이동)
+            const themePolicies = recommendations;
             
             return (
               <>
-                {/* 기초 정책이 있으면 첫 줄에 표시 */}
-                {basicPolicies.length > 0 && (
-                  <ul className="sc-result-rec-row" data-count={basicPolicies.length}>
-                    {basicPolicies.map((rec, index) => renderRecommendationCard(rec, index))}
-                  </ul>
-                )}
-                
                 {/* 테마 정책들 표시 */}
                 {/* [v1.2.1] data-count 로 건수별 배치(layout.css): 1~3건 한 줄, 4건 2×2, 5건 이상 3열 */}
                 {themePolicies.length > 0 && (
