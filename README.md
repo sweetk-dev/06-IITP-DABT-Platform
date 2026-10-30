@@ -1,6 +1,6 @@
 # IITP DABT Platform
 
-![version](https://img.shields.io/badge/version-v1.2.0-blue)
+![version](https://img.shields.io/badge/version-v1.2.2-blue)
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
@@ -143,7 +143,15 @@ npm run build:common           # 공통 패키지 빌드
   - 미달 영역(신체·정서·경제·사회)마다 그 유형으로 분류된 정책 중에서 무작위로 고른다(v1.2.0)
   - 외부 기관 정책 정보 링크가 비어 있는 정책은 추천하지 않는다
   - 성별·장애정도는 여러 값이 쉼표로 저장된 칸의 포함 여부로, 연령은 해당 값 또는 `all` 로 거른다
-  - 장애정도를 "모름"으로 답하면 장애인 등록 안내(유형 `basic`, 1건)를 먼저 보여 준다
+  - 장애정도를 "모름"으로 답하면 점수 카드와 추천 사이에 장애인 등록 안내 상자를 보여 준다(v1.2.2). 등록 안내(유형 `basic`)는 추천 카드 목록에는 넣지 않는다
+  - 미달 유형 개수에 따른 노출(v1.2.1, 70점 미만이 미달). 추천 우선순위는 신체 > 경제 > 정서 > 사회
+    - 4개 모두 미달: 우선순위 상위 3개 유형(신체·경제·정서)에서 1건씩
+    - 3개 미달: 우선순위 순으로 유형마다 1건씩
+    - 2개 미달: 점수가 더 낮은 유형 2건 + 다른 유형 1건(동점이면 우선순위가 높은 유형을 2건)
+    - 1개 미달: 그 유형에서만 3건
+    - 미달 없음: 추천 대신 안내 문구
+  - 규칙은 `packages/common` 의 `planRecommendations`·`pickRecommendedPolicies` 한 곳에 있고, 테스트는 `be/src/services/selfcheck/__tests__/recommendationPlan.test.ts`
+  - 결과 카드는 건수에 따라 1~3건이면 한 줄, 4건이면 2×2 로 배치한다
 
 ### 3. 정책 정보
 - **정책 목록**: 자립 지원 정책 리스트

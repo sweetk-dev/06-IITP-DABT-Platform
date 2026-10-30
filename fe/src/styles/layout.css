@@ -941,6 +941,80 @@ a.card-link:hover {
   min-width: 0;
   display: flex;
 }
+/* [v1.2.1] 추천 카드 건수별 배치
+ *  - 카드 폭 384px × 3 + 간격 24px × 2 = 1200px → 1~3건은 한 줄 가운데 정렬(기본 동작)
+ *  - 4건: 3+1 로 한 장이 떨어지지 않도록 2열(2×2). 2 × 384 + 24 = 792px
+ *  - 5건 이상: 3열로 흘려 보낸다(기본 동작)
+ *  - 768px 이하에서는 아래 미디어쿼리가 한 장씩 전체 폭으로 바꾼다 */
+.sc-result-rec-row[data-count="4"] {
+  max-width: 792px;
+}
+/* [v1.2.2] 장애정도 '모름' 안내 상자 — 결과 화면을 보는 동안 고정 표시 */
+.sc-result-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  margin: 0 auto 8px;
+  padding: 20px 28px;
+  border: 2px solid #0b67c2;
+  border-radius: 16px;
+  background: #f0f7ff;
+}
+.sc-result-notice-title {
+  margin: 0 0 4px;
+  color: #0b4f96; /* 배경 대비 7:1 이상 */
+  font-size: 20px;
+  font-weight: 700;
+}
+.sc-result-notice-desc {
+  margin: 0;
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.sc-result-notice-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #0b67c2; /* 흰 글자 대비 5.4:1 */
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sc-result-notice-link:hover,
+.sc-result-notice-link:focus-visible {
+  background: #08529b;
+}
+.sc-result-notice-link:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
+}
+@media (max-width: 768px) {
+  .sc-result-notice {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+  .sc-result-notice-link {
+    justify-content: center;
+  }
+}
+.sc-result-recs-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: #595959;
+  font-size: 18px;
+  line-height: 1.6;
+}
 .sc-result-rec-link {
   display: flex;
   width: 100%;
