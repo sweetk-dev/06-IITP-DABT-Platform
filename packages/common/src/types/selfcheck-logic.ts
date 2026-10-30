@@ -35,8 +35,30 @@ export const SELF_CHECK_CONSTANTS = {
   // 미달 기준 점수
   DEFICIENCY_THRESHOLD: 70,
   
-  // 정책 노출 우선순위 (SELF_RLTY_TYPE_CONSTANTS에서 동적으로 가져옴, basic 제외)
-  POLICY_PRIORITY_ORDER: SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code) as Exclude<SelfRltyTypeCode, 'basic'>[]
+  // 영역 진행 순서 (SELF_RLTY_TYPE_CONSTANTS에서 동적으로 가져옴, basic 제외)
+  // = 신체 → 정서 → 경제 → 사회. 문항 진행·점수 카드 표시 순서에 쓴다(특허 도 2·도 4 의 문항 구성 순서).
+  // ※ 이름은 PRIORITY 지만 추천 노출 우선순위가 아니다. 추천 우선순위는 아래 RECOMMENDATION_PRIORITY_ORDER.
+  POLICY_PRIORITY_ORDER: SELF_RLTY_TYPE_CONSTANTS.ALL_CODES.filter(code => code !== SELF_RLTY_TYPE_CONSTANTS.SELF_REL_TYPES.basic.code) as Exclude<SelfRltyTypeCode, 'basic'>[],
+
+  // [v1.2.1] 추천 노출 우선순위 — 신체 > 경제 > 정서 > 사회
+  //  근거: 등록특허 10-3012613 명세서 【0067】("신체적 자립도, 경제적 자립도, 정서적 자립도, 사회적 자립도 순"),
+  //        특허 작성용 엑셀(2025-10-24) 「자가진단 결과 로직」 '노출 우선순위'.
+  //  청구항 3(Case 1)·청구항 4(Case 2)는 "미리 설정된 우선 순위에 따라" 제공하도록 되어 있으므로
+  //  점수 순이 아니라 이 고정 순서를 쓴다. (점수 비교는 Case 3 에서만 — 청구항 5)
+  RECOMMENDATION_PRIORITY_ORDER: ['phys', 'econ', 'emo', 'soc'] as Exclude<SelfRltyTypeCode, 'basic'>[],
+
+  // [v1.2.1] 케이스별 노출 건수
+  //  - Case 1(미달 4개 이상): 우선순위 상위 3개 유형에서 1건씩 → 청구항 3 "미리 설정된 개수만큼", 명세서 【0067】【0068】 N=3
+  //  - Case 2(미달 3개): 우선순위 순으로 유형별 1건씩 → 청구항 4
+  //  - Case 3(미달 2개): 점수가 더 낮은 유형 2건 + 다른 유형 1건 → 청구항 5 "더 높은 비중"
+  //  - Case 4(미달 1개): 그 유형만 3건 → 청구항 6 "그 유형 콘텐츠만"
+  RECOMMENDATION_COUNTS: {
+    CASE1_TYPE_COUNT: 3,
+    PER_TYPE: 1,
+    CASE3_LOWER: 2,
+    CASE3_HIGHER: 1,
+    CASE4: 3
+  }
 } as const;
 
 // 총 소요시간 계산 (초)
@@ -315,8 +337,88 @@ export function identifyDeficientAreas(areaScores: { [key in SelfCheckAreaType]:
   return deficientAreas;
 }
 
+// ============================================================================
+// [v1.2.1] 추천 케이스 결정과 노출 슬롯 (등록특허 10-3012613 청구항 1·3~6)
+// ============================================================================
+
+/** 추천 케이스 번호. 0 = 미달 없음(특허 케이스 밖, 추천 없음) */
+export type RecommendationCaseNo = 0 | 1 | 2 | 3 | 4;
+
+/** 한 유형에서 몇 건을 보여줄지 (화면에 나오는 순서대로 나열) */
+export type RecommendationSlot = { area: SelfCheckAreaType; count: number };
+
+export type RecommendationPlan = {
+  caseNo: RecommendationCaseNo;
+  deficientAreas: SelfCheckAreaType[]; // 미달 유형(우선순위 순)
+  slots: RecommendationSlot[];         // 노출 순서·건수
+};
+
 /**
- * 정책 추천 로직
+ * 미달 유형 개수 → 케이스 번호 (청구항 1 "미달 유형의 개수에 따라 복수의 케이스 중 하나를 결정")
+ * Case 1 은 "4개 이상" (청구항 3 문언). 의견서의 "3개 이상" 표현은 따르지 않는다.
+ */
+export function determineRecommendationCase(numDeficient: number): RecommendationCaseNo {
+  if (numDeficient >= 4) return 1;
+  if (numDeficient === 3) return 2;
+  if (numDeficient === 2) return 3;
+  if (numDeficient === 1) return 4;
+  return 0;
+}
+
+/**
+ * 영역별 점수 → 케이스 + 유형별 노출 슬롯
+ *  - 미달 판정: 점수 < DEFICIENCY_THRESHOLD(70) — 공통 기준값
+ *  - Case 1: RECOMMENDATION_PRIORITY_ORDER 상위 3개 유형 × 1건 (신체·경제·정서)
+ *  - Case 2: 미달 3개 유형을 우선순위 순으로 × 1건
+ *  - Case 3: 점수가 더 낮은 유형 2건 → 다른 유형 1건. 점수가 같으면 우선순위가 높은 쪽을 2건으로 둔다
+ *  - Case 4: 미달 유형 × 3건
+ * 화면에 표시하는 점수(반올림 정수)와 같은 값을 넣어야 제목 문구·카드와 판정이 어긋나지 않는다.
+ */
+export function planRecommendations(
+  areaScores: Partial<Record<SelfCheckAreaType, number>>
+): RecommendationPlan {
+  const order = SELF_CHECK_CONSTANTS.RECOMMENDATION_PRIORITY_ORDER;
+  const C = SELF_CHECK_CONSTANTS.RECOMMENDATION_COUNTS;
+  const deficient = order.filter(area => (areaScores[area] ?? 0) < SELF_CHECK_CONSTANTS.DEFICIENCY_THRESHOLD);
+  const caseNo = determineRecommendationCase(deficient.length);
+  let slots: RecommendationSlot[] = [];
+
+  if (caseNo === 1) {
+    slots = deficient.slice(0, C.CASE1_TYPE_COUNT).map(area => ({ area, count: C.PER_TYPE }));
+  } else if (caseNo === 2) {
+    slots = deficient.map(area => ({ area, count: C.PER_TYPE }));
+  } else if (caseNo === 3) {
+    const [first, second] = deficient; // 우선순위 순
+    const firstScore = areaScores[first] ?? 0;
+    const secondScore = areaScores[second] ?? 0;
+    // 점수가 더 낮은 유형의 비중을 높인다(청구항 5). 동점이면 우선순위가 높은 first 를 2건으로.
+    const [lower, higher] = secondScore < firstScore ? [second, first] : [first, second];
+    slots = [{ area: lower, count: C.CASE3_LOWER }, { area: higher, count: C.CASE3_HIGHER }];
+  } else if (caseNo === 4) {
+    slots = [{ area: deficient[0], count: C.CASE4 }];
+  }
+
+  return { caseNo, deficientAreas: deficient, slots };
+}
+
+/**
+ * 노출 슬롯대로 정책을 고른다.
+ * policies 는 BE 가 유형별로 무작위 정렬해 준 후보(청구항 7 "무작위 매칭")이므로 앞에서부터 자른다.
+ * 어떤 유형의 후보가 슬롯보다 적으면 있는 만큼만 보여준다(빈 카드·다른 유형으로 채우기 없음 — 청구항 6 "그 유형만").
+ */
+export function pickRecommendedPolicies<T extends { self_rlty_type?: string | null }>(
+  policies: T[],
+  plan: RecommendationPlan
+): T[] {
+  const picked: T[] = [];
+  for (const slot of plan.slots) {
+    picked.push(...policies.filter(p => p.self_rlty_type === slot.area).slice(0, slot.count));
+  }
+  return picked;
+}
+
+/**
+ * 정책 추천 로직 (자리표시 문자열 반환 — 화면은 planRecommendations / pickRecommendedPolicies 를 쓴다)
  * @param deficientAreas 미달 영역 리스트
  * @param areaScores 영역별 점수
  * @param userInfo 사용자 정보
@@ -335,38 +437,20 @@ export function recommendPolicies(
     policies.push('기초 정책');
   }
   
-  const numDeficient = deficientAreas.length;
-  
-  if (numDeficient === 0) {
-    // 모든 영역 양호 - 기초만 있으면 기초만, 없으면 일반 정책
+  // [v1.2.1] 케이스·슬롯은 planRecommendations 와 같은 규칙(청구항 3~6)
+  const plan = planRecommendations(areaScores);
+  if (plan.caseNo === 0) {
+    // 모든 영역 양호 - 장애정도 모름이면 기초(등록 안내)만, 아니면 일반 안내
     if (!isDisLevelUnknown) {
       policies.push('전체 영역 양호 정책');
     }
-  } else if (numDeficient >= 4) {
-    // Case1: 4개 모두 미달 - 각 1개씩 (4개)
-    for (const area of deficientAreas) {
-      policies.push(`${area}_policy_1`);
-    }
-  } else if (numDeficient === 3) {
-    // Case2: 3개 미달 - 각 1개씩 (3개)
-    for (const area of deficientAreas) {
-      policies.push(`${area}_policy_1`);
-    }
-  } else if (numDeficient === 2) {
-    // Case3: 2개 미달 - 기존 로직 (최대 3개)
-    const [area1, area2] = deficientAreas;
-    if (areaScores[area1] < areaScores[area2]) {
-      policies.push(`${area1}_policy_1`, `${area1}_policy_2`);
-      policies.push(`${area2}_policy_1`);
-    } else {
-      policies.push(`${area2}_policy_1`, `${area2}_policy_2`);
-      policies.push(`${area1}_policy_1`);
-    }
-  } else if (numDeficient === 1) {
-    // Case4: 1개 미달 - 해당 영역 관련 정책 3개
-    policies.push(`${deficientAreas[0]}_policy_1`, `${deficientAreas[0]}_policy_2`, `${deficientAreas[0]}_policy_3`);
+    return policies;
   }
-  
+  for (const slot of plan.slots) {
+    for (let i = 1; i <= slot.count; i++) {
+      policies.push(`${slot.area}_policy_${i}`);
+    }
+  }
   return policies;
 }
 

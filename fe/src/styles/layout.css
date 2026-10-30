@@ -941,6 +941,21 @@ a.card-link:hover {
   min-width: 0;
   display: flex;
 }
+/* [v1.2.1] 추천 카드 건수별 배치
+ *  - 카드 폭 384px × 3 + 간격 24px × 2 = 1200px → 1~3건은 한 줄 가운데 정렬(기본 동작)
+ *  - 4건: 3+1 로 한 장이 떨어지지 않도록 2열(2×2). 2 × 384 + 24 = 792px
+ *  - 5건 이상: 3열로 흘려 보낸다(기본 동작)
+ *  - 768px 이하에서는 아래 미디어쿼리가 한 장씩 전체 폭으로 바꾼다 */
+.sc-result-rec-row[data-count="4"] {
+  max-width: 792px;
+}
+.sc-result-recs-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: #595959;
+  font-size: 18px;
+  line-height: 1.6;
+}
 .sc-result-rec-link {
   display: flex;
   width: 100%;
