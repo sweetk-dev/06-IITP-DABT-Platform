@@ -466,3 +466,32 @@ export function formatDate(dateString?: string): string {
   if (!dateString) return '-';
   return dateString.replace(/-/g, '.');
 }
+
+// ============================================================================
+// 위기 상담 안내 (v1.4.0)
+// ============================================================================
+
+/**
+ * 자살 생각·시도 같은 위기 관련 통계를 보여 주는 데이터 상세 화면에 함께 띄우는 상담전화 안내.
+ * - 대상: sys_data_summary_info.sys_tbl_id 목록(SYS_TBL_IDS)
+ * - 번호: 자살예방상담전화 109(2024-01 통합, 24시간), 정신건강위기상담전화 1577-0199(24시간)
+ */
+export const CRISIS_HELPLINE_CONSTANTS = {
+  SYS_TBL_IDS: ['stats_dis_emo_suicide_ideation'] as const,
+  TITLE: '혼자 힘들어하지 마세요',
+  DESCRIPTION: '이 데이터는 자살 생각과 관련된 통계입니다. 마음이 힘들거나 주변에 걱정되는 분이 있다면 언제든 전화해 상담받을 수 있습니다.',
+  LINES: [
+    { name: '자살예방상담전화', tel: '109', hours: '24시간' },
+    { name: '정신건강위기상담전화', tel: '1577-0199', hours: '24시간' },
+  ] as const,
+  EMERGENCY_NOTE: '지금 위험한 상황이라면 119(구급) 또는 112(경찰)에 바로 연락하세요.',
+} as const;
+
+/**
+ * 이 데이터 상세 화면에 상담전화 안내를 띄워야 하는지
+ * @param sysTblId - sys_data_summary_info.sys_tbl_id
+ */
+export function needsCrisisHelpline(sysTblId?: string | null): boolean {
+  const key = (sysTblId || '').trim();
+  return (CRISIS_HELPLINE_CONSTANTS.SYS_TBL_IDS as readonly string[]).includes(key);
+}
