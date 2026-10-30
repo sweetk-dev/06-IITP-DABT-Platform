@@ -1,6 +1,6 @@
 # IITP DABT Platform
 
-![version](https://img.shields.io/badge/version-v1.3.0-blue)
+![version](https://img.shields.io/badge/version-v1.4.0-blue)
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
@@ -133,6 +133,7 @@ npm run build:common           # 공통 패키지 빌드
 - **데이터 목록 조회**: 자립 테마별, 데이터 유형별 데이터 목록
 - **데이터 검색**: 키워드, 테마, 유형별 통합 검색
 - **데이터 상세**: 데이터 테이블 상세 정보 및 미리보기
+  - 자살 생각 등 위기 관련 통계(`stats_dis_emo_suicide_ideation`)에는 상세 화면 위쪽에 상담전화 안내(자살예방상담전화 109, 정신건강위기상담전화 1577-0199, 긴급 시 119·112)를 함께 보여 준다(v1.4.0)
 - **통계 정보**: 테마별, 유형별 데이터 건수 통계
 
 ### 2. 자가진단

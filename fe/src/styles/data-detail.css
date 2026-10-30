@@ -253,3 +253,75 @@
     height: 1200px;
   }
 }
+
+/* 위기 상담 안내 (v1.4.0) — 자살 생각 등 위기 관련 통계 상세에만 표시 */
+.crisis-helpline {
+  margin: 0 0 40px;
+  padding: 24px 28px;
+  border: 2px solid #0b67c2;
+  border-radius: 16px;
+  background: #f0f7ff;
+}
+.crisis-helpline-title {
+  margin: 0 0 8px;
+  color: #0b4f96; /* 배경 대비 7:1 이상 */
+  font-size: 22px;
+  font-weight: 700;
+}
+.crisis-helpline-desc,
+.crisis-helpline-note {
+  margin: 0;
+  color: #1f2937;
+  font-size: 18px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.crisis-helpline-lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.crisis-helpline-call {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #0b67c2; /* 흰 글자 대비 5.4:1 */
+  color: #fff;
+  font-size: 18px;
+  text-decoration: none;
+}
+.crisis-helpline-call:hover,
+.crisis-helpline-call:focus-visible {
+  background: #08529b;
+}
+.crisis-helpline-call:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
+}
+.crisis-helpline-name {
+  font-weight: 600;
+}
+.crisis-helpline-tel {
+  font-size: 22px;
+  font-weight: 700;
+}
+.crisis-helpline-hours {
+  font-size: 16px;
+}
+@media (max-width: 768px) {
+  .crisis-helpline {
+    padding: 20px 16px;
+  }
+  .crisis-helpline-lines li,
+  .crisis-helpline-call {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
