@@ -1,6 +1,6 @@
 # IITP DABT Platform
 
-![version](https://img.shields.io/badge/version-v1.4.1-blue)
+![version](https://img.shields.io/badge/version-v1.4.2-blue)
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
@@ -102,6 +102,26 @@ npm install                    # 루트 의존성
 cd fe && npm install          # 프론트엔드 의존성
 cd ../be && npm install       # 백엔드 의존성
 cd ../packages/common && npm install # 공통 패키지 의존성
+```
+
+#### lock 파일
+
+설치 버전을 고정하기 위해 lock 파일 3개를 저장소에 둔다. 의존성을 바꾸면 해당 lock 도 같은 커밋에서 함께 갱신한다.
+
+| 파일 | 쓰이는 곳 |
+|------|-----------|
+| `package-lock.json` (루트) | npm workspaces(common·fe·be) 전체 설치·빌드. 개발과 빌드는 이 파일 기준으로 `npm ci` |
+| `be/package-lock.json` | 실행 서버의 Backend 단독 설치(`be/` 와 `../packages/common` 구조). `npm ci --omit=dev` 권장 — `npm install --omit=dev` 도 lock 에 적힌 버전으로 설치한다 |
+| `fe/package-lock.json` | Frontend 단독 설치 |
+
+`be/`·`fe/` 폴더에서 `npm install` 을 해도 npm workspaces 구조라 루트 lock 만 갱신된다. 단독 lock 은 저장소 밖 임시 폴더에 `be/`(또는 `fe/`)와 `packages/common/` 의 `package.json` 을 같은 상대 위치로 복사한 뒤 그 폴더에서 다시 만든다.
+
+```bash
+# 예: be/package-lock.json 재생성 (저장소 루트에서 실행, 임시 폴더 ../lock-tmp)
+mkdir -p ../lock-tmp/be ../lock-tmp/packages/common
+cp be/package.json ../lock-tmp/be/ && cp packages/common/package.json ../lock-tmp/packages/common/
+(cd ../lock-tmp/be && npm install --package-lock-only && npm audit fix --package-lock-only)
+cp ../lock-tmp/be/package-lock.json be/
 ```
 
 ### 3. 개발 서버 실행
