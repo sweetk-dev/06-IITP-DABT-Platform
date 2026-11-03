@@ -1,6 +1,6 @@
 # IITP DABT Platform
 
-![version](https://img.shields.io/badge/version-v1.2.2-blue)
+![version](https://img.shields.io/badge/version-v1.4.2-blue)
 
 IITP 장애인 데이터 탐색 및 활용 플랫폼 (Disability Data Access and Utilization Platform)
 
@@ -104,6 +104,26 @@ cd ../be && npm install       # 백엔드 의존성
 cd ../packages/common && npm install # 공통 패키지 의존성
 ```
 
+#### lock 파일
+
+설치 버전을 고정하기 위해 lock 파일 3개를 저장소에 둔다. 의존성을 바꾸면 해당 lock 도 같은 커밋에서 함께 갱신한다.
+
+| 파일 | 쓰이는 곳 |
+|------|-----------|
+| `package-lock.json` (루트) | npm workspaces(common·fe·be) 전체 설치·빌드. 개발과 빌드는 이 파일 기준으로 `npm ci` |
+| `be/package-lock.json` | 실행 서버의 Backend 단독 설치(`be/` 와 `../packages/common` 구조). `npm ci --omit=dev` 권장 — `npm install --omit=dev` 도 lock 에 적힌 버전으로 설치한다 |
+| `fe/package-lock.json` | Frontend 단독 설치 |
+
+`be/`·`fe/` 폴더에서 `npm install` 을 해도 npm workspaces 구조라 루트 lock 만 갱신된다. 단독 lock 은 저장소 밖 임시 폴더에 `be/`(또는 `fe/`)와 `packages/common/` 의 `package.json` 을 같은 상대 위치로 복사한 뒤 그 폴더에서 다시 만든다.
+
+```bash
+# 예: be/package-lock.json 재생성 (저장소 루트에서 실행, 임시 폴더 ../lock-tmp)
+mkdir -p ../lock-tmp/be ../lock-tmp/packages/common
+cp be/package.json ../lock-tmp/be/ && cp packages/common/package.json ../lock-tmp/packages/common/
+(cd ../lock-tmp/be && npm install --package-lock-only && npm audit fix --package-lock-only)
+cp ../lock-tmp/be/package-lock.json be/
+```
+
 ### 3. 개발 서버 실행
 
 ```bash
@@ -133,6 +153,7 @@ npm run build:common           # 공통 패키지 빌드
 - **데이터 목록 조회**: 자립 테마별, 데이터 유형별 데이터 목록
 - **데이터 검색**: 키워드, 테마, 유형별 통합 검색
 - **데이터 상세**: 데이터 테이블 상세 정보 및 미리보기
+  - 자살 생각 등 위기 관련 통계(`stats_dis_emo_suicide_ideation`, v1.4.1 부터 2023년 장애인실태조사 정신건강 지표 `stats_dis_emo_rpt_mental` 포함)에는 상세 화면 위쪽에 상담전화 안내(자살예방상담전화 109, 정신건강위기상담전화 1577-0199, 긴급 시 119·112)를 함께 보여 준다(v1.4.0)
 - **통계 정보**: 테마별, 유형별 데이터 건수 통계
 
 ### 2. 자가진단
@@ -143,6 +164,8 @@ npm run build:common           # 공통 패키지 빌드
   - 미달 영역(신체·정서·경제·사회)마다 그 유형으로 분류된 정책 중에서 무작위로 고른다(v1.2.0)
   - 외부 기관 정책 정보 링크가 비어 있는 정책은 추천하지 않는다
   - 성별·장애정도는 여러 값이 쉼표로 저장된 칸의 포함 여부로, 연령은 해당 값 또는 `all` 로 거른다
+  - 성별·장애정도 조건은 코드(`male`·`severe` 등)와 한글 이름(남성·중증 등)을 모두 받아 DB 코드로 바꿔 거른다. 장애정도 "모름"은 장애정도로 거르지 않는다(v1.2.3)
+  - 결과 화면과 더보기는 본인 확인에서 받은 성별·장애정도·연령을 조회 조건으로 함께 보낸다. 질문을 더 묻지 않고 대상이 아닌 정책을 거른다(v1.3.0)
   - 장애정도를 "모름"으로 답하면 점수 카드와 추천 사이에 장애인 등록 안내 상자를 보여 준다(v1.2.2). 등록 안내(유형 `basic`)는 추천 카드 목록에는 넣지 않는다
   - 미달 유형 개수에 따른 노출(v1.2.1, 70점 미만이 미달). 추천 우선순위는 신체 > 경제 > 정서 > 사회
     - 4개 모두 미달: 우선순위 상위 3개 유형(신체·경제·정서)에서 1건씩

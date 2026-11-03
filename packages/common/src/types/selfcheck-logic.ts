@@ -87,6 +87,47 @@ export type IdentityResponse = {
   age_group: 'minor' | 'adult';
 };
 
+// 본인 확인 답 → 추천·정책 조회 조건 (v1.3.0)
+// - 이미 받은 성별·장애정도·연령으로 대상이 아닌 정책을 거른다(질문·단계를 늘리지 않는다)
+// - 장애정도 '모름'은 장애정도 조건을 보내지 않는다(모든 장애정도의 정책이 대상)
+// - 알 수 없는 값은 보내지 않는다
+export type IdentityFilterQuery = {
+  gender?: 'male' | 'female';
+  disLevel?: 'mild' | 'severe';
+  ageCond?: 'minor' | 'adult';
+};
+
+export function identityFilterQuery(identity?: Partial<IdentityResponse> | null): IdentityFilterQuery {
+  const q: IdentityFilterQuery = {};
+  if (!identity) {
+    return q;
+  }
+  if (identity.gender === 'male' || identity.gender === 'female') {
+    q.gender = identity.gender;
+  }
+  if (identity.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.mild.code
+    || identity.disability_level === DIS_LEVEL_CONSTANTS.DIS_LEVEL.severe.code) {
+    q.disLevel = identity.disability_level;
+  }
+  if (identity.age_group === 'minor' || identity.age_group === 'adult') {
+    q.ageCond = identity.age_group;
+  }
+  return q;
+}
+
+// 브라우저에 저장된 본인 확인 답을 읽는다(없거나 깨졌으면 null)
+export function readSavedIdentity(raw: string | null): IdentityResponse | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const v = JSON.parse(raw);
+    return v && typeof v === 'object' ? (v as IdentityResponse) : null;
+  } catch {
+    return null;
+  }
+}
+
 // 자가진단 점수 타입 (1~5점)
 export type SelfCheckScore = 1 | 2 | 3 | 4 | 5;
 

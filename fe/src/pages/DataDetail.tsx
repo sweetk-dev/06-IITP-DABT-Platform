@@ -6,7 +6,7 @@ import { Modal } from '../components/ui/Modal';
 import { Tag } from '../components/ui/Tag';
 import { Button } from '../components/ui/Button';
 import { useDataDetail, useDataPreview } from '../api/hooks';
-import { DATA_TYPE_CONSTANTS, type DataTypeCode, parseKeywords } from '@iitp-dabt-platform/common';
+import { CRISIS_HELPLINE_CONSTANTS, DATA_TYPE_CONSTANTS, type DataTypeCode, needsCrisisHelpline, parseKeywords } from '@iitp-dabt-platform/common';
 import { formatDataFormat, formatDisplayDate, formatPreviewNumber } from '../utils/format';
 import '../styles/data-detail.css';
 
@@ -185,6 +185,28 @@ export function DataDetail() {
           {detailData?.data_desc || '데이터 설명이 없습니다.'}
         </p>
       </div>
+
+      {/* 위기 상담 안내 — 자살 생각 등 위기 관련 통계에만 (v1.4.0) */}
+      {detailData && needsCrisisHelpline(detailData.sys_tbl_id) && (
+        <aside id="data-detail-crisis-helpline" className="crisis-helpline" aria-labelledby="data-detail-crisis-helpline-title">
+          <h2 id="data-detail-crisis-helpline-title" className="crisis-helpline-title">
+            {CRISIS_HELPLINE_CONSTANTS.TITLE}
+          </h2>
+          <p className="crisis-helpline-desc">{CRISIS_HELPLINE_CONSTANTS.DESCRIPTION}</p>
+          <ul className="crisis-helpline-lines">
+            {CRISIS_HELPLINE_CONSTANTS.LINES.map((line) => (
+              <li key={line.tel}>
+                <a className="crisis-helpline-call" href={`tel:${line.tel.replace(/-/g, '')}`}>
+                  <span className="crisis-helpline-name">{line.name}</span>
+                  <span className="crisis-helpline-tel">{line.tel}</span>
+                  <span className="crisis-helpline-hours">{line.hours}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="crisis-helpline-note">{CRISIS_HELPLINE_CONSTANTS.EMERGENCY_NOTE}</p>
+        </aside>
+      )}
 
       {/* Data Info Table — 용어/설명 목록 */}
       <dl id="data-info-table" className="data-info-table">

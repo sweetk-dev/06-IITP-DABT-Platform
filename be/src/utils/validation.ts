@@ -10,6 +10,7 @@ import {
   PAGINATION_CONSTANTS,
   SORT_CONSTANTS
 } from '@iitp-dabt-platform/common';
+import { GENDER_FILTER_VALUES, DIS_LEVEL_FILTER_VALUES } from './filterCodes';
 
 // 공통 검증 스키마들
 export const validationSchemas = {
@@ -42,11 +43,11 @@ export const validationSchemas = {
   // 검색어 검증
   searchQuery: z.string().min(1).max(100).regex(/^[가-힣a-zA-Z0-9\s]+$/),
 
-  // 성별 검증
-  gender: z.enum(['남성', '여성']),
+  // 성별 검증 — 코드와 한글 이름 모두 허용(v1.2.3)
+  gender: z.enum(GENDER_FILTER_VALUES),
 
-  // 장애 정도 검증
-  disLevel: z.enum(['경증', '중증']),
+  // 장애 정도 검증 — 코드와 한글 이름 모두 허용(v1.2.3)
+  disLevel: z.enum(DIS_LEVEL_FILTER_VALUES),
 
   // 연령 조건 검증
   ageCond: z.enum(['minor', 'adult', 'all']),

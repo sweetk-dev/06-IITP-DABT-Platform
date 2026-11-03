@@ -11,6 +11,7 @@ import {
   PAGINATION_CONSTANTS,
   SORT_CONSTANTS
 } from '@iitp-dabt-platform/common';
+import { GENDER_FILTER_VALUES, DIS_LEVEL_FILTER_VALUES } from '../utils/filterCodes';
 
 // 검증 스키마 타입
 export type ValidationSchema = {
@@ -106,8 +107,9 @@ export const commonSchemas = {
 
   // 자가진단 쿼리 - common 패키지의 상수 활용
   selfCheckQuery: z.object({
-    gender: z.enum(['남성', '여성']).optional(),
-    disLevel: z.enum(['경증', '중증']).optional(),
+    // 성별·장애정도는 코드(male·severe 등)와 한글 이름(남성·중증 등)을 모두 받는다. 조회 시 코드로 바꾼다(v1.2.3)
+    gender: z.enum(GENDER_FILTER_VALUES).optional(),
+    disLevel: z.enum(DIS_LEVEL_FILTER_VALUES).optional(),
     ageCond: z.enum(['minor', 'adult', 'all']).optional(),
     themes: z.string().optional(),
     limit: z.string().transform(Number).pipe(z.number().min(1).max(10)).optional(),

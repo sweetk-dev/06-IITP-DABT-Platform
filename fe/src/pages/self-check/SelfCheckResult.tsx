@@ -13,8 +13,10 @@ import {
   type IdentityResponse,
   calculateAreaScore,
   getAreaName,
+  type SelfCheckRecommendationsQuery,
   planRecommendations,
-  pickRecommendedPolicies
+  pickRecommendedPolicies,
+  identityFilterQuery
 } from '@iitp-dabt-platform/common';
 import { useRecommendations } from '../../api/hooks';
 import { publicAsset } from '../../utils/publicAsset';
@@ -121,17 +123,19 @@ export function SelfCheckResult() {
     // 항상 모든 영역(4개) 조회 - 표시 로직은 common에서 처리
     themesArray.push(...SELF_CHECK_CONSTANTS.POLICY_PRIORITY_ORDER);
     
-    const result = { 
+    // 본인 확인에서 받은 성별·장애정도·연령으로 대상이 아닌 정책을 거른다(v1.3.0, 모름은 조건 없음)
+    const result: SelfCheckRecommendationsQuery = { 
       themes: themesArray.join(','), 
-      limit: 3 
+      limit: 3,
+      ...identityFilterQuery(identityInfo)
     };
     
     return result;
   };
 
   // Recommendations API 호출 - scores가 계산된 후에만 호출
-  const [recommendationParams, setRecommendationParams] = useState<{themes: string, limit: number}>({themes: '', limit: 3});
-  const recommendationsState = useRecommendations(recommendationParams, recommendationParams.themes !== '');
+  const [recommendationParams, setRecommendationParams] = useState<SelfCheckRecommendationsQuery>({themes: '', limit: 3});
+  const recommendationsState = useRecommendations(recommendationParams, !!recommendationParams.themes);
 
   // API 응답 데이터를 필터링하여 최종 표시할 정책 선택
   const getDisplayRecommendations = () => {

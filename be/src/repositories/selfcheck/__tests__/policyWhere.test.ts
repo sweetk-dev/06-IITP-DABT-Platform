@@ -37,4 +37,15 @@ describe('buildPolicyWhere', () => {
     expect(buildPolicyWhere(undefined as any)).toEqual({});
     expect(buildPolicyWhere({ self_rlty_type: 'phys' })[Op.and]).toContainEqual({ self_rlty_type: { [Op.in]: ['phys'] } });
   });
+
+  it('한글 성별·장애정도도 DB 코드로 바꿔 거른다(v1.2.3)', () => {
+    const and = buildPolicyWhere({ gender: '여성', dis_level: '중증' })[Op.and];
+    expect(and).toContainEqual({ [Op.or]: [{ gender: { [Op.iRegexp]: listItemPattern('female') } }, { gender: null }, { gender: '' }] });
+    expect(and).toContainEqual({ [Op.or]: [{ dis_level: { [Op.iRegexp]: listItemPattern('severe') } }, { dis_level: null }, { dis_level: '' }] });
+  });
+
+  it("장애정도 '모름'은 장애정도 조건을 만들지 않는다", () => {
+    expect(buildPolicyWhere({ dis_level: '모름' })).toEqual({});
+    expect(buildPolicyWhere({ dis_level: 'unknown' })).toEqual({});
+  });
 });

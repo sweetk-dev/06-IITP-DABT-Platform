@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { Sidebar } from '../../components/ui/Sidebar';
@@ -29,7 +29,9 @@ import {
   SELF_RLTY_TYPE_CONSTANTS,
   GENDER_CONSTANTS,
   AGE_COND_CONSTANTS,
-  DIS_LEVEL_CONSTANTS
+  DIS_LEVEL_CONSTANTS,
+  identityFilterQuery,
+  readSavedIdentity
 } from '@iitp-dabt-platform/common';
 import { useRecommendations, usePolicies, useProviders, useFacilities } from '../../api/hooks';
 import '../../styles/data-pages.css';
@@ -57,9 +59,15 @@ export function SelfCheckMore() {
   // ============================================================================
   
   // 자가진단 관련 API 호출 - immediate=false로 설정
-  const recommendationsState = useRecommendations({ themes: themesParam }, false);
+  // 본인 확인 답으로 대상이 아닌 정책을 거른다(v1.3.0). 자가진단을 거치지 않고 들어오면 조건 없이 조회
+  const identityFilter = useMemo(
+    () => identityFilterQuery(readSavedIdentity(localStorage.getItem('selfCheckUserInfo'))),
+    []
+  );
+  const recommendationsState = useRecommendations({ themes: themesParam, ...identityFilter }, false);
   const policiesState = usePolicies({ 
     themes: themesParam, 
+    ...identityFilter,
     page: SELF_CHECK_POLICIES_DEFAULTS.PAGE, 
     pageSize: SELF_CHECK_POLICIES_DEFAULTS.PAGE_SIZE 
   }, false);
